@@ -22,7 +22,7 @@ public class AccountEntity {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "username", nullable = false)
+  @Column(name = "username", nullable = false, unique = true)
   private String username;
 
   @Column(name = "name", nullable = false)
@@ -34,7 +34,7 @@ public class AccountEntity {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "email", nullable = false)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
   @Column(name = "phone")
