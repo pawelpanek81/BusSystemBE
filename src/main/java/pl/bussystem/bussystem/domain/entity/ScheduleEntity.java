@@ -15,19 +15,19 @@ import java.sql.Time;
 public class ScheduleEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "bus_line")
+  @JoinColumn(name = "bus_line", nullable = false)
   private BusLineEntity busLine;
 
-  @Column(name = "code")
+  @Column(name = "code", nullable = false)
   private String code;
 
-  @Column(name = "start_hour")
+  @Column(name = "start_hour", nullable = false)
   private Time startHour;
 
-  @Column(name = "enabled")
+  @Column(name = "enabled", nullable = false)
   private Boolean enabled;
 }

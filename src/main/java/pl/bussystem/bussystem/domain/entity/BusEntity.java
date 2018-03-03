@@ -14,15 +14,15 @@ import javax.persistence.*;
 public class BusEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "registration_number")
+  @Column(name = "registration_number", nullable = false)
   private String registrationNumber;
 
-  @Column(name = "brand")
+  @Column(name = "brand", nullable = false)
   private String brand;
 
-  @Column(name = "model")
+  @Column(name = "model", nullable = false)
   private String model;
 }

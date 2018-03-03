@@ -19,28 +19,28 @@ import java.util.List;
 public class AccountEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "username")
+  @Column(name = "username", nullable = false)
   private String username;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "surname")
+  @Column(name = "surname", nullable = false)
   private String surname;
 
-  @Column(name = "password")
+  @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "email")
+  @Column(name = "email", nullable = false)
   private String email;
 
   @Column(name = "phone")
   private String phone;
 
-  @Column(name = "active")
+  @Column(name = "active", nullable = false)
   private Boolean active;
 
   @OneToMany(mappedBy = "account",

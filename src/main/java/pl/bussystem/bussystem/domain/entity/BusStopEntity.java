@@ -14,12 +14,12 @@ import javax.persistence.*;
 public class BusStopEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "city")
+  @Column(name = "city", nullable = false)
   private String city;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 }

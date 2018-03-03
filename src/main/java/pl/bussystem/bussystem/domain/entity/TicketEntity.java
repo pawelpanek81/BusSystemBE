@@ -15,38 +15,38 @@ import java.time.LocalDateTime;
 public class TicketEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "driver")
+  @JoinColumn(name = "driver", nullable = false)
   private AccountEntity driver;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "surname")
+  @Column(name = "surname", nullable = false)
   private String surname;
 
-  @Column(name = "email")
+  @Column(name = "email", nullable = false)
   private String email;
 
   @Column(name = "phone")
   private String phone;
 
-  @Column(name = "date_time")
+  @Column(name = "date_time", nullable = false)
   private LocalDateTime dateTime;
 
-  @Column(name = "price")
+  @Column(name = "price", nullable = false)
   private Double price;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "bus_ride")
+  @JoinColumn(name = "bus_ride", nullable = false)
   private BusRideEntity busRide;
 
-  @Column(name = "paid")
+  @Column(name = "paid", nullable = false)
   private Boolean paid;
 
-  @Column(name = "returned")
+  @Column(name = "returned", nullable = false)
   private Boolean returned;
 }

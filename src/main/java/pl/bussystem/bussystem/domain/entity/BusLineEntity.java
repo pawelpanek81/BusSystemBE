@@ -14,20 +14,20 @@ import javax.persistence.*;
 public class BusLineEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false)
   private String name;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "drive_from")
+  @JoinColumn(name = "drive_from", nullable = false)
   private BusStopEntity from;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "destination")
+  @JoinColumn(name = "destination", nullable = false)
   private BusStopEntity to;
 
-  @Column(name = "drive_time")
+  @Column(name = "drive_time", nullable = false)
   private Integer driveTime;
 }

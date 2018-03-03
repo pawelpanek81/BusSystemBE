@@ -17,14 +17,14 @@ import javax.persistence.*;
 public class AuthorityEntity {
   @Id
   @GeneratedValue
-  @Column(name = "id")
+  @Column(name = "id", nullable = false)
   private Integer id;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "account")
+  @JoinColumn(name = "account", nullable = false)
   private AccountEntity account;
 
-  @Column(name = "authority")
+  @Column(name = "authority", nullable = false)
   private String authority;
 
   public void setAuthority(String authority) {
