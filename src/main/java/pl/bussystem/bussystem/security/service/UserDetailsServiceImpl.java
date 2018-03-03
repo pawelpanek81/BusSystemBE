@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.repository.AccountRepository;
+import pl.bussystem.bussystem.domain.repository.AuthorityRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,13 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
   private AccountRepository accountRepository;
+  private AuthorityRepository authorityRepository;
 
   @Autowired
-  public UserDetailsServiceImpl(AccountRepository accountRepository) {
+  public UserDetailsServiceImpl(AccountRepository accountRepository,
+                                AuthorityRepository authorityRepository) {
     this.accountRepository = accountRepository;
+    this.authorityRepository = authorityRepository;
   }
 
   @Override
@@ -31,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     List<GrantedAuthority> authorities = new ArrayList<>();
-    account.getAuthorities().forEach(acc -> authorities.add(new SimpleGrantedAuthority(acc.getAuthority())));
+    authorityRepository.findByAccountId(account.getId()).forEach(acc -> authorities.add(new SimpleGrantedAuthority(acc.getAuthority())));
 
     return new User(account.getUsername(), account.getPassword(), authorities);
   }

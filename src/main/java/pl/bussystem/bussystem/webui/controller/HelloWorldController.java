@@ -10,7 +10,6 @@ import pl.bussystem.bussystem.domain.entity.AuthorityEntity;
 import pl.bussystem.bussystem.domain.repository.AccountRepository;
 import pl.bussystem.bussystem.domain.repository.AuthorityRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -36,7 +35,6 @@ public class HelloWorldController {
         "panczo12d@gmail.com",
         "795014696",
         Boolean.TRUE,
-        new ArrayList<>(),
         null);
   }
 
@@ -64,10 +62,7 @@ public class HelloWorldController {
         "panczo12d@gmail.com",
         "795014696",
         Boolean.TRUE,
-        new ArrayList<>(),
         null);
-    accountEntity.addAuthority(new AuthorityEntity(1, null, "auth1"));
-    accountEntity.addAuthority(new AuthorityEntity(2, null, "auth2"));
     accountRepository.save(accountEntity);
 
     AccountEntity accountEntity2 = new AccountEntity(
@@ -79,7 +74,6 @@ public class HelloWorldController {
         "admmin@gmail.com",
         "795014696",
         Boolean.TRUE,
-        new ArrayList<>(),
         null);
     accountRepository.save(accountEntity2);
     return "OK";
