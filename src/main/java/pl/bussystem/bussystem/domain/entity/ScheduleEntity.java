@@ -16,18 +16,18 @@ public class ScheduleEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus_line")
-  BusLineEntity busLine;
+  private BusLineEntity busLine;
 
   @Column(name = "code")
-  String code;
+  private String code;
 
   @Column(name = "start_hour")
-  Time startHour;
+  private Time startHour;
 
   @Column(name = "enabled")
-  Boolean enabled;
+  private Boolean enabled;
 }

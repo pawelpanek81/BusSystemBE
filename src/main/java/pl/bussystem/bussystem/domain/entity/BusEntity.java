@@ -15,14 +15,14 @@ public class BusEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
   @Column(name = "registration_number")
-  String registrationNumber;
+  private String registrationNumber;
 
   @Column(name = "brand")
-  String brand;
+  private String brand;
 
   @Column(name = "model")
-  String model;
+  private String model;
 }

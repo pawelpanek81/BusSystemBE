@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 
+import java.util.ArrayList;
+
 @Controller
 public class HelloWorldController {
-
 
   @RequestMapping(method = RequestMethod.GET, path = "/")
   @ResponseBody
@@ -22,7 +23,8 @@ public class HelloWorldController {
         "panczo12d@gmail.com",
         "795014696",
         Boolean.TRUE,
-        "USER",
+        new ArrayList<>(),
         null);
   }
+
 }

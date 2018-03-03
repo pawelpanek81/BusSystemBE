@@ -15,19 +15,19 @@ public class LineRouteEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus_line")
-  BusLineEntity busLine;
+  private BusLineEntity busLine;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus_stop")
-  BusStopEntity busStop;
+  private BusStopEntity busStop;
 
   @Column(name = "sequence")
-  Integer order;
+  private Integer order;
 
   @Column(name = "drive_time")
-  Integer driveTime;
+  private Integer driveTime;
 }

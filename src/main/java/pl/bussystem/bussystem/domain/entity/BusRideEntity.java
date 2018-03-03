@@ -16,27 +16,27 @@ public class BusRideEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
   @Column(name = "start_date_time")
-  LocalDateTime startDateTime;
+  private LocalDateTime startDateTime;
 
   @Column(name = "end_date_time")
-  LocalDateTime endDateTime;
+  private LocalDateTime endDateTime;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus_line")
-  BusLineEntity busLine;
+  private BusLineEntity busLine;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "primary_driver")
-  AccountEntity primaryDriver;
+  private AccountEntity primaryDriver;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "secondary_driver")
-  AccountEntity secondaryDriver;
+  private AccountEntity secondaryDriver;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus")
-  BusEntity bus;
+  private BusEntity bus;
 }

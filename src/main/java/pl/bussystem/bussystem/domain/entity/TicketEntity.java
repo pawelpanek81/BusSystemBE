@@ -16,37 +16,37 @@ public class TicketEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "driver")
-  AccountEntity driver;
+  private AccountEntity driver;
 
   @Column(name = "name")
-  String name;
+  private String name;
 
   @Column(name = "surname")
-  String surname;
+  private String surname;
 
   @Column(name = "email")
-  String email;
+  private String email;
 
   @Column(name = "phone")
-  String phone;
+  private String phone;
 
   @Column(name = "date_time")
-  LocalDateTime dateTime;
+  private LocalDateTime dateTime;
 
   @Column(name = "price")
-  Double price;
+  private Double price;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "bus_ride")
-  BusRideEntity busRide;
+  private BusRideEntity busRide;
 
   @Column(name = "paid")
-  Boolean paid;
+  private Boolean paid;
 
   @Column(name = "returned")
-  Boolean returned;
+  private Boolean returned;
 }

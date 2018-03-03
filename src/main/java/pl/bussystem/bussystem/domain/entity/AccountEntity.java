@@ -1,9 +1,12 @@
 package pl.bussystem.bussystem.domain.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -12,36 +15,47 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class AccountEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
   @Column(name = "username")
-  String username;
+  private String username;
 
   @Column(name = "name")
-  String name;
+  private String name;
 
   @Column(name = "surname")
-  String surname;
+  private String surname;
 
   @Column(name = "password")
-  String passwordHash;
+  private String password;
 
   @Column(name = "email")
-  String email;
+  private String email;
 
   @Column(name = "phone")
-  String phone;
+  private String phone;
 
   @Column(name = "active")
-  Boolean active;
+  private Boolean active;
 
-  @Column(name = "acc_type")
-  String accType;
+  @OneToMany(mappedBy = "account",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  private List<AuthorityEntity> authorities;
 
   @Column(name = "photo")
-  String photo;
+  private String photo;
+
+  public void addAuthority(AuthorityEntity authorityEntity) {
+    this.authorities.add(authorityEntity);
+    if (authorityEntity.getAccount() != this) {
+      authorityEntity.setAccount(this);
+    }
+  }
 }

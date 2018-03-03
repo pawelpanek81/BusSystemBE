@@ -16,18 +16,18 @@ public class NewsEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
   @Column(name = "title")
-  String title;
+  private String title;
 
   @Column(name = "date_time")
-  LocalDateTime dateTime;
+  private LocalDateTime dateTime;
 
   @Column(name = "body")
-  String body;
+  private String body;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(optional = false)
   @JoinColumn(name = "author")
-  AccountEntity author;
+  private AccountEntity author;
 }

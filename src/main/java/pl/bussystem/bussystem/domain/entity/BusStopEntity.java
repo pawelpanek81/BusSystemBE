@@ -15,11 +15,11 @@ public class BusStopEntity {
   @Id
   @GeneratedValue
   @Column(name = "id")
-  Integer id;
+  private Integer id;
 
   @Column(name = "city")
-  String city;
+  private String city;
 
   @Column(name = "name")
-  String name;
+  private String name;
 }
