@@ -1,7 +1,5 @@
 package pl.bussystem.bussystem.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +11,6 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class AuthorityEntity {
   @Id
   @GeneratedValue
@@ -27,10 +24,4 @@ public class AuthorityEntity {
   @Column(name = "authority", nullable = false)
   private String authority;
 
-  public void setAuthority(String authority) {
-    this.authority = authority;
-    if (!account.getAuthorities().contains(this)) {
-      account.getAuthorities().add(this);
-    }
-  }
 }

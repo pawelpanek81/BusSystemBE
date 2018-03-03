@@ -1,12 +1,9 @@
 package pl.bussystem.bussystem.domain.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -15,7 +12,6 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class AccountEntity {
   @Id
   @GeneratedValue
@@ -43,19 +39,6 @@ public class AccountEntity {
   @Column(name = "active", nullable = false)
   private Boolean active;
 
-  @OneToMany(mappedBy = "account",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.EAGER)
-  private List<AuthorityEntity> authorities;
-
   @Column(name = "photo")
   private String photo;
-
-  public void addAuthority(AuthorityEntity authorityEntity) {
-    this.authorities.add(authorityEntity);
-    if (authorityEntity.getAccount() != this) {
-      authorityEntity.setAccount(this);
-    }
-  }
 }
