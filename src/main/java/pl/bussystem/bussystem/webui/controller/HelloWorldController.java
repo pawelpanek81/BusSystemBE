@@ -1,6 +1,7 @@
 package pl.bussystem.bussystem.webui.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,11 +17,15 @@ import java.util.List;
 public class HelloWorldController {
   private AccountRepository accountRepository;
   private AuthorityRepository authorityRepository;
+  private BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @Autowired
-  public HelloWorldController(AccountRepository accountRepository, AuthorityRepository authorityRepository) {
+  public HelloWorldController(AccountRepository accountRepository,
+                              AuthorityRepository authorityRepository,
+                              BCryptPasswordEncoder bCryptPasswordEncoder) {
     this.accountRepository = accountRepository;
     this.authorityRepository = authorityRepository;
+    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
   }
 
   @RequestMapping(method = RequestMethod.GET, path = "/")
@@ -31,7 +36,7 @@ public class HelloWorldController {
         "panczo12d",
         "Paweł",
         "Panek",
-        "5f4dcc3b5aa765d61d8327deb882cf99",
+        bCryptPasswordEncoder.encode("password"),
         "panczo12d@gmail.com",
         "795014696",
         Boolean.TRUE,
@@ -58,7 +63,7 @@ public class HelloWorldController {
         "panczo12d",
         "Paweł",
         "Panek",
-        "5f4dcc3b5aa765d61d8327deb882cf99",
+        bCryptPasswordEncoder.encode("password"),
         "panczo12d@gmail.com",
         "795014696",
         Boolean.TRUE,
@@ -70,7 +75,7 @@ public class HelloWorldController {
         "admin",
         "adm",
         "admin",
-        "5f4dcc3b5aa765d61d8327deb882cf99",
+        bCryptPasswordEncoder.encode("password"),
         "admmin@gmail.com",
         "795014696",
         Boolean.TRUE,
