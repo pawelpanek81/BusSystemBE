@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
-import pl.bussystem.bussystem.domain.repository.AccountRepository;
 import pl.bussystem.bussystem.domain.service.AccountService;
 import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/users")
@@ -33,7 +33,7 @@ public class AccountController {
 
   @PostMapping("/sign-up")
   public ResponseEntity signUp(@RequestBody UserRegisterDTO account,
-                       WebRequest request) {
+                       HttpServletRequest request) {
     account.setPassword(
         bCryptPasswordEncoder.encode(account.getPassword())
     );
@@ -53,9 +53,14 @@ public class AccountController {
     accountService.create(accountEntity);
 
 //     here is logic to send mail
-//    String appUrl = request.getContextPath();
+    String scheme = request.getScheme();
+    String serverName = request.getServerName();
+    int serverPort = request.getServerPort();
+    String contextPath = request.getContextPath();  // includes leading forward slash
+
+    String resultPath = scheme + "://" + serverName + ":" + serverPort + contextPath;
 //    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(
-//        accountEntity, request.getLocale(), appUrl
+//        accountEntity, request.getLocale(), resultPath
 //    ));
 
     return new ResponseEntity(HttpStatus.OK);

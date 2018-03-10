@@ -63,8 +63,10 @@ public class RegistrationListener implements
     final String confirmationUrl = event.getAppUrl() + env.getProperty("message.confirmationUrl") + token;
     final String message = messages.getMessage("message.registerMailBody", null, event.getLocale());
 
+    final String preheader = messages.getMessage("message.preheader", null, event.getLocale());
     final String welcome = messages.getMessage("message.welcome", null, event.getLocale());
     final String registerButtonText = messages.getMessage("message.registerButtonText", null, event.getLocale());
+    final String alternativeUrlPrefix = messages.getMessage("message.alternativeUrlPrefix", null, event.getLocale());
     final String emailLastText = messages.getMessage("message.emailLastText", null, event.getLocale());
     final String footerText = messages.getMessage("message.footerText", null, event.getLocale());
 
@@ -79,11 +81,13 @@ public class RegistrationListener implements
       File file = new File(decodedFilePath);
       String data = FileUtils.readFileToString(file, "utf-8");
       String htmlMsg = String.format(data,
-          URLDecoder.decode(welcome, "UTF-8"),
+          preheader,
+          welcome,
           user.getName(),
           message,
           confirmationUrl,
           registerButtonText,
+          alternativeUrlPrefix + confirmationUrl,
           emailLastText,
           footerText
       );
