@@ -11,21 +11,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.repository.AccountRepository;
+import pl.bussystem.bussystem.domain.service.AccountService;
 import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
 
 @RestController
 @RequestMapping("/users")
 public class AccountController {
-  private AccountRepository accountRepository;
+  private AccountService accountService;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private ApplicationEventPublisher eventPublisher;
 
 
-  public AccountController(AccountRepository accountRepository,
+  public AccountController(AccountService accountService,
                            BCryptPasswordEncoder bCryptPasswordEncoder,
                            ApplicationEventPublisher applicationEventPublisher) {
-    this.accountRepository = accountRepository;
+    this.accountService = accountService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.eventPublisher = applicationEventPublisher;
   }
@@ -49,7 +50,7 @@ public class AccountController {
         null
     );
 
-    accountRepository.save(accountEntity);
+    accountService.create(accountEntity);
 
 //     here is logic to send mail
 //    String appUrl = request.getContextPath();
