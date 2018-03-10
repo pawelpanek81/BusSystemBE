@@ -1,16 +1,23 @@
 package pl.bussystem.bussystem.security.email.verification;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.security.email.verification.service.VerificationTokenService;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -43,27 +50,53 @@ public class RegistrationListener implements
     final String token = UUID.randomUUID().toString();
     verificationTokenService.createVerificationTokenForUser(user, token);
 
-    final SimpleMailMessage email = constructEmailMessage(event, user, token);
+    final MimeMessage email = constructEmailMessage(event, user, token);
     mailSender.send(email);
   }
 
 
-  private final SimpleMailMessage constructEmailMessage(final OnRegistrationCompleteEvent event,
-                                                        final AccountEntity user,
-                                                        final String token) {
+  private final MimeMessage constructEmailMessage(final OnRegistrationCompleteEvent event,
+                                                  final AccountEntity user,
+                                                  final String token) {
     final String recipientAddress = user.getEmail();
-
     final String subject = messages.getMessage("message.registerMailSubject", null, event.getLocale());
-
     final String confirmationUrl = event.getAppUrl() + env.getProperty("message.confirmationUrl") + token;
-
     final String message = messages.getMessage("message.registerMailBody", null, event.getLocale());
 
-    final SimpleMailMessage email = new SimpleMailMessage();
-    email.setTo(recipientAddress);
-    email.setSubject(subject);
-    email.setText(message + " \r\n" + confirmationUrl);
-    email.setFrom(env.getProperty("support.email"));
-    return email;
+    final String welcome = messages.getMessage("message.welcome", null, event.getLocale());
+    final String registerButtonText = messages.getMessage("message.registerButtonText", null, event.getLocale());
+    final String emailLastText = messages.getMessage("message.emailLastText", null, event.getLocale());
+    final String footerText = messages.getMessage("message.footerText", null, event.getLocale());
+
+    MimeMessage mimeMessage = mailSender.createMimeMessage();
+    MimeMessageHelper helper = null;
+    try {
+      helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+
+      ClassLoader classLoader = getClass().getClassLoader();
+      String filePath = Objects.requireNonNull(classLoader.getResource("static/mailtemplate.html")).getFile();
+      String decodedFilePath = URLDecoder.decode(filePath, "UTF-8");
+      File file = new File(decodedFilePath);
+      String data = FileUtils.readFileToString(file, "utf-8");
+      String htmlMsg = String.format(data,
+          URLDecoder.decode(welcome, "UTF-8"),
+          user.getName(),
+          message,
+          confirmationUrl,
+          registerButtonText,
+          emailLastText,
+          footerText
+      );
+
+      mimeMessage.setContent(htmlMsg, "text/html; charset=UTF-8");
+      helper.setTo(recipientAddress);
+      helper.setSubject(subject);
+      helper.setFrom(env.getProperty("support.email"));
+
+    } catch (MessagingException | IOException e) {
+      e.printStackTrace();
+    }
+
+    return mimeMessage;
   }
 }

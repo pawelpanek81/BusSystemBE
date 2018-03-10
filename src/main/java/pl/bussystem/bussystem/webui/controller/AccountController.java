@@ -49,14 +49,14 @@ public class AccountController {
         null
     );
 
-    // here is logic to send mail
+    accountRepository.save(accountEntity);
+
+//     here is logic to send mail
 //    String appUrl = request.getContextPath();
 //    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(
 //        accountEntity, request.getLocale(), appUrl
 //    ));
 
-
-    accountRepository.save(accountEntity);
     return new ResponseEntity(HttpStatus.OK);
   }
 }
