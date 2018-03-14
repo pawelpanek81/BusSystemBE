@@ -10,9 +10,14 @@ import javax.persistence.*;
 @Getter
 @Setter
 @EqualsAndHashCode
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccountEntity {
+
+  public AccountEntity() {
+    super();
+    this.active = false;
+  }
   @Id
   @GeneratedValue
   @Column(name = "id", nullable = false)
