@@ -74,25 +74,23 @@ public class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  public ResponseEntity<RestException> checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO,
-                                                     HttpServletRequest request) {
+  public ResponseEntity<RestException> checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO) {
     if (!accountService.existsByUsername(usernameDTO.getUsername())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
       RestException restException = new RestException(1, "Username is taken");
-      return new ResponseEntity<RestException>(restException, HttpStatus.CONFLICT);
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
   }
 
 
   @PostMapping("/check-email-free")
-  public ResponseEntity<RestException> checkEmail(@RequestBody CheckEmailFreeDTO emailDTO,
-                                   HttpServletRequest request) {
+  public ResponseEntity<RestException> checkEmail(@RequestBody CheckEmailFreeDTO emailDTO) {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
       RestException restException = new RestException(2, "Email is already used");
-      return new ResponseEntity<RestException>(restException, HttpStatus.CONFLICT);
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
   }
 }
