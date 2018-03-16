@@ -35,6 +35,15 @@ public class AccountController {
   @PostMapping("/sign-up")
   public ResponseEntity signUp(@RequestBody UserRegisterDTO account,
                        HttpServletRequest request) {
+
+
+    // check if username is free
+    // check if email is free
+    if (    !accountService.isUsernameFree(account.getUsername()) ||
+            !accountService.isEmailFree(account.getEmail())){
+      return new ResponseEntity(HttpStatus.CONFLICT);
+    }
+
     account.setPassword(
         bCryptPasswordEncoder.encode(account.getPassword())
     );
@@ -50,10 +59,6 @@ public class AccountController {
         true,
         null
     );
-
-    // check if username is free
-    // check if email is free
-
 
     accountService.create(accountEntity);
 
