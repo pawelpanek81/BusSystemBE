@@ -4,16 +4,21 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.service.AccountService;
-import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
+import pl.bussystem.bussystem.webui.dto.CheckUsernameFreeDTO;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
+import pl.bussystem.bussystem.webui.dto.CheckEmailFreeDTO;
+import pl.bussystem.bussystem.webui.dto.exception.ExceptionCodes;
+import pl.bussystem.bussystem.webui.dto.exception.RestException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -32,8 +37,15 @@ public class AccountController {
   }
 
   @PostMapping("/sign-up")
-  public ResponseEntity signUp(@RequestBody UserRegisterDTO account,
-                       HttpServletRequest request) {
+  public ResponseEntity<RestException> signUp(@RequestBody @Valid UserRegisterDTO account,
+                                              HttpServletRequest request) {
+
+    if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
+      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN_OR_EMAIL_ALREADY_USED,
+          "Username is taken or email is already used");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    }
+
     account.setPassword(
         bCryptPasswordEncoder.encode(account.getPassword())
     );
@@ -63,6 +75,27 @@ public class AccountController {
 //        accountEntity, request.getLocale(), resultPath
 //    ));
 
-    return new ResponseEntity(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @PostMapping("/check-username-free")
+  public ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO usernameDTO) {
+    if (!accountService.existsByUsername(usernameDTO.getUsername())) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN, "Username is taken");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    }
+  }
+
+
+  @PostMapping("/check-email-free")
+  public ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
+    if (!accountService.existsByEmail(emailDTO.getEmail())) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      RestException restException = new RestException(ExceptionCodes.EMAIL_ALREADY_USED, "Email is already used");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    }
   }
 }

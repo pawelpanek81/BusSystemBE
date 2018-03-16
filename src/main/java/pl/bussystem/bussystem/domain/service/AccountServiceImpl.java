@@ -18,4 +18,19 @@ public class AccountServiceImpl implements AccountService {
   public AccountEntity create(AccountEntity accountEntity) {
     return accountRepository.save(accountEntity);
   }
+
+  @Override
+  public Boolean existsByUsername(String username) {
+    return accountRepository.existsByUsername(username);
+  }
+
+  @Override
+  public Boolean existsByEmail(String email) {
+    return accountRepository.existsByEmail(email);
+  }
+
+  @Override
+  public Boolean isUsernameAndEmailAvailable(String username, String email) {
+    return (!existsByUsername(username) && !existsByEmail(email));
+  }
 }
