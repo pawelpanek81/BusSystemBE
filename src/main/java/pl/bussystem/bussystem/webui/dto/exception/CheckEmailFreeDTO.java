@@ -1,4 +1,4 @@
-package pl.bussystem.bussystem.webui.dto;
+package pl.bussystem.bussystem.webui.dto.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SingleUserAttributeDTO {
-    private String value;
+public class CheckEmailFreeDTO {
+  String email;
 }

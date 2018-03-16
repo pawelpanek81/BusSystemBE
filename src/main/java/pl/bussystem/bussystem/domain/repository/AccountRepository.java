@@ -7,5 +7,8 @@ import pl.bussystem.bussystem.domain.entity.AccountEntity;
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Integer> {
   AccountEntity findByUsername(String username);
-  AccountEntity findByEmail(String email);
+
+  Boolean existsByUsername(String username);
+
+  Boolean existsByEmail(String email);
 }

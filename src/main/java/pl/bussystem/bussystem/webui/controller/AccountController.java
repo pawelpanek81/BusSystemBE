@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.service.AccountService;
 import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
+import pl.bussystem.bussystem.webui.dto.CheckUsernameFreeDTO;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
-import pl.bussystem.bussystem.webui.dto.SingleUserAttributeDTO;
+import pl.bussystem.bussystem.webui.dto.exception.CheckEmailFreeDTO;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,10 +35,9 @@ public class AccountController {
 
   @PostMapping("/sign-up")
   public ResponseEntity signUp(@RequestBody UserRegisterDTO account,
-                       HttpServletRequest request) {
+                               HttpServletRequest request) {
 
-    if (    !accountService.isUsernameFree(account.getUsername()) ||
-            !accountService.isEmailFree(account.getEmail())){
+    if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
 
@@ -74,21 +74,21 @@ public class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  public ResponseEntity checkUsername(@RequestBody SingleUserAttributeDTO usernameDTO,
-                              HttpServletRequest request){
-    if (accountService.isUsernameFree(usernameDTO.getValue())){
+  public ResponseEntity checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO,
+                                      HttpServletRequest request) {
+    if (!accountService.existsByUsername(usernameDTO.getUsername())) {
       return new ResponseEntity(HttpStatus.OK);
-    }else{
+    } else {
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
   }
 
   @PostMapping("/check-email-free")
-  public ResponseEntity checkEmail(@RequestBody SingleUserAttributeDTO emailDTO,
-                              HttpServletRequest request){
-    if (accountService.isEmailFree(emailDTO.getValue())){
+  public ResponseEntity checkEmail(@RequestBody CheckEmailFreeDTO emailDTO,
+                                   HttpServletRequest request) {
+    if (!accountService.existsByEmail(emailDTO.getEmail())) {
       return new ResponseEntity(HttpStatus.OK);
-    }else{
+    } else {
       return new ResponseEntity(HttpStatus.CONFLICT);
     }
   }

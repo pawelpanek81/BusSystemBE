@@ -20,12 +20,17 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Boolean isUsernameFree(String username) {
-    return accountRepository.findByUsername(username) == null;
+  public Boolean existsByUsername(String username) {
+    return accountRepository.existsByUsername(username);
   }
 
   @Override
-  public Boolean isEmailFree(String email) {
-    return accountRepository.findByEmail(email) == null;
+  public Boolean existsByEmail(String email) {
+    return accountRepository.existsByEmail(email);
+  }
+
+  @Override
+  public Boolean isUsernameAndEmailAvailable(String username, String email) {
+    return (!existsByUsername(username) && !existsByEmail(email));
   }
 }
