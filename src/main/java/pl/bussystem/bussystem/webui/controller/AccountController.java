@@ -13,9 +13,11 @@ import pl.bussystem.bussystem.domain.service.AccountService;
 import pl.bussystem.bussystem.webui.dto.CheckUsernameFreeDTO;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
 import pl.bussystem.bussystem.webui.dto.CheckEmailFreeDTO;
+import pl.bussystem.bussystem.webui.dto.exception.ExceptionCodes;
 import pl.bussystem.bussystem.webui.dto.exception.RestException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -34,11 +36,13 @@ public class AccountController {
   }
 
   @PostMapping("/sign-up")
-  public ResponseEntity signUp(@RequestBody UserRegisterDTO account,
-                               HttpServletRequest request) {
+  public ResponseEntity<RestException> signUp(@RequestBody @Valid UserRegisterDTO account,
+                                              HttpServletRequest request) {
 
     if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
-      return new ResponseEntity(HttpStatus.CONFLICT);
+      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN_OR_EMAIL_ALREADY_USED,
+          "Username is taken or email is already used");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
 
     account.setPassword(
@@ -70,7 +74,7 @@ public class AccountController {
 //        accountEntity, request.getLocale(), resultPath
 //    ));
 
-    return new ResponseEntity(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @PostMapping("/check-username-free")
@@ -78,7 +82,7 @@ public class AccountController {
     if (!accountService.existsByUsername(usernameDTO.getUsername())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      RestException restException = new RestException(1, "Username is taken");
+      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN, "Username is taken");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
   }
@@ -89,7 +93,7 @@ public class AccountController {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      RestException restException = new RestException(2, "Email is already used");
+      RestException restException = new RestException(ExceptionCodes.EMAIL_ALREADY_USED, "Email is already used");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
   }
