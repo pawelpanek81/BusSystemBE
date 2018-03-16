@@ -12,6 +12,7 @@ import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.service.AccountService;
 import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
+import pl.bussystem.bussystem.webui.dto.SingleUserAttributeDTO;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,6 +51,10 @@ public class AccountController {
         null
     );
 
+    // check if username is free
+    // check if email is free
+
+
     accountService.create(accountEntity);
 
 //     here is logic to send mail
@@ -64,5 +69,25 @@ public class AccountController {
 //    ));
 
     return new ResponseEntity(HttpStatus.OK);
+  }
+
+  @PostMapping("/check-username-free")
+  public ResponseEntity checkUsername(@RequestBody SingleUserAttributeDTO usernameDTO,
+                              HttpServletRequest request){
+    if (accountService.isUsernameFree(usernameDTO.getValue())){
+      return new ResponseEntity(HttpStatus.OK);
+    }else{
+      return new ResponseEntity(HttpStatus.CONFLICT);
+    }
+  }
+
+  @PostMapping("/check-email-free")
+  public ResponseEntity checkEmail(@RequestBody SingleUserAttributeDTO emailDTO,
+                              HttpServletRequest request){
+    if (accountService.isEmailFree(emailDTO.getValue())){
+      return new ResponseEntity(HttpStatus.OK);
+    }else{
+      return new ResponseEntity(HttpStatus.CONFLICT);
+    }
   }
 }

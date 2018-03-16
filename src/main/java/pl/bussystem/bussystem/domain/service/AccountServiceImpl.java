@@ -18,4 +18,14 @@ public class AccountServiceImpl implements AccountService {
   public AccountEntity create(AccountEntity accountEntity) {
     return accountRepository.save(accountEntity);
   }
+
+  @Override
+  public Boolean isUsernameFree(String username) {
+    return accountRepository.findByUsername(username) == null;
+  }
+
+  @Override
+  public Boolean isEmailFree(String email) {
+    return accountRepository.findByEmail(email) == null;
+  }
 }
