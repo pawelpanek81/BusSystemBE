@@ -14,19 +14,25 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class UserRegisterDTO {
-  @NotNull @Size(min = 1)
+  @NotNull
+  @Size(min = 1)
   private String username;
 
-  @NotNull @Size(min = 1)
+  @NotNull
+  @Size(min = 1)
   private String name;
 
-  @NotNull @Size(min = 1)
+  @NotNull
+  @Size(min = 1)
   private String surname;
 
-  @NotNull @Size(min = 1)
+  @NotNull
+  @Size(min = 1)
   private String password;
 
-  @NotNull @Size(min = 1) @Email
+  @NotNull
+  @Size(min = 1)
+  @Email
   private String email;
 
   private String phone;

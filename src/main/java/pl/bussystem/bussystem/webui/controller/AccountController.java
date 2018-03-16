@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +79,7 @@ public class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  public ResponseEntity<RestException> checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO) {
+  public ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO usernameDTO) {
     if (!accountService.existsByUsername(usernameDTO.getUsername())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
@@ -89,7 +90,7 @@ public class AccountController {
 
 
   @PostMapping("/check-email-free")
-  public ResponseEntity<RestException> checkEmail(@RequestBody CheckEmailFreeDTO emailDTO) {
+  public ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {

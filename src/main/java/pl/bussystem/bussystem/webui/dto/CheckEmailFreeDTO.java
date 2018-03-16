@@ -14,6 +14,8 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class CheckEmailFreeDTO {
-  @NotNull @Size(min = 1) @Email
+  @NotNull
+  @Size(min = 1)
+  @Email
   String email;
 }

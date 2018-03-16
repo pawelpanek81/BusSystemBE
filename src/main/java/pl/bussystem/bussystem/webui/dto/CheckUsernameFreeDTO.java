@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class CheckUsernameFreeDTO {
-  @NotNull @Size(min = 1)
+  @NotNull
+  @Size(min = 1)
   String username;
 }
