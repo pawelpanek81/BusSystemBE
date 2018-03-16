@@ -1,4 +1,4 @@
-package pl.bussystem.bussystem.webui.dto.exception;
+package pl.bussystem.bussystem.webui.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

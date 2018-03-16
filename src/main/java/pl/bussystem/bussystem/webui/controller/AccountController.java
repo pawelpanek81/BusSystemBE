@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
 import pl.bussystem.bussystem.domain.service.AccountService;
-import pl.bussystem.bussystem.security.email.verification.OnRegistrationCompleteEvent;
 import pl.bussystem.bussystem.webui.dto.CheckUsernameFreeDTO;
 import pl.bussystem.bussystem.webui.dto.UserRegisterDTO;
-import pl.bussystem.bussystem.webui.dto.exception.CheckEmailFreeDTO;
+import pl.bussystem.bussystem.webui.dto.CheckEmailFreeDTO;
+import pl.bussystem.bussystem.webui.dto.exception.RestException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -74,22 +74,25 @@ public class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  public ResponseEntity checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO,
-                                      HttpServletRequest request) {
+  public ResponseEntity<RestException> checkUsername(@RequestBody CheckUsernameFreeDTO usernameDTO,
+                                                     HttpServletRequest request) {
     if (!accountService.existsByUsername(usernameDTO.getUsername())) {
-      return new ResponseEntity(HttpStatus.OK);
+      return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      return new ResponseEntity(HttpStatus.CONFLICT);
+      RestException restException = new RestException(1, "Username is taken");
+      return new ResponseEntity<RestException>(restException, HttpStatus.CONFLICT);
     }
   }
 
+
   @PostMapping("/check-email-free")
-  public ResponseEntity checkEmail(@RequestBody CheckEmailFreeDTO emailDTO,
+  public ResponseEntity<RestException> checkEmail(@RequestBody CheckEmailFreeDTO emailDTO,
                                    HttpServletRequest request) {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
-      return new ResponseEntity(HttpStatus.OK);
+      return new ResponseEntity<>(HttpStatus.OK);
     } else {
-      return new ResponseEntity(HttpStatus.CONFLICT);
+      RestException restException = new RestException(2, "Email is already used");
+      return new ResponseEntity<RestException>(restException, HttpStatus.CONFLICT);
     }
   }
 }
