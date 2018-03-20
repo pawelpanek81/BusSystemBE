@@ -3,15 +3,22 @@ package pl.bussystem.bussystem.domain.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bussystem.bussystem.domain.entity.AccountEntity;
+import pl.bussystem.bussystem.domain.entity.AuthorityEntity;
 import pl.bussystem.bussystem.domain.repository.AccountRepository;
+import pl.bussystem.bussystem.domain.repository.AuthorityRepository;
+
+import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
   private AccountRepository accountRepository;
+  private AuthorityRepository authorityRepository;
+
 
   @Autowired
-  public AccountServiceImpl(AccountRepository accountRepository) {
+  public AccountServiceImpl(AccountRepository accountRepository, AuthorityRepository authorityRepository) {
     this.accountRepository = accountRepository;
+    this.authorityRepository = authorityRepository;
   }
 
   @Override
@@ -32,5 +39,15 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Boolean isUsernameAndEmailAvailable(String username, String email) {
     return (!existsByUsername(username) && !existsByEmail(email));
+  }
+
+  public String getUserType(String username) {
+    List<AuthorityEntity> authorities = authorityRepository.findByAccountUsername(username);
+    for (AuthorityEntity auth : authorities) {
+      if (auth.getAuthority().substring(0,6).equals("group:")) {
+        return auth.getAuthority().substring(6);
+      }
+    }
+    return null;
   }
 }
