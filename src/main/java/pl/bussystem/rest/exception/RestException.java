@@ -1,12 +1,9 @@
 package pl.bussystem.rest.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 public class RestException {
   private Integer status;

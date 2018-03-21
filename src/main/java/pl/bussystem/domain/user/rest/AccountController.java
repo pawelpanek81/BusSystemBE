@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api-v1/users")
 class AccountController {
   private AccountService accountService;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -40,7 +40,8 @@ class AccountController {
                                               HttpServletRequest request) {
 
     if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
-      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN_OR_EMAIL_ALREADY_USED,
+      RestException restException = new RestException(
+          ExceptionCodes.USERNAME_TAKEN_OR_EMAIL_ALREADY_USED,
           "Username is taken or email is already used");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }

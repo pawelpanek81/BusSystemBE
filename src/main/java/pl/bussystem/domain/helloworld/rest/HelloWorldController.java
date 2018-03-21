@@ -46,12 +46,12 @@ public class HelloWorldController {
         null);
   }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/l")
-    @ResponseBody
-    @PreAuthorize("hasAuthority('group:Admin')")
-    public String helloL(Principal principal) {
-      return principal.getName(); //this return AccountEntity.username
-    }
+  @RequestMapping(method = RequestMethod.GET, path = "/l")
+  @ResponseBody
+  @PreAuthorize("hasAuthority('group:Admin')")
+  public String helloL(Principal principal) {
+    return principal.getName(); //this return AccountEntity.username
+  }
 
   @RequestMapping(method = RequestMethod.GET, path = "/users")
   @ResponseBody
