@@ -8,16 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.news.model.AddNewsDTO;
+import pl.bussystem.domain.news.model.NewsDTO;
 import pl.bussystem.domain.news.persistence.entity.NewsEntity;
 import pl.bussystem.domain.news.service.NewsService;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.function.Function;
 
 @RestController
-@RequestMapping(value = "/api-v1")
+@RequestMapping(value = "/api/v1.0")
 class NewsController {
   private NewsService newsService;
 
@@ -41,6 +41,7 @@ class NewsController {
   }
 
   @RequestMapping(method = RequestMethod.DELETE, path = "/auth/removeNews/{id}")
+  @PreAuthorize("hasAuthority('group:BOK')")
   ResponseEntity<RestException> removeNews(@PathVariable Integer id) {
     if (newsService.remove(id)) {
       return new ResponseEntity<>(HttpStatus.OK);
@@ -52,8 +53,18 @@ class NewsController {
   ResponseEntity getNews(Pageable pageable) {
     Page<NewsEntity> allByPageable = newsService.findAllByPageable(pageable);
 
-    Page<NewsEntity> mappedNewsEntities = allByPageable.map(news -> new NewsEntity());
+    Page<NewsDTO> mappedNewsEntities = allByPageable.map(n -> new NewsDTO(
+        n.getId(),
+        n.getTitle(),
+        n.getDateTime(),
+        n.getBody(),
+        n.getAuthor().getName(),
+        n.getAuthor().getSurname(),
+        n.getAuthor().getUsername(),
+        n.getAuthor().getEmail(),
+        n.getAuthor().getPhoto()
+    ));
 
-    return new ResponseEntity<>(allByPageable, HttpStatus.OK);
+    return new ResponseEntity<>(mappedNewsEntities, HttpStatus.OK);
   }
 }

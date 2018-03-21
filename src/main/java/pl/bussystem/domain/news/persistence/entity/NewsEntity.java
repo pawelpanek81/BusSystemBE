@@ -32,4 +32,5 @@ public class NewsEntity {
   @ManyToOne(optional = false)
   @JoinColumn(name = "author", nullable = false)
   private AccountEntity author;
+
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import pl.bussystem.security.email.verification.service.VerificationTokenService;
 
 @Controller
-@RequestMapping(value = "/api-v1")
+@RequestMapping(value = "/api/v1.0")
 public class VerificationController {
   private VerificationTokenService verificationTokenService;
 
