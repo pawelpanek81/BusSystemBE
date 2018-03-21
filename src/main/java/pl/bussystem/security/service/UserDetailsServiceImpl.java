@@ -37,6 +37,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     List<GrantedAuthority> authorities = new ArrayList<>();
     authorityRepository.findByAccountId(account.getId()).forEach(acc -> authorities.add(new SimpleGrantedAuthority(acc.getAuthority())));
 
-    return new User(account.getUsername(), account.getPassword(), authorities);
+    Boolean acitvated = account.getActive();
+
+    return new User(
+        account.getUsername(),
+        account.getPassword(),
+        acitvated,
+        true,
+        true,
+        true,
+        authorities
+    );
+
   }
 }

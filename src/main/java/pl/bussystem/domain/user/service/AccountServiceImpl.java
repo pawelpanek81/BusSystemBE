@@ -44,5 +44,10 @@ class AccountServiceImpl implements AccountService {
     return accountRepository.findByUsername(principal.getName());
   }
 
+  @Override
+  public AccountEntity getUserByUsername(String username) {
+    return accountRepository.findByUsername(username);
+  }
+
 
 }

@@ -14,4 +14,6 @@ public interface AccountService {
   Boolean isUsernameAndEmailAvailable(String username, String email);
 
   AccountEntity findAccountByPrincipal(Principal principal);
+
+  AccountEntity getUserByUsername(String username);
 }
