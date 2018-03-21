@@ -3,11 +3,11 @@ package pl.bussystem.domain.user.rest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.bussystem.domain.user.model.dto.AccountInfoDTO;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.domain.user.model.dto.CheckUsernameFreeDTO;
@@ -18,16 +18,17 @@ import pl.bussystem.rest.exception.RestException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
-@RequestMapping("api-v1/users")
+@RequestMapping("api/v1.0/users")
 class AccountController {
   private AccountService accountService;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private ApplicationEventPublisher eventPublisher;
 
 
-  public AccountController(AccountService accountService,
+  AccountController(AccountService accountService,
                            BCryptPasswordEncoder bCryptPasswordEncoder,
                            ApplicationEventPublisher applicationEventPublisher) {
     this.accountService = accountService;
@@ -36,7 +37,7 @@ class AccountController {
   }
 
   @PostMapping("/sign-up")
-  public ResponseEntity<RestException> signUp(@RequestBody @Valid UserRegisterDTO account,
+  ResponseEntity<RestException> signUp(@RequestBody @Valid UserRegisterDTO account,
                                               HttpServletRequest request) {
 
     if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
@@ -79,7 +80,7 @@ class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  public ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO usernameDTO) {
+  ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO usernameDTO) {
     if (!accountService.existsByUsername(usernameDTO.getUsername())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
@@ -90,12 +91,31 @@ class AccountController {
 
 
   @PostMapping("/check-email-free")
-  public ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
+  ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
       RestException restException = new RestException(ExceptionCodes.EMAIL_ALREADY_USED, "Email is already used");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/userData")
+  @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
+  ResponseEntity getAccountInfo(Principal principal) {
+    AccountEntity accountEntity = accountService.findAccountByPrincipal(principal);
+
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO(
+        accountEntity.getId(),
+        accountEntity.getUsername(),
+        accountEntity.getName(),
+        accountEntity.getSurname(),
+        accountEntity.getEmail(),
+        accountEntity.getPhone(),
+        accountEntity.getActive(),
+        accountEntity.getPhoto()
+    );
+
+    return new ResponseEntity<>(accountInfoDTO, HttpStatus.OK);
   }
 }
