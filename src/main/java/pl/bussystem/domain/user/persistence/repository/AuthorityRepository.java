@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Integer> {
   List<AuthorityEntity> findByAccountId(Integer id);
+
+  List<AuthorityEntity> findByAccountUsername(String username);
 }
