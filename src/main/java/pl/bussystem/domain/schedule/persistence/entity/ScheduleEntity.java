@@ -15,7 +15,7 @@ import java.sql.Time;
 @AllArgsConstructor
 public class ScheduleEntity {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private Integer id;
 

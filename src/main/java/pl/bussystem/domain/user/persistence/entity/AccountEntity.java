@@ -19,7 +19,7 @@ public class AccountEntity {
     this.active = false;
   }
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private Integer id;
 
