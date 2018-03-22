@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
+import pl.bussystem.domain.user.service.AccountService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,9 +24,11 @@ import static pl.bussystem.security.oauth2.jwt.SecurityConstants.*;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
   private AuthenticationManager authenticationManager;
+  private AccountService accountService;
 
-  JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+  JWTAuthenticationFilter(AuthenticationManager authenticationManager, AccountService accountService) {
     this.authenticationManager = authenticationManager;
+    this.accountService = accountService;
   }
 
   @Override
@@ -53,10 +56,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                           FilterChain chain,
                                           Authentication auth) throws IOException, ServletException {
 
+    String username = ((User) auth.getPrincipal()).getUsername();
     String token = Jwts.builder()
-        .setSubject(((User) auth.getPrincipal()).getUsername())
+        .setSubject(username)
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
         .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
+        .claim("ut", accountService.getUserType(username))
         .compact();
     res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
   }
