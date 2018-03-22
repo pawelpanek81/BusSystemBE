@@ -37,7 +37,7 @@ class NewsController {
         .build();
     newsService.add(news, principal);
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @RequestMapping(method = RequestMethod.DELETE, path = "/auth/removeNews/{id}")
