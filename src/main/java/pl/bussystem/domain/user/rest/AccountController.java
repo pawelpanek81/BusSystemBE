@@ -7,12 +7,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.bussystem.domain.user.model.dto.AccountInfoDTO;
+import pl.bussystem.domain.user.model.dto.*;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.service.AccountService;
-import pl.bussystem.domain.user.model.dto.CheckUsernameFreeDTO;
-import pl.bussystem.domain.user.model.dto.UserRegisterDTO;
-import pl.bussystem.domain.user.model.dto.CheckEmailFreeDTO;
 import pl.bussystem.rest.exception.ExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
 
@@ -89,7 +86,6 @@ class AccountController {
     }
   }
 
-
   @PostMapping("/check-email-free")
   ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
     if (!accountService.existsByEmail(emailDTO.getEmail())) {
@@ -117,5 +113,49 @@ class AccountController {
     );
 
     return new ResponseEntity<>(accountInfoDTO, HttpStatus.OK);
+  }
+
+  @RequestMapping(method = RequestMethod.PUT, value = "/updateData")
+  @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
+  ResponseEntity updateAccountInfo(Principal principal,
+                                   @RequestBody AccountUpdateDTO accountUpdateDTO) {
+    AccountEntity prevAccData = accountService.findAccountByPrincipal(principal);
+
+    if (!prevAccData.getUsername().equals(accountUpdateDTO.getUsername()) &&
+        accountService.existsByUsername(accountUpdateDTO.getUsername())) {
+      RestException restException = new RestException(ExceptionCodes.USERNAME_TAKEN,
+          "Username is taken");
+      return new ResponseEntity<>(restException, HttpStatus.OK);
+
+    }
+
+    String newUsername =  accountUpdateDTO.getUsername()  == null ? prevAccData.getUsername() : accountUpdateDTO.getUsername();
+    String newName =      accountUpdateDTO.getName()      == null ? prevAccData.getName()     : accountUpdateDTO.getName();
+    String newSurName =   accountUpdateDTO.getSurname()   == null ? prevAccData.getSurname()  : accountUpdateDTO.getSurname();
+    String newPassword =  accountUpdateDTO.getPassword()  == null ? prevAccData.getPassword() :
+        bCryptPasswordEncoder.encode(accountUpdateDTO.getPassword());
+    String newPhone =     accountUpdateDTO.getPhone()     == null ? prevAccData.getPhone()    : accountUpdateDTO.getPhone();
+    String newPhoto =     accountUpdateDTO.getPhoto()     == null ? prevAccData.getPhoto()    : accountUpdateDTO.getPhoto();
+
+    AccountEntity newAccData = AccountEntity.builder()
+        .id(
+            prevAccData.getId()
+        )
+        .username(newUsername)
+        .name(newName)
+        .surname(newSurName)
+        .password(newPassword)
+        .email(
+            prevAccData.getEmail()
+        )
+        .phone(newPhone)
+        .active(
+            prevAccData.getActive()
+        )
+        .photo(newPhoto)
+        .build();
+
+    accountService.updateAccount(newAccData);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

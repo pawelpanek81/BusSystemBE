@@ -1,11 +1,14 @@
 package pl.bussystem.domain.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 
 import java.security.Principal;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Service
 class AccountServiceImpl implements AccountService {
@@ -47,6 +50,20 @@ class AccountServiceImpl implements AccountService {
   @Override
   public AccountEntity getUserByUsername(String username) {
     return accountRepository.findByUsername(username);
+  }
+
+  @Override
+  public AccountEntity findById(Integer id) {
+    return accountRepository.findById(id).orElseThrow(bind(UsernameNotFoundException::new, "user with id" + id + " not found"));
+  }
+
+  @Override
+  public AccountEntity updateAccount(AccountEntity accountEntity) {
+    return accountRepository.save(accountEntity);
+  }
+
+  private static <T, R> Supplier<R> bind(Function<T, R> fn, T val) {
+    return () -> fn.apply(val);
   }
 
 

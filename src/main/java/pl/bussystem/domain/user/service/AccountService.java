@@ -16,4 +16,8 @@ public interface AccountService {
   AccountEntity findAccountByPrincipal(Principal principal);
 
   AccountEntity getUserByUsername(String username);
+
+  AccountEntity findById(Integer id);
+
+  AccountEntity updateAccount(AccountEntity accountEntity);
 }
