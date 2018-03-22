@@ -18,7 +18,7 @@ public class VerificationTokenEntity {
   private static final int EXPIRATION = 60 * 24;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue
   @Column(name = "id")
   private Long id;
 
