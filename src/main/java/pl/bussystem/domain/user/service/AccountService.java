@@ -16,4 +16,6 @@ public interface AccountService {
   AccountEntity findAccountByPrincipal(Principal principal);
 
   AccountEntity getUserByUsername(String username);
+
+  String getUserType(String username);
 }

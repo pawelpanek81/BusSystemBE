@@ -16,6 +16,7 @@ import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pl.bussystem.domain.user.service.AccountService;
 
 import static pl.bussystem.security.oauth2.jwt.SecurityConstants.SIGN_UP_URL;
 
@@ -26,13 +27,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
   private UserDetailsService userDetailsService;
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   private CustomCorsFilter customCorsFilter;
+  private AccountService accountService;
 
   public WebSecurity(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
                      BCryptPasswordEncoder bCryptPasswordEncoder,
-                     CustomCorsFilter customCorsFilter) {
+                     CustomCorsFilter customCorsFilter,
+                     AccountService accountService) {
     this.userDetailsService = userDetailsService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.customCorsFilter = customCorsFilter;
+    this.accountService = accountService;
   }
 
   @Override
@@ -42,7 +46,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .anyRequest().permitAll()//.authenticated()
         .and()
         .addFilterBefore(customCorsFilter, ChannelProcessingFilter.class)
-        .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+        .addFilter(new JWTAuthenticationFilter(authenticationManager(), accountService))
         .addFilter(new JWTAuthorizationFilter(authenticationManager(), userDetailsService))
         // this disables session creation on Spring Security
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
