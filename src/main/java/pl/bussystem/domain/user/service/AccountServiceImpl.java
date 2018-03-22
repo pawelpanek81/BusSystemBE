@@ -1,6 +1,7 @@
 package pl.bussystem.domain.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.user.exception.AmbiguousRolesException;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
@@ -9,6 +10,8 @@ import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.domain.user.persistence.repository.AuthorityRepository;
 
 import java.security.Principal;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.List;
 
 @Service
@@ -56,6 +59,19 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public AccountEntity findById(Integer id) {
+    return accountRepository.findById(id).orElseThrow(bind(UsernameNotFoundException::new, "user with id" + id + " not found"));
+  }
+
+  @Override
+  public AccountEntity updateAccount(AccountEntity accountEntity) {
+    return accountRepository.save(accountEntity);
+  }
+
+  private static <T, R> Supplier<R> bind(Function<T, R> fn, T val) {
+    return () -> fn.apply(val);
+  }
+
   public String getUserType(String username) {
     List<AuthorityEntity> authorities = authorityRepository.findByAccountUsername(username);
     if (authorities.size() != 1)
