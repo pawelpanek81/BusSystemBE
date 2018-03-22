@@ -15,6 +15,7 @@ import pl.bussystem.domain.user.model.dto.UserRegisterDTO;
 import pl.bussystem.domain.user.model.dto.CheckEmailFreeDTO;
 import pl.bussystem.rest.exception.ExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
+import pl.bussystem.security.email.verification.async.OnRegistrationCompleteEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
