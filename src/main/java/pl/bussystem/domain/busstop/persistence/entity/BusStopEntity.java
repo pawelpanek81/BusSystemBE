@@ -11,6 +11,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BusStopEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -48,7 +48,7 @@ public class HelloWorldController {
 
   @RequestMapping(method = RequestMethod.GET, path = "/l")
   @ResponseBody
-  @PreAuthorize("hasAuthority('group:Admin')")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public String helloL(Principal principal) {
     return principal.getName(); //this return AccountEntity.username
   }

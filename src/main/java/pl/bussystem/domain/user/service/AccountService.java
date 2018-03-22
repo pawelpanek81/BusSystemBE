@@ -22,3 +22,4 @@ public interface AccountService {
   AccountEntity updateAccount(AccountEntity accountEntity);
 
   String getUserType(String username);
+}

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 
 @Repository
-interface BusStopRepository extends JpaRepository<BusStopEntity, Integer> {
+public interface BusStopRepository extends JpaRepository<BusStopEntity, Integer> {
 }
