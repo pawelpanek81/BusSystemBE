@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "bus_stops")
+@Table(name = "bus_stops", uniqueConstraints = { @UniqueConstraint(columnNames = {"city", "name"})})
 @Getter
 @Setter
 @EqualsAndHashCode

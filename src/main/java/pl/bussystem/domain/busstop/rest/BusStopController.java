@@ -13,6 +13,7 @@ import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1.0/busstop")
@@ -36,5 +37,11 @@ class BusStopController {
     busStopService.addBusStop(busEntity);
 
     return new ResponseEntity(HttpStatus.CREATED);
+  }
+
+  @RequestMapping(path = "/get", method = RequestMethod.GET)
+  ResponseEntity getAllBusStop() {
+    List<BusStopEntity> busStops = busStopService.findAll();
+    return new ResponseEntity<>(busStops, HttpStatus.OK);
   }
 }

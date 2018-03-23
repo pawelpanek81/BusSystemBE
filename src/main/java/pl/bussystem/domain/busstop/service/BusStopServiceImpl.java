@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 
+import java.util.List;
+
 @Service
 public class BusStopServiceImpl implements BusStopService {
   private BusStopRepository busStopRepository;
@@ -16,6 +18,16 @@ public class BusStopServiceImpl implements BusStopService {
 
   @Override
   public BusStopEntity addBusStop(BusStopEntity busEntity) {
+    String city = busEntity.getCity();
+    String name = busEntity.getName();
+    if (!busStopRepository.findByCityAndName(city, name).isEmpty()) {
+      throw new IllegalArgumentException("bus entity: " + busEntity.toString() + " already exists");
+    }
     return busStopRepository.save(busEntity);
+  }
+
+  @Override
+  public List<BusStopEntity> findAll() {
+    return busStopRepository.findAll();
   }
 }
