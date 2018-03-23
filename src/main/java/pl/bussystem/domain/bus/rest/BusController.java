@@ -2,6 +2,7 @@ package pl.bussystem.domain.bus.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,18 +26,19 @@ public class BusController {
   }
 
   @PostMapping("/add")
-  ResponseEntity<RestException> addBus(@RequestBody @Valid BusAddDTO bus) {
+  @Secured(value = {"ROLE_ADMIN"})
+  ResponseEntity<RestException> addBus(@RequestBody @Valid BusAddDTO busAddDTO) {
     if (busService.existsByRegistrationNumber("a")) {
       RestException restException = new RestException(ExceptionCodes.BUS_REGISTRATION_ALREADY_EXISTS,
           "Bus with given registration number already exists");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
 
-    BusEntity busEntity = new BusEntity(
-        null,
-        bus.getRegistrationNumber(),
-        bus.getBrand(),
-        bus.getModel());
+    BusEntity busEntity = BusEntity.builder()
+        .registrationNumber(busAddDTO.getRegistrationNumber())
+        .brand(busAddDTO.getBrand())
+        .model(busAddDTO.getModel())
+        .build();
 
     busService.create(busEntity);
 

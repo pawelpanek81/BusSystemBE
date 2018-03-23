@@ -14,12 +14,14 @@ import javax.validation.constraints.Size;
 @Setter
 public class BusAddDTO {
   @NotNull
-  @Size(min = 4, max = 8)
+  @Size(min = 1)
   private String registrationNumber;
 
   @NotNull
+  @Size(min = 1)
   private String brand;
 
   @NotNull
+  @Size(min = 1)
   private String model;
 }
