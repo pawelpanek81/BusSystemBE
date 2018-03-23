@@ -12,19 +12,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BusAddDTO {
+public class RemoveBusDTO {
   @NotNull
   @Size(min = 1)
   private String registrationNumber;
-
-  @NotNull
-  @Size(min = 1)
-  private String brand;
-
-  @NotNull
-  @Size(min = 1)
-  private String model;
-
-  @NotNull
-  private Integer seats;
 }

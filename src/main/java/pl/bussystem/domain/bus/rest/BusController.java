@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.domain.bus.model.dto.BusAddDTO;
+import pl.bussystem.domain.bus.model.dto.RemoveBusDTO;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.service.BusService;
 import pl.bussystem.rest.exception.ExceptionCodes;
@@ -28,7 +29,7 @@ class BusController {
   @PostMapping("/add")
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> addBus(@RequestBody @Valid BusAddDTO busAddDTO) {
-    if (busService.existsByRegistrationNumber("a")) {
+    if (busService.existsByRegistrationNumber(busAddDTO.getRegistrationNumber())) {
       RestException restException = new RestException(ExceptionCodes.BUS_REGISTRATION_ALREADY_EXISTS,
           "Bus with given registration number already exists");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
@@ -38,12 +39,26 @@ class BusController {
         .registrationNumber(busAddDTO.getRegistrationNumber())
         .brand(busAddDTO.getBrand())
         .model(busAddDTO.getModel())
+        .seats(busAddDTO.getSeats())
         .build();
 
     busService.create(busEntity);
 
     return new ResponseEntity<>(HttpStatus.CREATED);
+  }
 
+  @PostMapping("/remove")
+  @Secured(value = {"ROLE_ADMIN"})
+  ResponseEntity<RestException> removeBus(@RequestBody @Valid RemoveBusDTO removeBusDTO){
+    if (!busService.existsByRegistrationNumber(removeBusDTO.getRegistrationNumber())){
+      RestException restException = new RestException(ExceptionCodes.BUS_DOES_NOT_EXISTS,
+          "There is no bus with given registration number!");
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
+
+    busService.removeByRegistrationNumber(removeBusDTO.getRegistrationNumber());
+
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 

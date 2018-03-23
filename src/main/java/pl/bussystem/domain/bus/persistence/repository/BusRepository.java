@@ -7,4 +7,5 @@ import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 @Repository
 public interface BusRepository extends JpaRepository<BusEntity, Integer> {
   Boolean existsByRegistrationNumber(String registrationNumber);
+  BusEntity findByRegistrationNumber(String registrationNumber);
 }
