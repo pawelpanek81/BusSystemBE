@@ -17,7 +17,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1.0/bus")
-public class BusController {
+class BusController {
 
   private BusService busService;
 
