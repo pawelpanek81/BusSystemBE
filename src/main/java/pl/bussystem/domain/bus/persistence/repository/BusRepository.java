@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 
 @Repository
-interface BusRepository extends JpaRepository<BusEntity, Integer> {
+public interface BusRepository extends JpaRepository<BusEntity, Integer> {
+  Boolean existsByRegistrationNumber(String registrationNumber);
 }
