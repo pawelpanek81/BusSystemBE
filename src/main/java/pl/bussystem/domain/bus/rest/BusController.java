@@ -3,10 +3,7 @@ package pl.bussystem.domain.bus.rest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.bus.model.dto.BusAddDTO;
 import pl.bussystem.domain.bus.model.dto.RemoveBusDTO;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
@@ -47,10 +44,10 @@ class BusController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @PostMapping("/remove")
+  @RequestMapping(path = "/remove", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity<RestException> removeBus(@RequestBody @Valid RemoveBusDTO removeBusDTO){
-    if (!busService.existsByRegistrationNumber(removeBusDTO.getRegistrationNumber())){
+  ResponseEntity<RestException> removeBus(@RequestBody @Valid RemoveBusDTO removeBusDTO) {
+    if (!busService.existsByRegistrationNumber(removeBusDTO.getRegistrationNumber())) {
       RestException restException = new RestException(ExceptionCodes.BUS_DOES_NOT_EXISTS,
           "There is no bus with given registration number!");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
