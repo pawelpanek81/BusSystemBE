@@ -26,7 +26,7 @@ public class NewsEntity {
   @Column(name = "date_time", nullable = false)
   private LocalDateTime dateTime;
 
-  @Column(name = "body", nullable = false)
+  @Column(name = "body", length = 65536, nullable = false)
   private String body;
 
   @ManyToOne(optional = false)
