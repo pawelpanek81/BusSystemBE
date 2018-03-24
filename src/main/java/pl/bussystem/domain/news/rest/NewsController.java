@@ -27,7 +27,7 @@ class NewsController {
   }
 
   @RequestMapping(method = RequestMethod.POST, path = "/auth/addNews")
-  @PreAuthorize("hasAuthority('group:BOK')")
+  @PreAuthorize("hasAuthority('ROLE_BOK')")
   ResponseEntity<RestException> addNews(@RequestBody @Valid AddNewsDTO addNewsDTO,
                                         Principal principal) {
     NewsEntity news = NewsEntity.builder()
@@ -41,7 +41,7 @@ class NewsController {
   }
 
   @RequestMapping(method = RequestMethod.DELETE, path = "/auth/removeNews/{id}")
-  @PreAuthorize("hasAuthority('group:BOK')")
+  @PreAuthorize("hasAuthority('ROLE_BOK')")
   ResponseEntity<RestException> removeNews(@PathVariable Integer id) {
     if (newsService.remove(id)) {
       return new ResponseEntity<>(HttpStatus.OK);
