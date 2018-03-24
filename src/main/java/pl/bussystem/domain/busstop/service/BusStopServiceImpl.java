@@ -21,7 +21,7 @@ public class BusStopServiceImpl implements BusStopService {
     String city = busEntity.getCity();
     String name = busEntity.getName();
     if (!busStopRepository.findByCityAndName(city, name).isEmpty()) {
-      throw new IllegalArgumentException("bus entity: " + busEntity.toString() + " already exists");
+      throw new IllegalArgumentException("Bus entity: " + busEntity.toString() + " already exists");
     }
     return busStopRepository.save(busEntity);
   }
@@ -29,5 +29,14 @@ public class BusStopServiceImpl implements BusStopService {
   @Override
   public List<BusStopEntity> findAll() {
     return busStopRepository.findAll();
+  }
+
+  @Override
+  public Boolean removeBusStop(Integer id) {
+    if (busStopRepository.existsById(id)) {
+      busStopRepository.deleteById(id);
+      return true;
+    }
+    return false;
   }
 }

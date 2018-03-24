@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddBusStopDTO {
+public class BusStopDTO {
   @NotNull
   @Size(min = 1)
   private String city;
@@ -18,4 +18,14 @@ public class AddBusStopDTO {
   @NotNull
   @Size(min = 1)
   private String name;
+
+  @NotNull
+  @Size(min = 1)
+  private String latitude;
+
+  @NotNull
+  @Size(min = 1)
+  private String longitude;
+
+  private String address;
 }
