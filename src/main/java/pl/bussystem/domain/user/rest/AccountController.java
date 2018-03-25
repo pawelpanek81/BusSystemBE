@@ -114,7 +114,7 @@ class AccountController {
     return new ResponseEntity<>(accountInfoDTO, HttpStatus.OK);
   }
 
-  @RequestMapping(method = RequestMethod.PUT, value = "/updateData")
+  @RequestMapping(method = RequestMethod.PUT, value = "/updateData")//TODO
   @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
   ResponseEntity updateAccountInfo(Principal principal,
                                    @RequestBody AccountUpdateDTO accountUpdateDTO) {

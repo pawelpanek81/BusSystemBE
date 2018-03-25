@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
 
 @Repository
-interface LineRouteRepository extends JpaRepository<LineRouteEntity, Integer> {
+public interface LineRouteRepository extends JpaRepository<LineRouteEntity, Integer> {
 }

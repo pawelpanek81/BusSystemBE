@@ -15,6 +15,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LineRouteEntity {
   @Id
   @SequenceGenerator(name = "lines_routes_generator",
@@ -32,7 +33,7 @@ public class LineRouteEntity {
   private BusStopEntity busStop;
 
   @Column(name = "sequence", nullable = false)
-  private Integer order;
+  private Integer sequence;
 
   @Column(name = "drive_time", nullable = false)
   private Integer driveTime;

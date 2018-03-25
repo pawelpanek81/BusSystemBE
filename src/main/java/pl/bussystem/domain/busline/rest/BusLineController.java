@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import pl.bussystem.domain.busline.exception.NoSuchBusStopFromException;
+import pl.bussystem.domain.busline.exception.NoSuchBusStopToException;
 import pl.bussystem.domain.busline.mapper.BusLineMapper;
 import pl.bussystem.domain.busline.model.CreateBusLineDTO;
 import pl.bussystem.domain.busline.model.ReadBusLineDTO;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.busline.service.BusLineService;
+import pl.bussystem.domain.lineroute.exception.NoSuchBusStopException;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
@@ -35,10 +38,16 @@ class BusLineController {
     BusLineEntity busLineEntity = null;
     try {
       busLineEntity = busLineMapper.mapToBusLineEntity(dto);
-    } catch (NoSuchElementException e) {
+    } catch (NoSuchBusStopFromException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.BUS_STOP_WITH_THAT_ID_DOES_NOT_EXISTS,
-          "Bus stop with id: " + dto.getBusStopFromId() + " or: " + dto.getBusStopToId() + " does not exists!"
+          RestExceptionCodes.BUS_STOP_FROM_WITH_THAT_ID_DOES_NOT_EXISTS,
+          "Bus stop from with id: " + dto.getBusStopFromId() + " or: " + dto.getBusStopToId() + " does not exists!"
+      );
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    } catch (NoSuchBusStopToException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.BUS_STOP_TO_WITH_THAT_ID_DOES_NOT_EXISTS,
+          "Bus stop to with id: " + dto.getBusStopFromId() + " or: " + dto.getBusStopToId() + " does not exists!"
       );
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
@@ -48,11 +57,11 @@ class BusLineController {
 
   @RequestMapping(path = "/read", method = RequestMethod.GET)
   ResponseEntity<List<ReadBusLineDTO>> readAll() {
-    List<BusLineEntity> busLines = busLineService.findAll();
-    List<ReadBusLineDTO> busLinesDTO = busLines.stream()
+    List<BusLineEntity> busLines = busLineService.read();
+    List<ReadBusLineDTO> busLinesDTOS = busLines.stream()
         .map(BusLineMapper.mapToReadBusLineDTO)
         .collect(Collectors.toList());
-    return new ResponseEntity<>(busLinesDTO, HttpStatus.OK);
+    return new ResponseEntity<>(busLinesDTOS, HttpStatus.OK);
   }
 
   @RequestMapping(path = "/delete/{id}", method = RequestMethod.DELETE)

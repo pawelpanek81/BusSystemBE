@@ -24,7 +24,7 @@ public class BusLineServiceImpl implements BusLineService {
   }
 
   @Override
-  public List<BusLineEntity> findAll() {
+  public List<BusLineEntity> read() {
     return busLineRepository.findAll();
   }
 
