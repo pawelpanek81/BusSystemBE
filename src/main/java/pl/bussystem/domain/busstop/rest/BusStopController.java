@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import pl.bussystem.domain.busstop.model.BusStopDTO;
+import pl.bussystem.domain.busstop.model.dto.BusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.rest.exception.RestExceptionCodes;
@@ -52,8 +52,8 @@ class BusStopController {
     if (busStopService.removeBusStop(id)) {
       return new ResponseEntity(HttpStatus.OK);
     } else {
-      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_WITH_THIS_ID_DOES_NOT_EXISTS,
-          "Bus with this id dont exists in database");
+      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_THAT_ID_DOES_NOT_EXISTS,
+          "Bus stop with this id don't exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }
   }

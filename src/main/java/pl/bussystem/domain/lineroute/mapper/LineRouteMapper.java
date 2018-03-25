@@ -8,8 +8,8 @@ import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 import pl.bussystem.domain.lineroute.exception.NoSuchBusLineException;
 import pl.bussystem.domain.lineroute.exception.NoSuchBusStopException;
-import pl.bussystem.domain.lineroute.model.CreateLineRouteDTO;
-import pl.bussystem.domain.lineroute.model.ReadLineRouteDTO;
+import pl.bussystem.domain.lineroute.model.dto.CreateLineRouteDTO;
+import pl.bussystem.domain.lineroute.model.dto.ReadLineRouteDTO;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
 
 import java.util.Optional;

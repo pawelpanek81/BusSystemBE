@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busline.exception.NoSuchBusStopFromException;
 import pl.bussystem.domain.busline.exception.NoSuchBusStopToException;
 import pl.bussystem.domain.busline.mapper.BusLineMapper;
-import pl.bussystem.domain.busline.model.CreateBusLineDTO;
-import pl.bussystem.domain.busline.model.ReadBusLineDTO;
+import pl.bussystem.domain.busline.model.dto.CreateBusLineDTO;
+import pl.bussystem.domain.busline.model.dto.ReadBusLineDTO;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.busline.service.BusLineService;
-import pl.bussystem.domain.lineroute.exception.NoSuchBusStopException;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ class BusLineController {
 
   @RequestMapping(path = "/create", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity<RestException> create(@RequestBody CreateBusLineDTO dto) {
+  ResponseEntity<RestException> create(@RequestBody @Valid CreateBusLineDTO dto) {
     BusLineEntity busLineEntity = null;
     try {
       busLineEntity = busLineMapper.mapToBusLineEntity(dto);

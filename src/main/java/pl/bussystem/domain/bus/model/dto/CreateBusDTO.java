@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BusAddDTO {
+public class CreateBusDTO {
   @NotBlank
   private String registrationNumber;
 
@@ -24,6 +24,6 @@ public class BusAddDTO {
   private String model;
 
   @NotNull
-  @Min(1)
+  @Digits(integer = 10, fraction = 0)
   private Integer seats;
 }

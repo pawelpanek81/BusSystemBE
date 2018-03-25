@@ -1,4 +1,4 @@
-package pl.bussystem.domain.busline.model;
+package pl.bussystem.domain.busline.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

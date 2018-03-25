@@ -1,4 +1,4 @@
-package pl.bussystem.domain.news.model;
+package pl.bussystem.domain.news.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

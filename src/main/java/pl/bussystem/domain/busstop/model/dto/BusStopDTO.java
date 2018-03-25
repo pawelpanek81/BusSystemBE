@@ -1,4 +1,4 @@
-package pl.bussystem.domain.busstop.model;
+package pl.bussystem.domain.busstop.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

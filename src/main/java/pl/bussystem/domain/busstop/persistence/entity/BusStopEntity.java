@@ -1,10 +1,9 @@
 package pl.bussystem.domain.busstop.persistence.entity;
 
 import lombok.*;
-import pl.bussystem.domain.busstop.model.BusStopDTO;
+import pl.bussystem.domain.busstop.model.dto.BusStopDTO;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 
 @Entity
 @Table(name = "bus_stops", uniqueConstraints = { @UniqueConstraint(columnNames = {"city", "name"})})
