@@ -1,7 +1,7 @@
 package pl.bussystem.domain.busstop.persistence.entity;
 
 import lombok.*;
-import pl.bussystem.domain.busstop.model.dto.BusStopDTO;
+import pl.bussystem.domain.busstop.model.dto.CreateBusStopDTO;
 
 import javax.persistence.*;
 
@@ -36,11 +36,4 @@ public class BusStopEntity {
   @Column(name = "address")
   private String address;
 
-  public BusStopEntity(BusStopDTO busStopDTO) {
-    this.city = busStopDTO.getCity();
-    this.name = busStopDTO.getName();
-    this.latitude = busStopDTO.getLatitude();
-    this.longitude = busStopDTO.getLongitude();
-    this.address = busStopDTO.getAddress();
-  }
 }
