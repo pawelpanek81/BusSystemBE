@@ -37,17 +37,17 @@ INSERT INTO public.authorities(id, authority, account)
 
 
 
-INSERT INTO public.news(title, body, author, date_time)
-  VALUES ('Litwo! Ojczyzno moja!', 'Ty jesteś jak zdrowie. Ile cię trzeba cenić, ten odwiązywać, składać. Właśnie tym obrazem. Właśnie dwukonną bryką wjechał młody panek i zdrowie. Nazywał się długo dumał, nim stał dwór szlachecki, z liczby kopic, co dzień za dowód', 1, '2008-01-01T16:06:09');
+INSERT INTO public.news(id, title, body, author, date_time)
+  VALUES (1, 'Litwo! Ojczyzno moja!', 'Ty jesteś jak zdrowie. Ile cię trzeba cenić, ten odwiązywać, składać. Właśnie tym obrazem. Właśnie dwukonną bryką wjechał młody panek i zdrowie. Nazywał się długo dumał, nim stał dwór szlachecki, z liczby kopic, co dzień za dowód', 1, '2008-01-01T16:06:09');
 
-INSERT INTO public.news(title, body, author, date_time)
-  VALUES ('Zresztą zdać się na przeciwnej szali.', 'Zwłaszcza gdy ów Wespazyjanus nie może. Widać, że za dozorcę księdza, który ma narowu, Żałował, że odbite od Nil szła rzecz o jej był to mówiąc, że polskie ubrani nagotowane z nim widzi sprzęty, też same szczypiąc trawę ciągnęły powoli pod Napoleonem, demokrata przyjechał pan Podkomorzy i jakoby zlewa. I tak rzadka nowina! ', 1, '2008-01-02T18:20:13');
+INSERT INTO public.news(id, title, body, author, date_time)
+  VALUES (2, 'Zresztą zdać się na przeciwnej szali.', 'Zwłaszcza gdy ów Wespazyjanus nie może. Widać, że za dozorcę księdza, który ma narowu, Żałował, że odbite od Nil szła rzecz o jej był to mówiąc, że polskie ubrani nagotowane z nim widzi sprzęty, też same szczypiąc trawę ciągnęły powoli pod Napoleonem, demokrata przyjechał pan Podkomorzy i jakoby zlewa. I tak rzadka nowina! ', 1, '2008-01-02T18:20:13');
 
-INSERT INTO public.news(title, body, author, date_time)
-  VALUES ('Pańskiej cioci. Choć Sędzia wie, jak gwiazdy', 'Hrabia ma żądło w tabakierkę złotą Podkomorzy i knieje więc ja Ruski, teraz jeśli zechcesz, i mniej był legijonistą przynosił kości stare na konikach małe dziecię, kiedy mamy panien wiele. Stryjaszek myśli wkrótce sprawić ci znowu o czyjeś kolana pośliznęła się stało wody pełne naczynie blaszane ale myśl wcale aby się do stodoły a starzy i mniej trudnych i gestami ją nudzi rzecz długa, choć świadka nie skąpił. On za domem', 1, '2009-11-30T23:33:59');
+INSERT INTO public.news(id, title, body, author, date_time)
+  VALUES (3, 'Pańskiej cioci. Choć Sędzia wie, jak gwiazdy', 'Hrabia ma żądło w tabakierkę złotą Podkomorzy i knieje więc ja Ruski, teraz jeśli zechcesz, i mniej był legijonistą przynosił kości stare na konikach małe dziecię, kiedy mamy panien wiele. Stryjaszek myśli wkrótce sprawić ci znowu o czyjeś kolana pośliznęła się stało wody pełne naczynie blaszane ale myśl wcale aby się do stodoły a starzy i mniej trudnych i gestami ją nudzi rzecz długa, choć świadka nie skąpił. On za domem', 1, '2009-11-30T23:33:59');
 
-INSERT INTO public.news(title, body, author, date_time)
-VALUES ('Kapelusz', 'Czasem odłożenie pracy na później nie przynosi szkody. Lecz w wypadku baobabu jest to zawsze katastrofą.', 1, '2018-01-01T08:11:55');
+INSERT INTO public.news(id, title, body, author, date_time)
+VALUES (4, 'Kapelusz', 'Czasem odłożenie pracy na później nie przynosi szkody. Lecz w wypadku baobabu jest to zawsze katastrofą.', 1, '2018-01-01T08:11:55');
 
 
 

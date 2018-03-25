@@ -17,7 +17,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class LineRouteEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "lines_routes_generator",
+      sequenceName = "lines_routes_id_seq", initialValue = 1)
+  @GeneratedValue(generator = "lines_routes_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
 

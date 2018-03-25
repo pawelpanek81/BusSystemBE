@@ -13,7 +13,9 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class AuthorityEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "authorities_generator",
+      sequenceName = "authorities_id_seq", initialValue = 7)
+  @GeneratedValue(generator = "authorities_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
 

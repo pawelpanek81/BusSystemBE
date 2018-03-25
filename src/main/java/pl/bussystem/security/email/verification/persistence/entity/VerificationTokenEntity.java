@@ -18,7 +18,9 @@ public class VerificationTokenEntity {
   private static final int EXPIRATION = 60 * 24;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "verification_token_generator",
+      sequenceName = "verification_token_id_seq", initialValue = 1)
+  @GeneratedValue(generator = "verification_token_generator")
   @Column(name = "id")
   private Long id;
 
