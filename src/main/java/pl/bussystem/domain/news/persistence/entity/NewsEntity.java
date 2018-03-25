@@ -16,7 +16,9 @@ import java.time.LocalDateTime;
 @Builder
 public class NewsEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "news_generator",
+      sequenceName = "news_id_seq", initialValue = 5)
+  @GeneratedValue(generator = "news_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
 
@@ -26,7 +28,7 @@ public class NewsEntity {
   @Column(name = "date_time", nullable = false)
   private LocalDateTime dateTime;
 
-  @Column(name = "body", nullable = false)
+  @Column(name = "body", length = 65536, nullable = false)
   private String body;
 
   @ManyToOne(optional = false)
