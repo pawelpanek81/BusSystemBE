@@ -26,7 +26,7 @@ public class BusServiceImpl implements BusService {
   @Override
   public void removeById(Integer id) {
     Optional<BusEntity> busEntity = busRepository.findById(id);
-    busEntity.ifPresent(busEntity1 -> busRepository.delete(busEntity1));
+    busEntity.ifPresent(bus -> busRepository.delete(bus));
   }
 
   @Override

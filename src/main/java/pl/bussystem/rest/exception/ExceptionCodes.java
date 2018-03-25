@@ -7,5 +7,4 @@ public class ExceptionCodes {
   public static final int BUS_REGISTRATION_ALREADY_EXISTS = 4;
   public static final int BUS_STOP_WITH_CITY_AND_NAME_EXISTS = 5;
   public static final int BUS_WITH_ID_DOESNT_EXISTS = 6;
-  public static final int BUS_DOES_NOT_EXISTS = 7;
 }

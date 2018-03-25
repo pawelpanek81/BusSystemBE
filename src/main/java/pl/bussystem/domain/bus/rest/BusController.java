@@ -48,7 +48,7 @@ class BusController {
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> removeBus(@PathVariable Integer id) {
     if (!busService.existsById(id)) {
-      RestException restException = new RestException(ExceptionCodes.BUS_DOES_NOT_EXISTS,
+      RestException restException = new RestException(ExceptionCodes.BUS_WITH_ID_DOESNT_EXISTS,
           "There is no bus with given registration number!");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
