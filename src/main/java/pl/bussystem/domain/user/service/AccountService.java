@@ -7,6 +7,10 @@ import java.security.Principal;
 public interface AccountService {
   AccountEntity create(AccountEntity accountEntity);
 
+  AccountEntity readById(Integer id);
+
+  String getUserType(String username);
+
   Boolean existsByUsername(String username);
 
   Boolean existsByEmail(String email);
@@ -17,10 +21,6 @@ public interface AccountService {
 
   AccountEntity getUserByUsername(String username);
 
-  AccountEntity findById(Integer id);
-
   AccountEntity updateAccount(AccountEntity accountEntity);
-
-  String getUserType(String username);
 
 }

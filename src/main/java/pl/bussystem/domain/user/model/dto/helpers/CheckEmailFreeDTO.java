@@ -1,19 +1,19 @@
-package pl.bussystem.domain.user.model.dto;
+package pl.bussystem.domain.user.model.dto.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class CheckUsernameFreeDTO {
+public class CheckEmailFreeDTO {
   @NotBlank
-  String username;
+  @Email
+  String email;
 }

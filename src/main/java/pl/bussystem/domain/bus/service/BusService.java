@@ -9,8 +9,6 @@ public interface BusService {
 
   List<BusEntity> read();
 
-  Boolean existsById(Integer id);
-
   Boolean existsByRegistrationNumber(String registrationNumber);
 
   void removeById(Integer id);

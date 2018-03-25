@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ReadBusLineDTO {
+  private Integer id;
   private String name;
   private Integer busStopFromId;
   private Integer busStopToId;

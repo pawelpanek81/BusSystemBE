@@ -24,20 +24,6 @@ public class BusServiceImpl implements BusService {
   }
 
   @Override
-  public void removeById(Integer id) {
-    try {
-      busRepository.deleteById(id);
-    } catch (EmptyResultDataAccessException e) {
-      throw new NoSuchBusException("Bus with id: " + id + " does not exists!");
-    }
-  }
-
-  @Override
-  public Boolean existsById(Integer id) {
-    return busRepository.existsById(id);
-  }
-
-  @Override
   public List<BusEntity> read() {
     return busRepository.findAll();
   }
@@ -45,5 +31,14 @@ public class BusServiceImpl implements BusService {
   @Override
   public Boolean existsByRegistrationNumber(String registrationNumber) {
     return busRepository.existsByRegistrationNumber(registrationNumber);
+  }
+
+  @Override
+  public void removeById(Integer id) {
+    try {
+      busRepository.deleteById(id);
+    } catch (EmptyResultDataAccessException e) {
+      throw new NoSuchBusException("Bus with id: " + id + " does not exists!");
+    }
   }
 }

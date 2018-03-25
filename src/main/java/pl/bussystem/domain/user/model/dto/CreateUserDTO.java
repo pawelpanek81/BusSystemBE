@@ -12,8 +12,22 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CheckEmailFreeDTO {
+public class CreateUserDTO {
+  @NotBlank
+  private String username;
+
+  @NotBlank
+  private String name;
+
+  @NotBlank
+  private String surname;
+
+  @NotBlank
+  private String password;
+
   @NotBlank
   @Email
-  String email;
+  private String email;
+
+  private String phone;
 }

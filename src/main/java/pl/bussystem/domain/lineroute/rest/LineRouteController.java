@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/v1.0/line-routes")
-public class LineRouteController {
+class LineRouteController {
   private LineRouteService lineRouteService;
   private LineRouteMapper lineRouteMapper;
 
   @Autowired
-  public LineRouteController(LineRouteService lineRouteService, LineRouteMapper lineRouteMapper) {
+  LineRouteController(LineRouteService lineRouteService, LineRouteMapper lineRouteMapper) {
     this.lineRouteService = lineRouteService;
     this.lineRouteMapper = lineRouteMapper;
   }

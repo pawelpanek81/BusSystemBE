@@ -24,6 +24,7 @@ public class BusLineMapper {
 
   public static Function<? super BusLineEntity, ? extends ReadBusLineDTO> mapToReadBusLineDTO =
       entity -> new ReadBusLineDTO(
+          entity.getId(),
           entity.getName(),
           entity.getFrom().getId(),
           entity.getTo().getId(),
@@ -47,4 +48,5 @@ public class BusLineMapper {
         .driveTime(dto.getDriveTime())
         .build();
   }
+
 }

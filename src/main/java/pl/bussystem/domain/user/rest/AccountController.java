@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.bussystem.domain.user.mapper.UserMapper;
 import pl.bussystem.domain.user.model.dto.*;
+import pl.bussystem.domain.user.model.dto.helpers.CheckEmailFreeDTO;
+import pl.bussystem.domain.user.model.dto.helpers.CheckUsernameFreeDTO;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.rest.exception.RestExceptionCodes;
@@ -33,7 +36,7 @@ class AccountController {
   }
 
   @PostMapping("/sign-up")
-  ResponseEntity<RestException> signUp(@RequestBody @Valid UserRegisterDTO account,
+  ResponseEntity<RestException> signUp(@RequestBody @Valid CreateUserDTO account,
                                               HttpServletRequest request) {
 
     if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
@@ -76,8 +79,8 @@ class AccountController {
   }
 
   @PostMapping("/check-username-free")
-  ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO usernameDTO) {
-    if (!accountService.existsByUsername(usernameDTO.getUsername())) {
+  ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO dto) {
+    if (!accountService.existsByUsername(dto.getUsername())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
       RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN, "Username is taken");
@@ -86,8 +89,8 @@ class AccountController {
   }
 
   @PostMapping("/check-email-free")
-  ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO emailDTO) {
-    if (!accountService.existsByEmail(emailDTO.getEmail())) {
+  ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO dto) {
+    if (!accountService.existsByEmail(dto.getEmail())) {
       return new ResponseEntity<>(HttpStatus.OK);
     } else {
       RestException restException = new RestException(RestExceptionCodes.EMAIL_IS_ALREADY_USED, "Email is already used");
@@ -100,39 +103,30 @@ class AccountController {
   ResponseEntity getAccountInfo(Principal principal) {
     AccountEntity accountEntity = accountService.findAccountByPrincipal(principal);
 
-    AccountInfoDTO accountInfoDTO = new AccountInfoDTO(
-        accountEntity.getId(),
-        accountEntity.getUsername(),
-        accountEntity.getName(),
-        accountEntity.getSurname(),
-        accountEntity.getEmail(),
-        accountEntity.getPhone(),
-        accountEntity.getActive(),
-        accountEntity.getPhoto()
-    );
+    ReadUserDTO readUserDTO = UserMapper.mapToReadUserDTO.apply(accountEntity);
 
-    return new ResponseEntity<>(accountInfoDTO, HttpStatus.OK);
+    return new ResponseEntity<>(readUserDTO, HttpStatus.OK);
   }
 
   @RequestMapping(method = RequestMethod.PUT, value = "/updateData")//TODO
   @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
   ResponseEntity updateAccountInfo(Principal principal,
-                                   @RequestBody AccountUpdateDTO accountUpdateDTO) {
+                                   @RequestBody UpdateUserDTO updateUserDTO) {
     AccountEntity prevAccData = accountService.findAccountByPrincipal(principal);
 
-    if (!prevAccData.getUsername().equals(accountUpdateDTO.getUsername()) &&
-        accountService.existsByUsername(accountUpdateDTO.getUsername())) {
+    if (!prevAccData.getUsername().equals(updateUserDTO.getUsername()) &&
+        accountService.existsByUsername(updateUserDTO.getUsername())) {
       RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN,
           "Username is taken");
       return new ResponseEntity<>(restException, HttpStatus.OK);
 
     }
 
-    String newUsername =  accountUpdateDTO.getUsername()  == null ? prevAccData.getUsername() : accountUpdateDTO.getUsername();
-    String newName =      accountUpdateDTO.getName()      == null ? prevAccData.getName()     : accountUpdateDTO.getName();
-    String newSurName =   accountUpdateDTO.getSurname()   == null ? prevAccData.getSurname()  : accountUpdateDTO.getSurname();
-    String newPhone =     accountUpdateDTO.getPhone()     == null ? prevAccData.getPhone()    : accountUpdateDTO.getPhone();
-    String newPhoto =     accountUpdateDTO.getPhoto()     == null ? prevAccData.getPhoto()    : accountUpdateDTO.getPhoto();
+    String newUsername =  updateUserDTO.getUsername()  == null ? prevAccData.getUsername() : updateUserDTO.getUsername();
+    String newName =      updateUserDTO.getName()      == null ? prevAccData.getName()     : updateUserDTO.getName();
+    String newSurName =   updateUserDTO.getSurname()   == null ? prevAccData.getSurname()  : updateUserDTO.getSurname();
+    String newPhone =     updateUserDTO.getPhone()     == null ? prevAccData.getPhone()    : updateUserDTO.getPhone();
+    String newPhoto =     updateUserDTO.getPhoto()     == null ? prevAccData.getPhoto()    : updateUserDTO.getPhoto();
 
     AccountEntity newAccData = AccountEntity.builder()
         .id(prevAccData.getId())

@@ -31,7 +31,7 @@ class BusStopController {
 
   @RequestMapping(path = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity create(@RequestBody @Valid CreateBusStopDTO dto) {
+  ResponseEntity<RestException> create(@RequestBody @Valid CreateBusStopDTO dto) {
     BusStopEntity busEntity = BusStopMapper.mapToBusStopEntity(dto);
 
     try {
@@ -42,7 +42,7 @@ class BusStopController {
       return new ResponseEntity<>(exceptionDTO, HttpStatus.CONFLICT);
     }
 
-    return new ResponseEntity(HttpStatus.CREATED);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @RequestMapping(path = "/", method = RequestMethod.GET)
@@ -55,7 +55,7 @@ class BusStopController {
   }
 
   @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-  ResponseEntity deleteById(@PathVariable Integer id) {
+  ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       busStopService.deleteById(id);
     } catch (NoSuchElementException e) {
@@ -63,6 +63,6 @@ class BusStopController {
           "Bus stop with this id don't exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }
-    return new ResponseEntity(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

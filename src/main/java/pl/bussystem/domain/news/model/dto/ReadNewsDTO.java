@@ -12,9 +12,5 @@ public class ReadNewsDTO {
   private String title;
   private LocalDateTime dateTime;
   private String body;
-  private String authorName;
-  private String authorSurname;
-  private String authorUsername;
-  private String authorEmail;
-  private String authorPhoto;
+  private ReadNewsAuthorDTO author;
 }
