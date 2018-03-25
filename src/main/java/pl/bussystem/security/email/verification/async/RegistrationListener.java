@@ -76,7 +76,7 @@ public class RegistrationListener implements
     templateArgs.add(footerText);
 
     return sendEmailService.constructEmailMessage(
-        "static/mailtemplate.html",
+        "static/registration-verification-mail-template.html",
         templateArgs,
         recipientAddress,
         subject

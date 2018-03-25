@@ -15,7 +15,7 @@ public class RestExceptionCodes {
   /* BUS LINES */
   public static final int BUS_LINE_WITH_THAT_ID_DOES_NOT_EXISTS = 8;
   public static final int BUS_STOP_FROM_WITH_THAT_ID_DOES_NOT_EXISTS = 12;
-  public static final int BUS_STOP_TO_WITH_THAT_ID_DOES_NOT_EXISTS = 12;
+  public static final int BUS_STOP_TO_WITH_THAT_ID_DOES_NOT_EXISTS = 13;
 
   /* SCHEDULE */
 
