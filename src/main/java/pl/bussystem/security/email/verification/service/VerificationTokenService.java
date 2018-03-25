@@ -1,7 +1,6 @@
 package pl.bussystem.security.email.verification.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;

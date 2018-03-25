@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.bus.model.dto.BusAddDTO;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.service.BusService;
-import pl.bussystem.rest.exception.ExceptionCodes;
+import pl.bussystem.rest.exception.RestExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
@@ -27,7 +27,7 @@ class BusController {
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> addBus(@RequestBody @Valid BusAddDTO busAddDTO) {
     if (busService.existsByRegistrationNumber(busAddDTO.getRegistrationNumber())) {
-      RestException restException = new RestException(ExceptionCodes.BUS_REGISTRATION_ALREADY_EXISTS,
+      RestException restException = new RestException(RestExceptionCodes.BUS_REGISTRATION_NUMBER_EXISTS,
           "Bus with given registration number already exists");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
@@ -48,7 +48,7 @@ class BusController {
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> removeBus(@PathVariable Integer id) {
     if (!busService.existsById(id)) {
-      RestException restException = new RestException(ExceptionCodes.BUS_WITH_ID_DOESNT_EXISTS,
+      RestException restException = new RestException(RestExceptionCodes.BUS_WITH_THIS_ID_DOES_NOT_EXISTS,
           "There is no bus with given registration number!");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }

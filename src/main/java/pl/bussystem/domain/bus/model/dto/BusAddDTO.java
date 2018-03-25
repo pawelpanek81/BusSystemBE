@@ -6,24 +6,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class BusAddDTO {
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String registrationNumber;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String brand;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String model;
 
   @NotNull

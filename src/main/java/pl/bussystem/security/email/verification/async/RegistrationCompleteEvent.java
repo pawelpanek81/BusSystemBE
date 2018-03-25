@@ -9,12 +9,12 @@ import java.util.Locale;
 
 @Getter
 @Setter
-public class OnRegistrationCompleteEvent extends ApplicationEvent {
+public class RegistrationCompleteEvent extends ApplicationEvent {
   private String appUrl;
   private Locale locale;
   private AccountEntity accountEntity;
 
-  public OnRegistrationCompleteEvent(AccountEntity accountEntity, Locale locale, String appUrl) {
+  public RegistrationCompleteEvent(AccountEntity accountEntity, Locale locale, String appUrl) {
     super(accountEntity);
     this.accountEntity = accountEntity;
     this.locale = locale;

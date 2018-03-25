@@ -6,32 +6,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class UserRegisterDTO {
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String username;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String name;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String surname;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   private String password;
 
-  @NotNull
-  @Size(min = 1)
+  @NotBlank
   @Email
   private String email;
 

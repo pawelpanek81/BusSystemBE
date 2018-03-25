@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busstop.model.BusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
-import pl.bussystem.rest.exception.ExceptionCodes;
+import pl.bussystem.rest.exception.RestExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
@@ -33,7 +33,7 @@ class BusStopController {
     try {
       busStopService.addBusStop(busEntity);
     } catch (IllegalArgumentException e) {
-      RestException exceptionDTO = new RestException(ExceptionCodes.BUS_STOP_WITH_CITY_AND_NAME_EXISTS,
+      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_THAT_CITY_AND_NAME_EXISTS,
           "Bus stop with this city and name exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.CONFLICT);
     }
@@ -52,7 +52,7 @@ class BusStopController {
     if (busStopService.removeBusStop(id)) {
       return new ResponseEntity(HttpStatus.OK);
     } else {
-      RestException exceptionDTO = new RestException(ExceptionCodes.BUS_WITH_ID_DOESNT_EXISTS,
+      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_WITH_THIS_ID_DOES_NOT_EXISTS,
           "Bus with this id dont exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }
