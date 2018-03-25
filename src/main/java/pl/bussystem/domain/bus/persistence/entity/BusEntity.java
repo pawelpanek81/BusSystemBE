@@ -20,7 +20,7 @@ public class BusEntity {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @Column(name = "registration_number", nullable = false)
+  @Column(name = "registration_number", nullable = false, unique = true)
   private String registrationNumber;
 
   @Column(name = "brand", nullable = false)
@@ -28,4 +28,7 @@ public class BusEntity {
 
   @Column(name = "model", nullable = false)
   private String model;
+
+  @Column(name = "seats", nullable = false)
+  private Integer seats;
 }
