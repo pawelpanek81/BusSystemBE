@@ -25,7 +25,9 @@ public class BusServiceImpl implements BusService {
   @Override
   public void removeByRegistrationNumber(String registrationNumber) {
     BusEntity busEntity = busRepository.findByRegistrationNumber(registrationNumber);
-    busRepository.delete(busEntity);
+    if (busEntity != null) {
+      busRepository.delete(busEntity);
+    }
   }
 
   @Override
