@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddNewsDTO {
+public class CreateNewsDTO {
   @NotBlank
   private String title;
 

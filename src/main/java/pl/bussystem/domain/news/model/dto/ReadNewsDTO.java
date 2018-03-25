@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class NewsDTO {
+public class ReadNewsDTO {
   private Integer id;
   private String title;
   private LocalDateTime dateTime;

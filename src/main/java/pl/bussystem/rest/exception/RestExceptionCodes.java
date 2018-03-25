@@ -37,4 +37,8 @@ public class RestExceptionCodes {
   /* BUS RIDES */
 
 
+  /* NEWS */
+  public static final int NEWS_WITH_THIS_ID_DOES_NOT_EXISTS = 7;
+
+
 }

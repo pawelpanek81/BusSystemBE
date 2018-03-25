@@ -9,9 +9,9 @@ import java.security.Principal;
 
 @Service
 public interface NewsService {
-  NewsEntity add(NewsEntity newsEntity, Principal principal);
+  NewsEntity create(NewsEntity newsEntity, Principal principal);
 
-  boolean remove(Integer id);
+  Page<NewsEntity> readByPageable(Pageable pageable);
 
-  Page<NewsEntity> findAllByPageable(Pageable pageable);
+  void deleteById(Integer id);
 }
