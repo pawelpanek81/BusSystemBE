@@ -6,6 +6,7 @@ import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BusServiceImpl implements BusService {
@@ -23,20 +24,23 @@ public class BusServiceImpl implements BusService {
   }
 
   @Override
-  public void removeByRegistrationNumber(String registrationNumber) {
-    BusEntity busEntity = busRepository.findByRegistrationNumber(registrationNumber);
-    if (busEntity != null) {
-      busRepository.delete(busEntity);
-    }
+  public void removeById(Integer id) {
+    Optional<BusEntity> busEntity = busRepository.findById(id);
+    busEntity.ifPresent(busEntity1 -> busRepository.delete(busEntity1));
   }
 
   @Override
-  public Boolean existsByRegistrationNumber(String registrationNumber) {
-    return busRepository.existsByRegistrationNumber(registrationNumber);
+  public Boolean existsById(Integer id) {
+    return busRepository.existsById(id);
   }
 
   @Override
   public List<BusEntity> findAll() {
     return busRepository.findAll();
+  }
+
+  @Override
+  public Boolean existsByRegistrationNumber(String registrationNumber) {
+    return busRepository.existsByRegistrationNumber(registrationNumber);
   }
 }
