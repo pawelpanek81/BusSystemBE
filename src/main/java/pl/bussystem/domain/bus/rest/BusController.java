@@ -12,6 +12,7 @@ import pl.bussystem.rest.exception.ExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1.0/bus")
@@ -23,7 +24,7 @@ class BusController {
     this.busService = busService;
   }
 
-  @PostMapping("/add")
+  @RequestMapping(path = "/add", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> addBus(@RequestBody @Valid BusAddDTO busAddDTO) {
     if (busService.existsByRegistrationNumber(busAddDTO.getRegistrationNumber())) {
@@ -56,6 +57,13 @@ class BusController {
     busService.removeByRegistrationNumber(removeBusDTO.getRegistrationNumber());
 
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(path = "/get-all", method = RequestMethod.GET)
+  @Secured(value = {"ROLE_ADMIN"})
+  @ResponseBody
+  public List<BusEntity> getAllBuses() {
+    return busService.findAll();
   }
 
 

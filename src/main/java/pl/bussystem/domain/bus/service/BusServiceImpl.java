@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 
+import java.util.List;
+
 @Service
 public class BusServiceImpl implements BusService {
 
@@ -29,5 +31,10 @@ public class BusServiceImpl implements BusService {
   @Override
   public Boolean existsByRegistrationNumber(String registrationNumber) {
     return busRepository.existsByRegistrationNumber(registrationNumber);
+  }
+
+  @Override
+  public List<BusEntity> findAll() {
+    return busRepository.findAll();
   }
 }
