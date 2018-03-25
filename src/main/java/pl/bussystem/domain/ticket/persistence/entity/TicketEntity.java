@@ -16,7 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TicketEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "tickets_generator",
+      sequenceName = "tickets_id_seq", initialValue = 1)
+  @GeneratedValue(generator = "tickets_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
 

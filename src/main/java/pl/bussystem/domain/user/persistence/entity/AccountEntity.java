@@ -19,7 +19,9 @@ public class AccountEntity {
     this.active = false;
   }
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "accounts_generator",
+      sequenceName = "accounts_id_seq", initialValue = 7)
+  @GeneratedValue(generator = "accounts_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
 
