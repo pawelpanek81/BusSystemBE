@@ -133,29 +133,20 @@ class AccountController {
     String newUsername =  accountUpdateDTO.getUsername()  == null ? prevAccData.getUsername() : accountUpdateDTO.getUsername();
     String newName =      accountUpdateDTO.getName()      == null ? prevAccData.getName()     : accountUpdateDTO.getName();
     String newSurName =   accountUpdateDTO.getSurname()   == null ? prevAccData.getSurname()  : accountUpdateDTO.getSurname();
-    String newPassword =  accountUpdateDTO.getPassword()  == null ? prevAccData.getPassword() :
-        bCryptPasswordEncoder.encode(accountUpdateDTO.getPassword());
     String newPhone =     accountUpdateDTO.getPhone()     == null ? prevAccData.getPhone()    : accountUpdateDTO.getPhone();
     String newPhoto =     accountUpdateDTO.getPhoto()     == null ? prevAccData.getPhoto()    : accountUpdateDTO.getPhoto();
 
     AccountEntity newAccData = AccountEntity.builder()
-        .id(
-            prevAccData.getId()
-        )
+        .id(prevAccData.getId())
         .username(newUsername)
         .name(newName)
         .surname(newSurName)
-        .password(newPassword)
-        .email(
-            prevAccData.getEmail()
-        )
+        .password(prevAccData.getPassword())
+        .email(prevAccData.getEmail())
         .phone(newPhone)
-        .active(
-            prevAccData.getActive()
-        )
+        .active(prevAccData.getActive())
         .photo(newPhoto)
         .build();
-
     accountService.updateAccount(newAccData);
     return new ResponseEntity<>(HttpStatus.OK);
   }

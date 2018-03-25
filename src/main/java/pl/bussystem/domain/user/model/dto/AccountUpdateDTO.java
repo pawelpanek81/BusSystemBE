@@ -13,5 +13,4 @@ public class AccountUpdateDTO {
   private String surname;
   private String phone;
   private String photo;
-  private String password;
 }
