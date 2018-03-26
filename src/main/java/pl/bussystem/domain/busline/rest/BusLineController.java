@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/api/v1.0/busline")
+@RequestMapping(path = "/api/v1.0/bus-lines")
 class BusLineController {
   private BusLineService busLineService;
   private BusLineMapper busLineMapper;
@@ -32,7 +32,7 @@ class BusLineController {
     this.busLineMapper = busLineMapper;
   }
 
-  @RequestMapping(path = "/create", method = RequestMethod.POST)
+  @RequestMapping(path = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusLineDTO dto) {
     BusLineEntity busLineEntity = null;
@@ -55,7 +55,7 @@ class BusLineController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(path = "/read", method = RequestMethod.GET)
+  @RequestMapping(path = "/", method = RequestMethod.GET)
   ResponseEntity<List<ReadBusLineDTO>> readAll() {
     List<BusLineEntity> busLines = busLineService.read();
     List<ReadBusLineDTO> busLinesDTOS = busLines.stream()
@@ -64,7 +64,7 @@ class BusLineController {
     return new ResponseEntity<>(busLinesDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/delete/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {

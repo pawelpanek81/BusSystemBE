@@ -98,47 +98,40 @@ class AccountController {
     }
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/userData")
+  @RequestMapping(method = RequestMethod.GET, value = "/{id}")
   @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
-  ResponseEntity getAccountInfo(Principal principal) {
+  ResponseEntity readById(@PathVariable Integer id,
+                                Principal principal) {
     AccountEntity accountEntity = accountService.findAccountByPrincipal(principal);
+
+    if (!accountEntity.getId().equals(id)) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
 
     ReadUserDTO readUserDTO = UserMapper.mapToReadUserDTO.apply(accountEntity);
 
     return new ResponseEntity<>(readUserDTO, HttpStatus.OK);
   }
 
-  @RequestMapping(method = RequestMethod.PUT, value = "/updateData")//TODO
+  @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
   @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
-  ResponseEntity updateAccountInfo(Principal principal,
-                                   @RequestBody UpdateUserDTO updateUserDTO) {
+  ResponseEntity updateById(@PathVariable Integer id,
+                            Principal principal,
+                            @Valid @RequestBody UpdateUserDTO dto) {
     AccountEntity prevAccData = accountService.findAccountByPrincipal(principal);
 
-    if (!prevAccData.getUsername().equals(updateUserDTO.getUsername()) &&
-        accountService.existsByUsername(updateUserDTO.getUsername())) {
+    if (!prevAccData.getId().equals(id)) {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!prevAccData.getUsername().equals(dto.getUsername()) &&
+        accountService.existsByUsername(dto.getUsername())) {
       RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN,
           "Username is taken");
       return new ResponseEntity<>(restException, HttpStatus.OK);
-
     }
 
-    String newUsername =  updateUserDTO.getUsername()  == null ? prevAccData.getUsername() : updateUserDTO.getUsername();
-    String newName =      updateUserDTO.getName()      == null ? prevAccData.getName()     : updateUserDTO.getName();
-    String newSurName =   updateUserDTO.getSurname()   == null ? prevAccData.getSurname()  : updateUserDTO.getSurname();
-    String newPhone =     updateUserDTO.getPhone()     == null ? prevAccData.getPhone()    : updateUserDTO.getPhone();
-    String newPhoto =     updateUserDTO.getPhoto()     == null ? prevAccData.getPhoto()    : updateUserDTO.getPhoto();
-
-    AccountEntity newAccData = AccountEntity.builder()
-        .id(prevAccData.getId())
-        .username(newUsername)
-        .name(newName)
-        .surname(newSurName)
-        .password(prevAccData.getPassword())
-        .email(prevAccData.getEmail())
-        .phone(newPhone)
-        .active(prevAccData.getActive())
-        .photo(newPhoto)
-        .build();
+    AccountEntity newAccData = UserMapper.mapToAccountEntity(prevAccData, dto);
     accountService.updateAccount(newAccData);
     return new ResponseEntity<>(HttpStatus.OK);
   }
