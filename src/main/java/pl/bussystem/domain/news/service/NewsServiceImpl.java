@@ -33,16 +33,16 @@ public class NewsServiceImpl implements NewsService {
   }
 
   @Override
+  public Page<NewsEntity> readByPageable(Pageable pageable) {
+    return newsRepository.findAll(pageable);
+  }
+
+  @Override
   public void deleteById(Integer id) {
     try {
       newsRepository.deleteById(id);
     } catch (EmptyResultDataAccessException e) {
       throw new NoSuchElementException("News with id: " + id + " does not exists!");
     }
-  }
-
-  @Override
-  public Page<NewsEntity> readByPageable(Pageable pageable) {
-    return newsRepository.findAll(pageable);
   }
 }
