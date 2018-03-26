@@ -32,7 +32,7 @@ class BusLineController {
     this.busLineMapper = busLineMapper;
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusLineDTO dto) {
     BusLineEntity busLineEntity;
@@ -55,7 +55,7 @@ class BusLineController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<List<ReadBusLineDTO>> readAll() {
     List<BusLineEntity> busLines = busLineService.read();
     List<ReadBusLineDTO> busLinesDTOS = busLines.stream()

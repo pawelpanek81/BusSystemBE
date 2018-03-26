@@ -27,7 +27,7 @@ class BusController {
     this.busService = busService;
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusDTO dto) {
     if (busService.existsByRegistrationNumber(dto.getRegistrationNumber())) {
@@ -53,7 +53,7 @@ class BusController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "", method = RequestMethod.GET)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<List<ReadBusDTO>> readAll() {
     List<BusEntity> buses = busService.read();

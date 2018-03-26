@@ -31,7 +31,7 @@ class LineRouteController {
     this.lineRouteMapper = lineRouteMapper;
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody CreateLineRouteDTO dto) {
     LineRouteEntity lineRouteEntity;
@@ -54,7 +54,7 @@ class LineRouteController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<List<ReadLineRouteDTO>> readAll() {
     List<LineRouteEntity> lineRoutes = lineRouteService.read();
     List<ReadLineRouteDTO> lineRouteDTOS = lineRoutes.stream()

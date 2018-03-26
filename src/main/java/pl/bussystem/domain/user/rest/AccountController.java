@@ -35,7 +35,7 @@ class AccountController {
     this.eventPublisher = applicationEventPublisher;
   }
 
-  @PostMapping("/")
+  @RequestMapping(value = "", method = RequestMethod.POST)
   ResponseEntity<RestException> signUp(@RequestBody @Valid CreateUserDTO account,
                                        HttpServletRequest request) {
 

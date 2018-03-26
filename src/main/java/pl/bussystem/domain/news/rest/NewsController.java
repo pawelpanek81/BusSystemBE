@@ -29,7 +29,7 @@ class NewsController {
     this.newsService = newsService;
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('ROLE_BOK')")
   ResponseEntity<RestException> create(@RequestBody @Valid CreateNewsDTO dto,
                                        Principal principal) {
@@ -55,7 +55,7 @@ class NewsController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<Page<ReadNewsDTO>> read(Pageable pageable) {
     Page<NewsEntity> allByPageable = newsService.readByPageable(pageable);
 
