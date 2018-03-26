@@ -7,13 +7,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.user.mapper.UserMapper;
-import pl.bussystem.domain.user.model.dto.*;
-import pl.bussystem.domain.user.model.dto.helpers.CheckEmailFreeDTO;
-import pl.bussystem.domain.user.model.dto.helpers.CheckUsernameFreeDTO;
+import pl.bussystem.domain.user.model.dto.CreateUserDTO;
+import pl.bussystem.domain.user.model.dto.ReadUserDTO;
+import pl.bussystem.domain.user.model.dto.UpdateUserDTO;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.service.AccountService;
-import pl.bussystem.rest.exception.RestExceptionCodes;
 import pl.bussystem.rest.exception.RestException;
+import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,16 +28,16 @@ class AccountController {
 
 
   AccountController(AccountService accountService,
-                           BCryptPasswordEncoder bCryptPasswordEncoder,
-                           ApplicationEventPublisher applicationEventPublisher) {
+                    BCryptPasswordEncoder bCryptPasswordEncoder,
+                    ApplicationEventPublisher applicationEventPublisher) {
     this.accountService = accountService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.eventPublisher = applicationEventPublisher;
   }
 
-  @PostMapping("/sign-up")
+  @PostMapping("/")
   ResponseEntity<RestException> signUp(@RequestBody @Valid CreateUserDTO account,
-                                              HttpServletRequest request) {
+                                       HttpServletRequest request) {
 
     if (!accountService.isUsernameAndEmailAvailable(account.getUsername(), account.getEmail())) {
       RestException restException = new RestException(
@@ -78,30 +78,10 @@ class AccountController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @PostMapping("/check-username-free")
-  ResponseEntity<RestException> checkUsername(@RequestBody @Valid CheckUsernameFreeDTO dto) {
-    if (!accountService.existsByUsername(dto.getUsername())) {
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN, "Username is taken");
-      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
-    }
-  }
-
-  @PostMapping("/check-email-free")
-  ResponseEntity<RestException> checkEmail(@RequestBody @Valid CheckEmailFreeDTO dto) {
-    if (!accountService.existsByEmail(dto.getEmail())) {
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      RestException restException = new RestException(RestExceptionCodes.EMAIL_IS_ALREADY_USED, "Email is already used");
-      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
-    }
-  }
-
   @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-  @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
+  @Secured(value = {"ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
   ResponseEntity readById(@PathVariable Integer id,
-                                Principal principal) {
+                          Principal principal) {
     AccountEntity accountEntity = accountService.findAccountByPrincipal(principal);
 
     if (!accountEntity.getId().equals(id)) {
@@ -113,15 +93,35 @@ class AccountController {
     return new ResponseEntity<>(readUserDTO, HttpStatus.OK);
   }
 
+  @RequestMapping(path = "/usernames", method = RequestMethod.GET)
+  ResponseEntity<RestException> checkUsername(@RequestParam("username") String username) {
+    if (!accountService.existsByUsername(username)) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN, "Username is taken");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    }
+  }
+
+  @RequestMapping(path = "/emails", method = RequestMethod.GET)
+  ResponseEntity<RestException> checkEmail(@RequestParam("email") String email) {
+    if (!accountService.existsByEmail(email)) {
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      RestException restException = new RestException(RestExceptionCodes.EMAIL_IS_ALREADY_USED, "Email is already used");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    }
+  }
+
   @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-  @Secured(value = { "ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
+  @Secured(value = {"ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
   ResponseEntity updateById(@PathVariable Integer id,
                             Principal principal,
                             @Valid @RequestBody UpdateUserDTO dto) {
     AccountEntity prevAccData = accountService.findAccountByPrincipal(principal);
 
     if (!prevAccData.getId().equals(id)) {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     if (!prevAccData.getUsername().equals(dto.getUsername()) &&
