@@ -29,7 +29,7 @@ class NewsController {
     this.newsService = newsService;
   }
 
-  @RequestMapping(method = RequestMethod.POST, path = "/")
+  @RequestMapping(value = "/", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('ROLE_BOK')")
   ResponseEntity<RestException> create(@RequestBody @Valid CreateNewsDTO dto,
                                        Principal principal) {
@@ -40,7 +40,7 @@ class NewsController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE, path = "/{id}")
+  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
   @PreAuthorize("hasAuthority('ROLE_BOK')")
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
@@ -55,7 +55,7 @@ class NewsController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(method = RequestMethod.GET, path = "/")
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   ResponseEntity<Page<ReadNewsDTO>> read(Pageable pageable) {
     Page<NewsEntity> allByPageable = newsService.readByPageable(pageable);
 
