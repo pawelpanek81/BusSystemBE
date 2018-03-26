@@ -7,6 +7,7 @@ import pl.bussystem.domain.busline.exception.NoSuchBusStopToException;
 import pl.bussystem.domain.busline.model.dto.CreateBusLineDTO;
 import pl.bussystem.domain.busline.model.dto.ReadBusLineDTO;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busstop.mapper.BusStopMapper;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 
@@ -26,8 +27,8 @@ public class BusLineMapper {
       entity -> new ReadBusLineDTO(
           entity.getId(),
           entity.getName(),
-          entity.getFrom().getId(),
-          entity.getTo().getId(),
+          BusStopMapper.mapToReadBusStopDTO.apply(entity.getFrom()),
+          BusStopMapper.mapToReadBusStopDTO.apply(entity.getTo()),
           entity.getDriveTime());
 
   public BusLineEntity mapToBusLineEntity(CreateBusLineDTO dto) {

@@ -2,8 +2,10 @@ package pl.bussystem.domain.lineroute.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.bussystem.domain.busline.mapper.BusLineMapper;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.busline.persistence.repository.BusLineRepository;
+import pl.bussystem.domain.busstop.mapper.BusStopMapper;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 import pl.bussystem.domain.lineroute.exception.NoSuchBusLineException;
@@ -29,8 +31,8 @@ public class LineRouteMapper {
   public static Function<? super LineRouteEntity, ? extends ReadLineRouteDTO> mapToReadLineRouteDTO =
       entity -> new ReadLineRouteDTO(
         entity.getId(),
-          entity.getBusLine().getId(),
-          entity.getBusStop().getId(),
+          BusLineMapper.mapToReadBusLineDTO.apply(entity.getBusLine()),
+          BusStopMapper.mapToReadBusStopDTO.apply(entity.getBusStop()),
           entity.getSequence(),
           entity.getDriveTime());
 
