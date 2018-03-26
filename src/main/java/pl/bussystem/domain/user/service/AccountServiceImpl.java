@@ -59,7 +59,7 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public AccountEntity findById(Integer id) {
+  public AccountEntity readById(Integer id) {
     return accountRepository.findById(id).orElseThrow(bind(UsernameNotFoundException::new, "user with id" + id + " not found"));
   }
 

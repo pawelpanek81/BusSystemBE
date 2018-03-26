@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Component
 public class RegistrationListener implements
-    ApplicationListener<OnRegistrationCompleteEvent> {
+    ApplicationListener<RegistrationCompleteEvent> {
 
   private VerificationTokenService verificationTokenService;
   private MessageSource messages;
@@ -35,11 +35,11 @@ public class RegistrationListener implements
   }
 
   @Override
-  public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+  public void onApplicationEvent(RegistrationCompleteEvent event) {
     this.confirmRegistration(event);
   }
 
-  private void confirmRegistration(OnRegistrationCompleteEvent event) {
+  private void confirmRegistration(RegistrationCompleteEvent event) {
     AccountEntity user = event.getAccountEntity();
     String token = UUID.randomUUID().toString();
     verificationTokenService.createVerificationTokenForUser(user, token);
@@ -49,20 +49,20 @@ public class RegistrationListener implements
   }
 
 
-  private MimeMessage constructVerificationTokenEmail(OnRegistrationCompleteEvent event,
+  private MimeMessage constructVerificationTokenEmail(RegistrationCompleteEvent event,
                                                       AccountEntity user,
                                                       String token) {
-    final String recipientAddress = user.getEmail();
-    final String subject = messages.getMessage("message.registerMailSubject", null, event.getLocale());
-    final String confirmationUrl = event.getAppUrl() + env.getProperty("message.confirmationUrl") + token;
-    final String message = messages.getMessage("message.registerMailBody", null, event.getLocale());
+    String recipientAddress = user.getEmail();
+    String subject = messages.getMessage("message.registerMailSubject", null, event.getLocale());
+    String confirmationUrl = event.getAppUrl() + env.getProperty("message.confirmationUrl") + token;
+    String message = messages.getMessage("message.registerMailBody", null, event.getLocale());
 
-    final String preheader = messages.getMessage("message.preheader", null, event.getLocale());
-    final String welcome = messages.getMessage("message.welcome", null, event.getLocale());
-    final String registerButtonText = messages.getMessage("message.registerButtonText", null, event.getLocale());
-    final String alternativeUrlPrefix = messages.getMessage("message.alternativeUrlPrefix", null, event.getLocale());
-    final String emailLastText = messages.getMessage("message.emailLastText", null, event.getLocale());
-    final String footerText = messages.getMessage("message.footerText", null, event.getLocale());
+    String preheader = messages.getMessage("message.preheader", null, event.getLocale());
+    String welcome = messages.getMessage("message.welcome", null, event.getLocale());
+    String registerButtonText = messages.getMessage("message.registerButtonText", null, event.getLocale());
+    String alternativeUrlPrefix = messages.getMessage("message.alternativeUrlPrefix", null, event.getLocale());
+    String emailLastText = messages.getMessage("message.emailLastText", null, event.getLocale());
+    String footerText = messages.getMessage("message.footerText", null, event.getLocale());
 
     List<String> templateArgs = new ArrayList<>();
     templateArgs.add(preheader);
@@ -76,7 +76,7 @@ public class RegistrationListener implements
     templateArgs.add(footerText);
 
     return sendEmailService.constructEmailMessage(
-        "static/mailtemplate.html",
+        "static/registration-verification-mail-template.html",
         templateArgs,
         recipientAddress,
         subject

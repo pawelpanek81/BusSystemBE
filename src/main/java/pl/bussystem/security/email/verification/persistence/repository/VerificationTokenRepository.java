@@ -6,6 +6,5 @@ import pl.bussystem.security.email.verification.persistence.entity.VerificationT
 
 @Repository
 public interface VerificationTokenRepository extends JpaRepository<VerificationTokenEntity, Integer> {
-
   VerificationTokenEntity findByToken(String token);
 }

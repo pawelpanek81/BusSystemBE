@@ -1,11 +1,13 @@
 package pl.bussystem.domain.busstop.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BusStopServiceImpl implements BusStopService {
@@ -17,7 +19,7 @@ public class BusStopServiceImpl implements BusStopService {
   }
 
   @Override
-  public BusStopEntity addBusStop(BusStopEntity busEntity) {
+  public BusStopEntity create(BusStopEntity busEntity) {
     String city = busEntity.getCity();
     String name = busEntity.getName();
     if (!busStopRepository.findByCityAndName(city, name).isEmpty()) {
@@ -27,16 +29,16 @@ public class BusStopServiceImpl implements BusStopService {
   }
 
   @Override
-  public List<BusStopEntity> findAll() {
+  public List<BusStopEntity> read() {
     return busStopRepository.findAll();
   }
 
   @Override
-  public Boolean removeBusStop(Integer id) {
-    if (busStopRepository.existsById(id)) {
+  public void deleteById(Integer id) {
+    try {
       busStopRepository.deleteById(id);
-      return true;
+    } catch (EmptyResultDataAccessException e) {
+      throw new NoSuchElementException("Bus stop with id: " + id + " does not exists!");
     }
-    return false;
   }
 }

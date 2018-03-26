@@ -1,6 +1,7 @@
 package pl.bussystem.domain.news.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 
 import java.security.Principal;
+import java.util.NoSuchElementException;
 
 @Service
 public class NewsServiceImpl implements NewsService {
@@ -23,7 +25,7 @@ public class NewsServiceImpl implements NewsService {
     this.accountRepository = accountRepository;
   }
 
-  public NewsEntity add(NewsEntity newsEntity, Principal principal) {
+  public NewsEntity create(NewsEntity newsEntity, Principal principal) {
     AccountEntity user = accountRepository.findByUsername(principal.getName());
     newsEntity.setAuthor(user);
 
@@ -31,16 +33,16 @@ public class NewsServiceImpl implements NewsService {
   }
 
   @Override
-  public boolean remove(Integer id) {
-    if (newsRepository.existsById(id)) {
-      newsRepository.deleteById(id);
-      return true;
-    }
-    return false;
+  public Page<NewsEntity> readByPageable(Pageable pageable) {
+    return newsRepository.findAll(pageable);
   }
 
   @Override
-  public Page<NewsEntity> findAllByPageable(Pageable pageable) {
-    return newsRepository.findAll(pageable);
+  public void deleteById(Integer id) {
+    try {
+      newsRepository.deleteById(id);
+    } catch (EmptyResultDataAccessException e) {
+      throw new NoSuchElementException("News with id: " + id + " does not exists!");
+    }
   }
 }

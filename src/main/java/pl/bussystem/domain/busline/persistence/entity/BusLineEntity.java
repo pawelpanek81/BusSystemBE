@@ -12,6 +12,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BusLineEntity {
   @Id
   @SequenceGenerator(name = "bus_lines_generator",

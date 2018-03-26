@@ -7,17 +7,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.bussystem.domain.news.model.AddNewsDTO;
-import pl.bussystem.domain.news.model.NewsDTO;
+import pl.bussystem.domain.news.mapper.NewsMapper;
+import pl.bussystem.domain.news.model.dto.CreateNewsDTO;
+import pl.bussystem.domain.news.model.dto.ReadNewsDTO;
 import pl.bussystem.domain.news.persistence.entity.NewsEntity;
 import pl.bussystem.domain.news.service.NewsService;
 import pl.bussystem.rest.exception.RestException;
+import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = "/api/v1.0")
+@RequestMapping(value = "/api/v1.0/news")
 class NewsController {
   private NewsService newsService;
 
@@ -26,44 +29,37 @@ class NewsController {
     this.newsService = newsService;
   }
 
-  @RequestMapping(method = RequestMethod.POST, path = "/auth/addNews")
+  @RequestMapping(value = "", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('ROLE_BOK')")
-  ResponseEntity<RestException> addNews(@RequestBody @Valid AddNewsDTO addNewsDTO,
-                                        Principal principal) {
-    NewsEntity news = NewsEntity.builder()
-        .title(addNewsDTO.getTitle())
-        .dateTime(addNewsDTO.getDate())
-        .body(addNewsDTO.getBody())
-        .build();
-    newsService.add(news, principal);
+  ResponseEntity<RestException> create(@RequestBody @Valid CreateNewsDTO dto,
+                                       Principal principal) {
+    NewsEntity news = NewsMapper.mapToNewsEntity(dto);
+
+    newsService.create(news, principal);
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE, path = "/auth/removeNews/{id}")
+  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
   @PreAuthorize("hasAuthority('ROLE_BOK')")
-  ResponseEntity<RestException> removeNews(@PathVariable Integer id) {
-    if (newsService.remove(id)) {
-      return new ResponseEntity<>(HttpStatus.OK);
+  ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
+    try {
+      newsService.deleteById(id);
+    } catch (NoSuchElementException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.NEWS_WITH_GIVEN_ID_DOES_NOT_EXISTS,
+          "News with id: " + id + " does not exists"
+      );
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
-    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(method = RequestMethod.GET, path = "/getNews")
-  ResponseEntity getNews(Pageable pageable) {
-    Page<NewsEntity> allByPageable = newsService.findAllByPageable(pageable);
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  ResponseEntity<Page<ReadNewsDTO>> read(Pageable pageable) {
+    Page<NewsEntity> allByPageable = newsService.readByPageable(pageable);
 
-    Page<NewsDTO> mappedNewsEntities = allByPageable.map(n -> new NewsDTO(
-        n.getId(),
-        n.getTitle(),
-        n.getDateTime(),
-        n.getBody(),
-        n.getAuthor().getName(),
-        n.getAuthor().getSurname(),
-        n.getAuthor().getUsername(),
-        n.getAuthor().getEmail(),
-        n.getAuthor().getPhoto()
-    ));
+    Page<ReadNewsDTO> mappedNewsEntities = allByPageable.map(NewsMapper.mapToReadNewsDTO);
 
     return new ResponseEntity<>(mappedNewsEntities, HttpStatus.OK);
   }

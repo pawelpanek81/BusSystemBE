@@ -7,11 +7,9 @@ import java.util.List;
 public interface BusService {
   BusEntity create(BusEntity busEntity);
 
-  void removeById(Integer id);
-
-  Boolean existsById(Integer id);
+  List<BusEntity> read();
 
   Boolean existsByRegistrationNumber(String registrationNumber);
 
-  List<BusEntity> findAll();
+  void removeById(Integer id);
 }

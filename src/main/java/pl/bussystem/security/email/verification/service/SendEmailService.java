@@ -30,7 +30,7 @@ public class SendEmailService {
     mailSender.send(email);
   }
 
-  // e.g. templateURI: static/mailtemplate.html
+  // e.g. templateURI: static/registration-verification-mail-template.html
   public MimeMessage constructEmailMessage(String templateURI,
                                            List<? extends String> emailTemplateVariables,
                                            String recipientAddress,

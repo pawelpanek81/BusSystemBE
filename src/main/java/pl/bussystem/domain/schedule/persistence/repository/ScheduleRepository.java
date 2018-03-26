@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import pl.bussystem.domain.schedule.persistence.entity.ScheduleEntity;
 
 @Repository
-interface ScheduleRepository extends JpaRepository<ScheduleEntity, Integer> {
+public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Integer> {
 }
