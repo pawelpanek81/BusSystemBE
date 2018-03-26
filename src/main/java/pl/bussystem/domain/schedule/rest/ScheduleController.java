@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.domain.schedule.service.ScheduleService;
 
 @RestController
-@RequestMapping(path = "/api/v1.0/schedules")
+@RequestMapping(value = "/api/v1.0/schedules")
 public class ScheduleController {
   private ScheduleService scheduleService;
 

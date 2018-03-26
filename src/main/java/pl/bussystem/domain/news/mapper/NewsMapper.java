@@ -20,8 +20,7 @@ public class NewsMapper {
               entity.getAuthor().getSurname(),
               entity.getAuthor().getUsername(),
               entity.getAuthor().getEmail(),
-              entity.getAuthor().getPhoto(
-          )));
+              entity.getAuthor().getPhoto()));
 
   public static NewsEntity mapToNewsEntity(CreateNewsDTO dto) {
     return NewsEntity.builder()

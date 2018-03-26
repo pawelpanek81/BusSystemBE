@@ -47,7 +47,7 @@ class NewsController {
       newsService.deleteById(id);
     } catch (NoSuchElementException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.NEWS_WITH_THIS_ID_DOES_NOT_EXISTS,
+          RestExceptionCodes.NEWS_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "News with id: " + id + " does not exists"
       );
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);

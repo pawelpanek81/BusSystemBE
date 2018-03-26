@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/api/v1.0/bus-lines")
+@RequestMapping(value = "/api/v1.0/bus-lines")
 class BusLineController {
   private BusLineService busLineService;
   private BusLineMapper busLineMapper;
@@ -32,21 +32,21 @@ class BusLineController {
     this.busLineMapper = busLineMapper;
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusLineDTO dto) {
-    BusLineEntity busLineEntity = null;
+    BusLineEntity busLineEntity;
     try {
       busLineEntity = busLineMapper.mapToBusLineEntity(dto);
     } catch (NoSuchBusStopFromException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.BUS_STOP_FROM_WITH_THAT_ID_DOES_NOT_EXISTS,
+          RestExceptionCodes.BUS_STOP_FROM_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Bus stop from with id: " + dto.getBusStopFromId() + " or: " + dto.getBusStopToId() + " does not exists!"
       );
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     } catch (NoSuchBusStopToException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.BUS_STOP_TO_WITH_THAT_ID_DOES_NOT_EXISTS,
+          RestExceptionCodes.BUS_STOP_TO_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Bus stop to with id: " + dto.getBusStopFromId() + " or: " + dto.getBusStopToId() + " does not exists!"
       );
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
@@ -55,7 +55,7 @@ class BusLineController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   ResponseEntity<List<ReadBusLineDTO>> readAll() {
     List<BusLineEntity> busLines = busLineService.read();
     List<ReadBusLineDTO> busLinesDTOS = busLines.stream()
@@ -64,14 +64,14 @@ class BusLineController {
     return new ResponseEntity<>(busLinesDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       busLineService.deleteById(id);
     } catch (NoSuchElementException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.BUS_LINE_WITH_THAT_ID_DOES_NOT_EXISTS,
+          RestExceptionCodes.BUS_LINE_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Bus line with id: " + id + " does not exists!"
       );
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);

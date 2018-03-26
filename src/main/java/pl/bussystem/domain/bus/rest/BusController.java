@@ -27,11 +27,11 @@ class BusController {
     this.busService = busService;
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusDTO dto) {
     if (busService.existsByRegistrationNumber(dto.getRegistrationNumber())) {
-      RestException restException = new RestException(RestExceptionCodes.BUS_WITH_THAT_REGISTRATION_NUMBER_EXISTS,
+      RestException restException = new RestException(RestExceptionCodes.BUS_WITH_GIVEN_REGISTRATION_NUMBER_EXISTS,
           "Bus with registration number: " + dto.getRegistrationNumber() + " already exists");
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
@@ -40,20 +40,20 @@ class BusController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       busService.removeById(id);
     } catch (EmptyResultDataAccessException e) {
-      RestException restException = new RestException(RestExceptionCodes.BUS_WITH_THIS_ID_DOES_NOT_EXISTS,
+      RestException restException = new RestException(RestExceptionCodes.BUS_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "There is no bus with id: " + id);
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<List<ReadBusDTO>> readAll() {
     List<BusEntity> buses = busService.read();

@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/api/v1.0/line-routes")
+@RequestMapping(value = "/api/v1.0/line-routes")
 class LineRouteController {
   private LineRouteService lineRouteService;
   private LineRouteMapper lineRouteMapper;
@@ -31,10 +31,10 @@ class LineRouteController {
     this.lineRouteMapper = lineRouteMapper;
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody CreateLineRouteDTO dto) {
-    LineRouteEntity lineRouteEntity = null;
+    LineRouteEntity lineRouteEntity;
     try {
       lineRouteEntity = lineRouteMapper.mapToLineRouteEntity(dto);
     } catch (NoSuchBusLineException e) {
@@ -54,7 +54,7 @@ class LineRouteController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   ResponseEntity<List<ReadLineRouteDTO>> readAll() {
     List<LineRouteEntity> lineRoutes = lineRouteService.read();
     List<ReadLineRouteDTO> lineRouteDTOS = lineRoutes.stream()
@@ -63,14 +63,14 @@ class LineRouteController {
     return new ResponseEntity<>(lineRouteDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       lineRouteService.deleteById(id);
     } catch (NoSuchElementException e) {
       RestException restException = new RestException(
-          RestExceptionCodes.LINE_ROUTE_WITH_THAT_ID_DOES_NOT_EXISTS,
+          RestExceptionCodes.LINE_ROUTE_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Line route with id: " + id + " does not exists!");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }

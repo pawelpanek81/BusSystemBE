@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/api/v1.0/bus-stops")
+@RequestMapping(value = "/api/v1.0/bus-stops")
 class BusStopController {
   private BusStopService busStopService;
 
@@ -29,7 +29,7 @@ class BusStopController {
   }
 
 
-  @RequestMapping(path = "/", method = RequestMethod.POST)
+  @RequestMapping(value = "/", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusStopDTO dto) {
     BusStopEntity busEntity = BusStopMapper.mapToBusStopEntity(dto);
@@ -37,7 +37,7 @@ class BusStopController {
     try {
       busStopService.create(busEntity);
     } catch (IllegalArgumentException e) {
-      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_THAT_CITY_AND_NAME_EXISTS,
+      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_GIVEN_CITY_AND_NAME_EXISTS,
           "Bus stop with this city and name exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.CONFLICT);
     }
@@ -45,7 +45,7 @@ class BusStopController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  @RequestMapping(path = "/", method = RequestMethod.GET)
+  @RequestMapping(value = "/", method = RequestMethod.GET)
   ResponseEntity <List<ReadBusStopDTO>> readAll() {
     List<BusStopEntity> busStops = busStopService.read();
     List<ReadBusStopDTO> busStopDTOS = busStops.stream()
@@ -54,12 +54,12 @@ class BusStopController {
     return new ResponseEntity<>(busStopDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       busStopService.deleteById(id);
     } catch (NoSuchElementException e) {
-      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_THAT_ID_DOES_NOT_EXISTS,
+      RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Bus stop with this id don't exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }

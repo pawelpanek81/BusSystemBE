@@ -93,7 +93,7 @@ class AccountController {
     return new ResponseEntity<>(readUserDTO, HttpStatus.OK);
   }
 
-  @RequestMapping(path = "/usernames", method = RequestMethod.GET)
+  @RequestMapping(value = "/availability/username", method = RequestMethod.GET)
   ResponseEntity<RestException> checkUsername(@RequestParam("username") String username) {
     if (!accountService.existsByUsername(username)) {
       return new ResponseEntity<>(HttpStatus.OK);
@@ -103,7 +103,7 @@ class AccountController {
     }
   }
 
-  @RequestMapping(path = "/emails", method = RequestMethod.GET)
+  @RequestMapping(value = "/availability/email", method = RequestMethod.GET)
   ResponseEntity<RestException> checkEmail(@RequestParam("email") String email) {
     if (!accountService.existsByEmail(email)) {
       return new ResponseEntity<>(HttpStatus.OK);
