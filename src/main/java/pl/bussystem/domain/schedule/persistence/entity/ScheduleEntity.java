@@ -13,6 +13,7 @@ import java.sql.Time;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ScheduleEntity {
   @Id
   @SequenceGenerator(name = "schedules_generator",
