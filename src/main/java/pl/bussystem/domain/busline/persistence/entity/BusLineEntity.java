@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class BusLineEntity {
   @Id
   @SequenceGenerator(name = "bus_lines_generator",
-      sequenceName = "bus_lines_id_seq", initialValue = 1)
+      sequenceName = "bus_lines_id_seq", initialValue = 17)
   @GeneratedValue(generator = "bus_lines_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
