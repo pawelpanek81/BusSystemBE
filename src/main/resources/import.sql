@@ -170,3 +170,6 @@ INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
   VALUES (15, '1-7', true, '14:00', 2);
 INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
   VALUES (16, '1-7', true, '15:00', 2);
+
+
+-- EXPERIMENTAL TICKETS

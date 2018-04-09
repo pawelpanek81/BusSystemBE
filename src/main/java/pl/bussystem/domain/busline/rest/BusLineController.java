@@ -12,6 +12,10 @@ import pl.bussystem.domain.busline.model.dto.CreateBusLineDTO;
 import pl.bussystem.domain.busline.model.dto.ReadBusLineDTO;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.busline.service.BusLineService;
+import pl.bussystem.domain.busstop.mapper.BusStopMapper;
+import pl.bussystem.domain.busstop.model.dto.ReadBusStopDTO;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
+import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineroute.mapper.LineRouteMapper;
 import pl.bussystem.domain.lineroute.model.dto.ReadLineRouteDTO;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
@@ -34,17 +38,20 @@ class BusLineController {
   private BusLineService busLineService;
   private LineRouteService lineRouteService;
   private ScheduleService scheduleService;
+  private BusStopService busStopService;
   private BusLineMapper busLineMapper;
 
   @Autowired
   public BusLineController(BusLineService busLineService,
                            BusLineMapper busLineMapper,
                            LineRouteService lineRouteService,
-                           ScheduleService scheduleService) {
+                           ScheduleService scheduleService,
+                           BusStopService busStopService) {
     this.busLineService = busLineService;
     this.busLineMapper = busLineMapper;
     this.lineRouteService = lineRouteService;
     this.scheduleService = scheduleService;
+    this.busStopService = busStopService;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -101,6 +108,20 @@ class BusLineController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<>(schedules, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{id}/stops", method = RequestMethod.GET)
+  ResponseEntity<List<ReadBusStopDTO>> readStops(@PathVariable Integer id) {
+    List<BusStopEntity> busStopEntities = busStopService.readByBusLineId(id);
+
+    List<ReadBusStopDTO> busStops = busStopEntities.stream()
+        .map(BusStopMapper.mapToReadBusStopDTO)
+        .collect(Collectors.toList());
+
+    if (busStopEntities.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(busStops, HttpStatus.OK);
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
