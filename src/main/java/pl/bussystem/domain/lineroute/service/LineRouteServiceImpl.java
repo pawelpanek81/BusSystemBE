@@ -8,6 +8,7 @@ import pl.bussystem.domain.lineroute.persistence.repository.LineRouteRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class LineRouteServiceImpl implements LineRouteService {
@@ -35,5 +36,13 @@ public class LineRouteServiceImpl implements LineRouteService {
     } catch (EmptyResultDataAccessException e) {
       throw new NoSuchElementException("Line route with id: " + id + " does not exists!");
     }
+  }
+
+  @Override
+  public List<LineRouteEntity> readByBusLineId(Integer id) {
+    List<LineRouteEntity> allLineRoutes = this.read();
+    return allLineRoutes.stream()
+        .filter(lr -> lr.getBusLine().getId().equals(id))
+        .collect(Collectors.toList());
   }
 }

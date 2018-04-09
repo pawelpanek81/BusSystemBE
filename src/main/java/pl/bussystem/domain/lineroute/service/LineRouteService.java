@@ -10,4 +10,6 @@ public interface LineRouteService {
   List<LineRouteEntity> read();
 
   void deleteById(Integer id);
+
+  List<LineRouteEntity> readByBusLineId(Integer id);
 }
