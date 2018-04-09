@@ -8,6 +8,7 @@ import pl.bussystem.domain.schedule.persistence.repository.ScheduleRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -35,5 +36,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     } catch (EmptyResultDataAccessException e) {
       throw new NoSuchElementException("There is no schedule with: " + id);
     }
+  }
+
+  @Override
+  public List<ScheduleEntity> readByBusLineId(Integer id) {
+    List<ScheduleEntity> allScheduleEntities = this.read();
+    return allScheduleEntities.stream()
+        .filter(se -> se.getBusLine().getId().equals(id))
+        .collect(Collectors.toList());
   }
 }

@@ -16,11 +16,14 @@ import pl.bussystem.domain.lineroute.mapper.LineRouteMapper;
 import pl.bussystem.domain.lineroute.model.dto.ReadLineRouteDTO;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineroute.service.LineRouteService;
+import pl.bussystem.domain.schedule.mapper.ScheduleMapper;
+import pl.bussystem.domain.schedule.model.dto.ReadScheduleDTO;
+import pl.bussystem.domain.schedule.persistence.entity.ScheduleEntity;
+import pl.bussystem.domain.schedule.service.ScheduleService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -30,15 +33,18 @@ import java.util.stream.Collectors;
 class BusLineController {
   private BusLineService busLineService;
   private LineRouteService lineRouteService;
+  private ScheduleService scheduleService;
   private BusLineMapper busLineMapper;
 
   @Autowired
   public BusLineController(BusLineService busLineService,
                            BusLineMapper busLineMapper,
-                           LineRouteService lineRouteService) {
+                           LineRouteService lineRouteService,
+                           ScheduleService scheduleService) {
     this.busLineService = busLineService;
     this.busLineMapper = busLineMapper;
     this.lineRouteService = lineRouteService;
+    this.scheduleService = scheduleService;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -73,8 +79,8 @@ class BusLineController {
     return new ResponseEntity<>(busLinesDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "{id}/route", method = RequestMethod.GET)
-  ResponseEntity<List<ReadLineRouteDTO>> readRoute(@PathVariable Integer id) {
+  @RequestMapping(value = "{id}/routes", method = RequestMethod.GET)
+  ResponseEntity<List<ReadLineRouteDTO>> readRoutes(@PathVariable Integer id) {
     List<LineRouteEntity> routeEntities = lineRouteService.readByBusLineId(id);
     List<ReadLineRouteDTO> routes = routeEntities.stream()
         .map(LineRouteMapper.mapToReadLineRouteDTO)
@@ -83,6 +89,18 @@ class BusLineController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     return new ResponseEntity<>(routes, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{id}/schedules", method = RequestMethod.GET)
+  ResponseEntity<List<ReadScheduleDTO>> readSchedules(@PathVariable Integer id) {
+    List<ScheduleEntity> scheduleEntities = scheduleService.readByBusLineId(id);
+    List<ReadScheduleDTO> schedules = scheduleEntities.stream()
+        .map(ScheduleMapper.mapToReadScheduleDTO)
+        .collect(Collectors.toList());
+    if (schedules.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(schedules, HttpStatus.OK);
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

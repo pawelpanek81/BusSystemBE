@@ -51,7 +51,6 @@ class ScheduleController {
   }
 
   @RequestMapping(path = "", method = RequestMethod.GET)
-  @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<List<ReadScheduleDTO>> readAll() {
     List<ScheduleEntity> scheduleEntities = scheduleService.read();
     List<ReadScheduleDTO> dtos = scheduleEntities.stream()
@@ -61,7 +60,6 @@ class ScheduleController {
   }
 
   @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-  @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
     try {
       scheduleService.deleteById(id);
