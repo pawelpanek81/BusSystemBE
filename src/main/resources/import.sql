@@ -98,7 +98,7 @@ INSERT INTO public.bus_lines(id, drive_time, name, drive_from, destination)
   VALUES (2, 60, 'L2 Rzeszów -> Tarnobrzeg', 13, 1);
 
 -- LINE ROUTES
--- L1 Tarnobrzeg -> Rzeszów
+-- dla L1 Tarnobrzeg -> Rzeszów
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (1, 10, 2, 1, 3);
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
@@ -116,7 +116,7 @@ INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (8, 50, 9, 1, 12);
 
--- L1 Rzeszów -> Tarnobrzeg
+-- dla L1 Rzeszów -> Tarnobrzeg
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (9, 10, 9, 2, 12);
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
@@ -135,3 +135,38 @@ INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (16, 50, 2, 2, 2);
 
 --SCHEDULES
+-- dla L1 Tarnobrzeg -> Rzeszów
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (1, '1-7', true, '8:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (2, '1-7', true, '9:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (3, '1-7', true, '10:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (4, '1-7', true, '11:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (5, '1-7', true, '12:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (6, '1-7', true, '13:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (7, '1-7', true, '14:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+  VALUES (8, '1-7', true, '15:00', 1);
+
+-- dla L1 Rzeszów -> Tarnobrzeg
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (9, '1-7', true, '8:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (10, '1-7', true, '9:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (11, '1-7', true, '10:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (12, '1-7', true, '11:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (13, '1-7', true, '12:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (14, '1-7', true, '13:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (15, '1-7', true, '14:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
+VALUES (16, '1-7', true, '15:00', 2);

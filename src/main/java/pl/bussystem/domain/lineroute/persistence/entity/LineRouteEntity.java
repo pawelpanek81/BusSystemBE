@@ -19,7 +19,7 @@ import javax.persistence.*;
 public class LineRouteEntity {
   @Id
   @SequenceGenerator(name = "lines_routes_generator",
-      sequenceName = "lines_routes_id_seq", initialValue = 1)
+      sequenceName = "lines_routes_id_seq", initialValue = 17)
   @GeneratedValue(generator = "lines_routes_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
