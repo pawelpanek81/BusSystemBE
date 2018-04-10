@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineroute.persistence.repository.LineRouteRepository;
@@ -14,10 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LineRouteServiceImplTest {
   private LineRouteService lineRouteService;
 
@@ -47,7 +48,7 @@ public class LineRouteServiceImplTest {
         new BusLineEntity(2, "bus line3", null, null, null),
         null, null, null
     );
-    List<LineRouteEntity> lineRoutes = new ArrayList<>(Arrays.asList(lineRoute1, lineRoute2, lineRoute3));
+    List<LineRouteEntity> lineRoutes = Arrays.asList(lineRoute1, lineRoute2, lineRoute3);
 
     when(lineRouteRepositoryMock.findAll()).thenReturn(lineRoutes);
 
