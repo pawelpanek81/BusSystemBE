@@ -37,7 +37,7 @@ public class BusRideEntity {
   @JoinColumn(name = "primary_driver", nullable = false)
   private AccountEntity primaryDriver;
 
-  @ManyToOne(optional = false)
+  @ManyToOne
   @JoinColumn(name = "secondary_driver")
   private AccountEntity secondaryDriver;
 
