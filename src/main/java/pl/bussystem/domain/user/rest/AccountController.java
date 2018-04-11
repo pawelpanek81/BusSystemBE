@@ -93,26 +93,6 @@ class AccountController {
     return new ResponseEntity<>(readUserDTO, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/availability/username", method = RequestMethod.GET)
-  ResponseEntity<RestException> checkUsername(@RequestParam("username") String username) {
-    if (!accountService.existsByUsername(username)) {
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN, "Username is taken");
-      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
-    }
-  }
-
-  @RequestMapping(value = "/availability/email", method = RequestMethod.GET)
-  ResponseEntity<RestException> checkEmail(@RequestParam("email") String email) {
-    if (!accountService.existsByEmail(email)) {
-      return new ResponseEntity<>(HttpStatus.OK);
-    } else {
-      RestException restException = new RestException(RestExceptionCodes.EMAIL_IS_ALREADY_USED, "Email is already used");
-      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
-    }
-  }
-
   @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
   @Secured(value = {"ROLE_USER", "ROLE_ADMIN", "ROLE_BOK", "ROLE_DRIVER"})
   ResponseEntity updateById(@PathVariable Integer id,
