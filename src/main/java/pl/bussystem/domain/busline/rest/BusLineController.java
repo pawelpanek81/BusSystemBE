@@ -89,12 +89,15 @@ class BusLineController {
   @RequestMapping(value = "{id}/routes", method = RequestMethod.GET)
   ResponseEntity<List<ReadLineRouteDTO>> readRoutes(@PathVariable Integer id) {
     List<LineRouteEntity> routeEntities = lineRouteService.readByBusLineId(id);
+
+    if (routeEntities.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     List<ReadLineRouteDTO> routes = routeEntities.stream()
         .map(LineRouteMapper.mapToReadLineRouteDTO)
         .collect(Collectors.toList());
-    if (routes.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+
     return new ResponseEntity<>(routes, HttpStatus.OK);
   }
 

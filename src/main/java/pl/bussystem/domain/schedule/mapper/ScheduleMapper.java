@@ -24,7 +24,7 @@ public class ScheduleMapper {
 
   public static Function<? super ScheduleEntity, ? extends ReadScheduleDTO> mapToReadScheduleDTO =
       entity -> new ReadScheduleDTO(
-        entity.getId(),
+          entity.getId(),
           BusLineMapper.mapToReadBusLineDTO.apply(entity.getBusLine()),
           entity.getCode(),
           entity.getStartHour(),

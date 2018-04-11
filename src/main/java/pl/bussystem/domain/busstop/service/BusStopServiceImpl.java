@@ -53,7 +53,6 @@ public class BusStopServiceImpl implements BusStopService {
     List<LineRouteEntity> lineRouteEntitiesById = lineRouteService.readByBusLineId(id);
 
     return lineRouteEntitiesById.stream()
-        .filter(lr -> lr.getBusLine().getId().equals(id))
         .map(LineRouteEntity::getBusStop)
         .collect(Collectors.toList());
 
