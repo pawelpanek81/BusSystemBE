@@ -3,6 +3,8 @@ package pl.bussystem.domain.busstop.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busline.service.BusLineService;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
@@ -16,12 +18,15 @@ import java.util.stream.Collectors;
 public class BusStopServiceImpl implements BusStopService {
   private BusStopRepository busStopRepository;
   private LineRouteService lineRouteService;
+  private BusLineService busLineService;
 
   @Autowired
   public BusStopServiceImpl(BusStopRepository busStopRepository,
-                            LineRouteService lineRouteService) {
+                            LineRouteService lineRouteService,
+                            BusLineService busLineService) {
     this.busStopRepository = busStopRepository;
     this.lineRouteService = lineRouteService;
+    this.busLineService = busLineService;
   }
 
   @Override
@@ -50,11 +55,18 @@ public class BusStopServiceImpl implements BusStopService {
 
   @Override
   public List<BusStopEntity> readByBusLineId(Integer id) {
+    if (busLineService.notExistsById(id)) {
+      throw new NoSuchElementException("Bus line with id: " + id + " does not exists!");
+    }
+    BusLineEntity busLine = busLineService.readById(id);
     List<LineRouteEntity> lineRouteEntitiesById = lineRouteService.readByBusLineId(id);
-
-    return lineRouteEntitiesById.stream()
+    List<BusStopEntity> busStops = lineRouteEntitiesById.stream()
         .map(LineRouteEntity::getBusStop)
         .collect(Collectors.toList());
 
+    busStops.add(0, busLine.getFrom());
+    busStops.add(busLine.getTo());
+
+    return busStops;
   }
 }

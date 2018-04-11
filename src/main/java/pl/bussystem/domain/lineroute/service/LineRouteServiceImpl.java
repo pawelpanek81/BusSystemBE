@@ -3,6 +3,7 @@ package pl.bussystem.domain.lineroute.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import pl.bussystem.domain.busline.service.BusLineService;
 import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineroute.persistence.repository.LineRouteRepository;
 
@@ -13,10 +14,13 @@ import java.util.stream.Collectors;
 @Service
 public class LineRouteServiceImpl implements LineRouteService {
   private LineRouteRepository lineRouteRepository;
+  private BusLineService busLineService;
 
   @Autowired
-  public LineRouteServiceImpl(LineRouteRepository lineRouteRepository) {
+  public LineRouteServiceImpl(LineRouteRepository lineRouteRepository,
+                              BusLineService busLineService) {
     this.lineRouteRepository = lineRouteRepository;
+    this.busLineService = busLineService;
   }
 
   @Override
@@ -40,9 +44,19 @@ public class LineRouteServiceImpl implements LineRouteService {
 
   @Override
   public List<LineRouteEntity> readByBusLineId(Integer id) {
+    if (busLineService.notExistsById(id)) {
+      throw new NoSuchElementException("Bus line with id: " + id + " does not exists!");
+    }
     List<LineRouteEntity> allLineRoutes = this.read();
     return allLineRoutes.stream()
         .filter(lr -> lr.getBusLine().getId().equals(id))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public LineRouteEntity readById(Integer id) {
+    return lineRouteRepository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Line route with id: " + id + " does not exists!"));
   }
 }

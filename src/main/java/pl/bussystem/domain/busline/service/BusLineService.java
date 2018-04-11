@@ -10,4 +10,8 @@ public interface BusLineService {
   List<BusLineEntity> read();
 
   void deleteById(Integer id);
+
+  BusLineEntity readById(Integer id);
+
+  boolean notExistsById(Integer id);
 }

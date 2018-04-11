@@ -3,6 +3,7 @@ package pl.bussystem.domain.schedule.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import pl.bussystem.domain.busline.service.BusLineService;
 import pl.bussystem.domain.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.schedule.persistence.repository.ScheduleRepository;
 
@@ -13,10 +14,13 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
   private ScheduleRepository scheduleRepository;
+  private BusLineService busLineService;
 
   @Autowired
-  public ScheduleServiceImpl(ScheduleRepository scheduleRepository) {
+  public ScheduleServiceImpl(ScheduleRepository scheduleRepository,
+                             BusLineService busLineService) {
     this.scheduleRepository = scheduleRepository;
+    this.busLineService = busLineService;
   }
 
   @Override
@@ -40,6 +44,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
   @Override
   public List<ScheduleEntity> readByBusLineId(Integer id) {
+    if (busLineService.notExistsById(id)) {
+      throw new NoSuchElementException("Bus line with id: " + id + " does not exists!");
+    }
     List<ScheduleEntity> allScheduleEntities = this.read();
     return allScheduleEntities.stream()
         .filter(se -> se.getBusLine().getId().equals(id))

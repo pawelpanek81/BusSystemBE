@@ -88,43 +88,56 @@ class BusLineController {
 
   @RequestMapping(value = "{id}/routes", method = RequestMethod.GET)
   ResponseEntity<List<ReadLineRouteDTO>> readRoutes(@PathVariable Integer id) {
-    List<LineRouteEntity> routeEntities = lineRouteService.readByBusLineId(id);
-
-    if (routeEntities.isEmpty()) {
+    List<LineRouteEntity> routeEntities;
+    try {
+      routeEntities = lineRouteService.readByBusLineId(id);
+    } catch (NoSuchElementException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
     List<ReadLineRouteDTO> routes = routeEntities.stream()
         .map(LineRouteMapper.mapToReadLineRouteDTO)
         .collect(Collectors.toList());
-
     return new ResponseEntity<>(routes, HttpStatus.OK);
   }
 
   @RequestMapping(value = "{id}/schedules", method = RequestMethod.GET)
   ResponseEntity<List<ReadScheduleDTO>> readSchedules(@PathVariable Integer id) {
-    List<ScheduleEntity> scheduleEntities = scheduleService.readByBusLineId(id);
+    List<ScheduleEntity> scheduleEntities;
+    try {
+      scheduleEntities = scheduleService.readByBusLineId(id);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
     List<ReadScheduleDTO> schedules = scheduleEntities.stream()
         .map(ScheduleMapper.mapToReadScheduleDTO)
         .collect(Collectors.toList());
-    if (schedules.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
     return new ResponseEntity<>(schedules, HttpStatus.OK);
   }
 
   @RequestMapping(value = "{id}/stops", method = RequestMethod.GET)
   ResponseEntity<List<ReadBusStopDTO>> readStops(@PathVariable Integer id) {
-    List<BusStopEntity> busStopEntities = busStopService.readByBusLineId(id);
-
+    List<BusStopEntity> busStopEntities;
+    try {
+      busStopEntities = busStopService.readByBusLineId(id);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
     List<ReadBusStopDTO> busStops = busStopEntities.stream()
         .map(BusStopMapper.mapToReadBusStopDTO)
         .collect(Collectors.toList());
+    return new ResponseEntity<>(busStops, HttpStatus.OK);
+  }
 
-    if (busStopEntities.isEmpty()) {
+  @RequestMapping(value = "{id}", method = RequestMethod.GET)
+  ResponseEntity<ReadBusLineDTO> readById(@PathVariable Integer id) {
+    BusLineEntity busLine;
+    try {
+      busLine = busLineService.readById(id);
+    } catch (NoSuchElementException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    return new ResponseEntity<>(busStops, HttpStatus.OK);
+    ReadBusLineDTO busLineDTO = BusLineMapper.mapToReadBusLineDTO.apply(busLine);
+    return new ResponseEntity<>(busLineDTO, HttpStatus.OK);
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

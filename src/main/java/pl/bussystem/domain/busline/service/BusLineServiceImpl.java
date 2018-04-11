@@ -36,4 +36,16 @@ public class BusLineServiceImpl implements BusLineService {
       throw new NoSuchElementException("Bus line with id: " + id + " does not exists!");
     }
   }
+
+  @Override
+  public BusLineEntity readById(Integer id) {
+    return busLineRepository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Bus line with id: " + id + " does not exists!"));
+  }
+
+  @Override
+  public boolean notExistsById(Integer id) {
+    return !busLineRepository.existsById(id);
+  }
 }
