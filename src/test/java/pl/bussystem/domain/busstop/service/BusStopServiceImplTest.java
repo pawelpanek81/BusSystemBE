@@ -5,13 +5,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busline.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busline.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.busline.lineroute.persistence.repository.LineRouteRepository;
+import pl.bussystem.domain.busline.lineroute.service.LineRouteService;
+import pl.bussystem.domain.busline.lineroute.service.LineRouteServiceImpl;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
-import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
-import pl.bussystem.domain.lineroute.persistence.repository.LineRouteRepository;
-import pl.bussystem.domain.lineroute.service.LineRouteService;
-import pl.bussystem.domain.lineroute.service.LineRouteServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,8 +34,8 @@ public class BusStopServiceImplTest {
 
   @Before
   public void setUp() {
-    this.lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock);
-    this.busStopService = new BusStopServiceImpl(busStopRepositoryMock, lineRouteService);
+    this.lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock, null);
+    this.busStopService = new BusStopServiceImpl(busStopRepositoryMock, lineRouteService, null);
   }
 
   @Test
