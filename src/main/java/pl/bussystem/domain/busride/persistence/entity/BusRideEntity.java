@@ -2,7 +2,7 @@ package pl.bussystem.domain.busride.persistence.entity;
 
 import lombok.*;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
-import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busline.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 
 import javax.persistence.*;
