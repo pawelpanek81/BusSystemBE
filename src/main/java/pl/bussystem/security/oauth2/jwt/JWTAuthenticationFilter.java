@@ -3,7 +3,9 @@ package pl.bussystem.security.oauth2.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -38,13 +40,20 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       AccountEntity creds = new ObjectMapper()
           .readValue(req.getInputStream(), AccountEntity.class);
 
-      return authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(
-              creds.getUsername(),
-              creds.getPassword(),
-              new ArrayList<>()
-          )
-      );
+      Authentication authenticate = null;
+      try {
+        authenticate = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                creds.getUsername(),
+                creds.getPassword(),
+                new ArrayList<>()
+            )
+        );
+      } catch (BadCredentialsException e) {
+        res.setStatus(HttpStatus.NOT_FOUND.value());
+      }
+
+      return authenticate;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -15,6 +15,7 @@ import pl.bussystem.domain.lineroute.service.LineRouteService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ class LineRouteController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity<RestException> create(@RequestBody CreateLineRouteDTO dto) {
+  ResponseEntity<RestException> create(@Valid @RequestBody CreateLineRouteDTO dto) {
     LineRouteEntity lineRouteEntity;
     try {
       lineRouteEntity = lineRouteMapper.mapToLineRouteEntity(dto);

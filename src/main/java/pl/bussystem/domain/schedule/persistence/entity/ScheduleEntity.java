@@ -13,10 +13,11 @@ import java.sql.Time;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ScheduleEntity {
   @Id
   @SequenceGenerator(name = "schedules_generator",
-      sequenceName = "schedules_id_seq", initialValue = 1)
+      sequenceName = "schedules_id_seq", initialValue = 17)
   @GeneratedValue(generator = "schedules_generator")
   @Column(name = "id", nullable = false)
   private Integer id;

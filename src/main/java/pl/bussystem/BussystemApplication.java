@@ -9,7 +9,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-class BussystemApplication {
+public class BussystemApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BussystemApplication.class, args);

@@ -5,17 +5,23 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
+import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.lineroute.service.LineRouteService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class BusStopServiceImpl implements BusStopService {
   private BusStopRepository busStopRepository;
+  private LineRouteService lineRouteService;
 
   @Autowired
-  public BusStopServiceImpl(BusStopRepository busStopRepository) {
+  public BusStopServiceImpl(BusStopRepository busStopRepository,
+                            LineRouteService lineRouteService) {
     this.busStopRepository = busStopRepository;
+    this.lineRouteService = lineRouteService;
   }
 
   @Override
@@ -40,5 +46,15 @@ public class BusStopServiceImpl implements BusStopService {
     } catch (EmptyResultDataAccessException e) {
       throw new NoSuchElementException("Bus stop with id: " + id + " does not exists!");
     }
+  }
+
+  @Override
+  public List<BusStopEntity> readByBusLineId(Integer id) {
+    List<LineRouteEntity> lineRouteEntitiesById = lineRouteService.readByBusLineId(id);
+
+    return lineRouteEntitiesById.stream()
+        .map(LineRouteEntity::getBusStop)
+        .collect(Collectors.toList());
+
   }
 }

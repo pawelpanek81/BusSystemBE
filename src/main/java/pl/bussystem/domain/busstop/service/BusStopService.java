@@ -10,4 +10,6 @@ public interface BusStopService {
   List<BusStopEntity> read();
 
   void deleteById(Integer id);
+
+  List<BusStopEntity> readByBusLineId(Integer id);
 }
