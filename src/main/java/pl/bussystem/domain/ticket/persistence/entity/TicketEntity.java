@@ -22,9 +22,9 @@ public class TicketEntity {
   @Column(name = "id", nullable = false)
   private Integer id;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "driver", nullable = false)
-  private AccountEntity driver;
+  @ManyToOne
+  @JoinColumn(name = "user_account")
+  private AccountEntity userAccount;
 
   @Column(name = "name", nullable = false)
   private String name;
