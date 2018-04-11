@@ -5,9 +5,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import pl.bussystem.domain.busline.persistence.entity.BusLineEntity;
-import pl.bussystem.domain.lineroute.persistence.entity.LineRouteEntity;
-import pl.bussystem.domain.lineroute.persistence.repository.LineRouteRepository;
+import pl.bussystem.domain.busline.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.busline.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.busline.lineroute.persistence.repository.LineRouteRepository;
+import pl.bussystem.domain.busline.lineroute.service.LineRouteService;
+import pl.bussystem.domain.busline.lineroute.service.LineRouteServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,7 @@ public class LineRouteServiceImplTest {
 
   @Before
   public void setUp() {
-    lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock);
+    lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock, null);
   }
 
   @Test
