@@ -28,17 +28,19 @@ INSERT INTO public.accounts(id, username, password, name, surname, email, phone,
   VALUES  (5, 'user1', '$2a$04$epeg1B52UFs0iBLleXk9y.O2R93KRjRA4XljnE0zIes2kVnpOAXSa',
          'Maciej', 'Kozioł', 'maciej.k@o2.pl', '739323257', null, TRUE);
 INSERT INTO public.authorities(id, authority, account)
-  VALUES (5, 'ROLE_DRIVER', 5);
+  VALUES (5, 'ROLE_USER', 5);
 
 INSERT INTO public.accounts(id, username, password, name, surname, email, phone, photo, active)
   VALUES  (6, 'user2', '$2a$04$epeg1B52UFs0iBLleXk9y.O2R93KRjRA4XljnE0zIes2kVnpOAXSa',
          'Jan', 'Świderski', 'jan.swiderski@buziaczek.pl', '883287189', null, TRUE);
 INSERT INTO public.authorities(id, authority, account)
-  VALUES (6, 'ROLE_DRIVER', 6);
+  VALUES (6, 'ROLE_USER', 6);
 
 INSERT INTO public.accounts(id, username, password, name, surname, email, phone, photo, active)
 VALUES  (7, 'user3', '$2a$04$epeg1B52UFs0iBLleXk9y.O2R93KRjRA4XljnE0zIes2kVnpOAXSa',
          'Andrzej', 'Nowoczesny', 'andrzej.nowoczesny@onet.pl', '785213489', null, FALSE);
+INSERT INTO public.authorities(id, authority, account)
+VALUES (7, 'ROLE_USER', 7);
 
 -- NEWS
 INSERT INTO public.news(id, title, body, author, date_time)
