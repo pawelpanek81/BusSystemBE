@@ -54,7 +54,7 @@ public class LineRouteServiceImpl implements LineRouteService {
 
   @Override
   public List<LineRouteEntity> read() {
-    return lineRouteRepository.findAll();
+    return lineRouteRepository.findAllByOrderBySequence();
   }
 
   @Override
