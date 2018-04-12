@@ -5,11 +5,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import pl.bussystem.domain.busline.busline.persistence.entity.BusLineEntity;
-import pl.bussystem.domain.busline.lineroute.persistence.entity.LineRouteEntity;
-import pl.bussystem.domain.busline.lineroute.persistence.repository.LineRouteRepository;
-import pl.bussystem.domain.busline.lineroute.service.LineRouteService;
-import pl.bussystem.domain.busline.lineroute.service.LineRouteServiceImpl;
+import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.lineinfo.lineroute.persistence.repository.LineRouteRepository;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteServiceImpl;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
 
