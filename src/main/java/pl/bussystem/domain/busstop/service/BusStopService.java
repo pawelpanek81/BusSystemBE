@@ -12,4 +12,6 @@ public interface BusStopService {
   void deleteById(Integer id);
 
   List<BusStopEntity> readByBusLineId(Integer id);
+
+  List<BusStopEntity> readUnusedByBusLineId(Integer id);
 }

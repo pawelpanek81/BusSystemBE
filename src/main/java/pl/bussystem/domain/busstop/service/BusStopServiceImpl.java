@@ -69,4 +69,17 @@ public class BusStopServiceImpl implements BusStopService {
 
     return busStops;
   }
+
+  @Override
+  public List<BusStopEntity> readUnusedByBusLineId(Integer id) {
+    List<Integer> busStopsIdsUsedByBusLine = this.readByBusLineId(id).stream()
+        .map(BusStopEntity::getId)
+        .collect(Collectors.toList());
+
+    List<BusStopEntity> allStops = this.read();
+
+    return allStops.stream()
+        .filter(bs -> !busStopsIdsUsedByBusLine.contains(bs.getId()))
+        .collect(Collectors.toList());
+  }
 }

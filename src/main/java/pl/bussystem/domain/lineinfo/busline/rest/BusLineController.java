@@ -162,6 +162,20 @@ class BusLineController {
     return new ResponseEntity<>(busStops, HttpStatus.OK);
   }
 
+  @RequestMapping(value = "{id}/leftStops", method = RequestMethod.GET)
+  ResponseEntity<List<ReadBusStopDTO>> readUnusedStops(@PathVariable Integer id) {
+    List<BusStopEntity> busStopEntities;
+    try {
+      busStopEntities = busStopService.readUnusedByBusLineId(id);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    List<ReadBusStopDTO> leftBusStops = busStopEntities.stream()
+        .map(BusStopMapper.mapToReadBusStopDTO)
+        .collect(Collectors.toList());
+    return new ResponseEntity<>(leftBusStops, HttpStatus.OK);
+  }
+
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
