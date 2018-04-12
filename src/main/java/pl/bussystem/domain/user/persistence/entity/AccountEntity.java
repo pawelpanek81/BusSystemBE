@@ -20,7 +20,7 @@ public class AccountEntity {
   }
   @Id
   @SequenceGenerator(name = "accounts_generator",
-      sequenceName = "accounts_id_seq", initialValue = 7)
+      sequenceName = "accounts_id_seq", initialValue = 8)
   @GeneratedValue(generator = "accounts_generator")
   @Column(name = "id", nullable = false)
   private Integer id;

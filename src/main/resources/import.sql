@@ -36,6 +36,10 @@ INSERT INTO public.accounts(id, username, password, name, surname, email, phone,
 INSERT INTO public.authorities(id, authority, account)
   VALUES (6, 'ROLE_DRIVER', 6);
 
+INSERT INTO public.accounts(id, username, password, name, surname, email, phone, photo, active)
+VALUES  (7, 'user3', '$2a$04$epeg1B52UFs0iBLleXk9y.O2R93KRjRA4XljnE0zIes2kVnpOAXSa',
+         'Andrzej', 'Nowoczesny', 'andrzej.nowoczesny@onet.pl', '785213489', null, FALSE);
+
 -- NEWS
 INSERT INTO public.news(id, title, body, author, date_time)
   VALUES (1, 'Litwo! Ojczyzno moja!', 'Ty jesteś jak zdrowie. Ile cię trzeba cenić, ten odwiązywać, składać. Właśnie tym obrazem. Właśnie dwukonną bryką wjechał młody panek i zdrowie. Nazywał się długo dumał, nim stał dwór szlachecki, z liczby kopic, co dzień za dowód', 1, '2008-01-01T16:06:09');
