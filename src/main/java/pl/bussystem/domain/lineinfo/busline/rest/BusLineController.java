@@ -13,15 +13,16 @@ import pl.bussystem.domain.lineinfo.busline.exception.NoSuchBusStopFromException
 import pl.bussystem.domain.lineinfo.busline.exception.NoSuchBusStopToException;
 import pl.bussystem.domain.lineinfo.busline.mapper.BusLineMapper;
 import pl.bussystem.domain.lineinfo.busline.mapper.RouteMapper;
-import pl.bussystem.domain.lineinfo.busline.model.dto.CreateBusLineDTO;
-import pl.bussystem.domain.lineinfo.busline.model.dto.ReadBusLineDTO;
-import pl.bussystem.domain.lineinfo.busline.model.dto.ReadRouteDTO;
-import pl.bussystem.domain.lineinfo.busline.model.dto.ReadScheduleDTO;
+import pl.bussystem.domain.lineinfo.busline.mapper.ScheduleMapper;
+import pl.bussystem.domain.lineinfo.busline.model.dto.*;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
+import pl.bussystem.domain.lineinfo.lineroute.exception.NoSuchBusLineException;
+import pl.bussystem.domain.lineinfo.lineroute.exception.NoSuchBusStopException;
+import pl.bussystem.domain.lineinfo.lineroute.mapper.LineRouteMapper;
+import pl.bussystem.domain.lineinfo.lineroute.model.dto.CreateLineRouteDTO;
 import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
-import pl.bussystem.domain.lineinfo.busline.mapper.ScheduleMapper;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.service.ScheduleService;
 import pl.bussystem.rest.exception.RestException;
@@ -40,18 +41,21 @@ class BusLineController {
   private ScheduleService scheduleService;
   private BusStopService busStopService;
   private BusLineMapper busLineMapper;
+  private LineRouteMapper lineRouteMapper;
 
   @Autowired
   public BusLineController(BusLineService busLineService,
                            BusLineMapper busLineMapper,
                            LineRouteService lineRouteService,
                            ScheduleService scheduleService,
-                           BusStopService busStopService) {
+                           BusStopService busStopService,
+                           LineRouteMapper lineRouteMapper) {
     this.busLineService = busLineService;
     this.busLineMapper = busLineMapper;
     this.lineRouteService = lineRouteService;
     this.scheduleService = scheduleService;
     this.busStopService = busStopService;
+    this.lineRouteMapper = lineRouteMapper;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -110,6 +114,24 @@ class BusLineController {
         .map(RouteMapper.mapToReadLineRouteDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(routes, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{id}/routes", method = RequestMethod.POST)
+  ResponseEntity<RestException> createRoute(@PathVariable Integer id, @Valid @RequestBody CreateRouteDTO dto) {
+    CreateLineRouteDTO lineRouteDTO = new CreateLineRouteDTO(
+        id,
+        dto.getBusStopId(),
+        dto.getSequence(),
+        dto.getDriveTime()
+    );
+    LineRouteEntity lineRouteEntity;
+    try {
+      lineRouteEntity = lineRouteMapper.mapToLineRouteEntity(lineRouteDTO);
+      lineRouteService.create(lineRouteEntity);
+    } catch (NoSuchBusLineException | NoSuchBusStopException | IllegalArgumentException e) {
+      return new ResponseEntity<>(HttpStatus.CONFLICT);
+    }
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @RequestMapping(value = "{id}/schedules", method = RequestMethod.GET)

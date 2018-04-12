@@ -34,7 +34,7 @@ class LineRouteController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity<RestException> create(@Valid @RequestBody CreateLineRouteDTO dto) {
+  public ResponseEntity<RestException> create(@Valid @RequestBody CreateLineRouteDTO dto) {
     LineRouteEntity lineRouteEntity;
     try {
       lineRouteEntity = lineRouteMapper.mapToLineRouteEntity(dto);
@@ -51,7 +51,11 @@ class LineRouteController {
       );
       return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
-    lineRouteService.create(lineRouteEntity);
+    try {
+      lineRouteService.create(lineRouteEntity);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(HttpStatus.CONFLICT);
+    }
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 

@@ -92,13 +92,13 @@ INSERT INTO public.bus_stops(id, city, name, latitude, longitude, address)
 
 -- BUS LINES
 INSERT INTO public.bus_lines(id, drive_time, name, drive_from, destination)
-  VALUES (1, 60, 'L1 Tarnobrzeg -> Rzeszów', 1, 13);
+  VALUES (1, 60, 'L1', 1, 13);
 
 INSERT INTO public.bus_lines(id, drive_time, name, drive_from, destination)
-  VALUES (2, 60, 'L2 Rzeszów -> Tarnobrzeg', 13, 1);
+  VALUES (2, 60, 'L2', 13, 1);
 
 -- LINE ROUTES
--- dla L1 Tarnobrzeg -> Rzeszów
+-- dla L1 (Tarnobrzeg -> Rzeszów)
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (1, 10, 2, 1, 3);
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
@@ -116,23 +116,23 @@ INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (8, 50, 9, 1, 12);
 
--- dla L1 Rzeszów -> Tarnobrzeg
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (9, 10, 9, 2, 12);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (10, 15, 8, 2, 11);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (11, 20, 7, 2, 10);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (12, 25, 6, 2, 8);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (13, 35, 5, 2, 7);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (14, 40, 4, 2, 6);
-INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
-  VALUES (15, 45, 3, 2, 4);
+-- dla L2 (Rzeszów -> Tarnobrzeg)
 INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
   VALUES (16, 50, 2, 2, 2);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (15, 45, 3, 2, 4);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (14, 40, 4, 2, 6);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (13, 35, 5, 2, 7);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (12, 25, 6, 2, 8);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (11, 20, 7, 2, 10);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (10, 15, 8, 2, 11);
+INSERT INTO public.lines_routes(id, drive_time, sequence, bus_line, bus_stop)
+VALUES (9, 10, 9, 2, 12);
 
 --SCHEDULES
 -- dla L1 Tarnobrzeg -> Rzeszów
