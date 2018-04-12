@@ -55,9 +55,6 @@ public class BusStopServiceImpl implements BusStopService {
 
   @Override
   public List<BusStopEntity> readByBusLineId(Integer id) {
-    if (busLineService.notExistsById(id)) {
-      throw new NoSuchElementException("Bus line with id: " + id + " does not exists!");
-    }
     BusLineEntity busLine = busLineService.readById(id);
     List<LineRouteEntity> lineRouteEntitiesById = lineRouteService.readByBusLineId(id);
     List<BusStopEntity> busStops = lineRouteEntitiesById.stream()
