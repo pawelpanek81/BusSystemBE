@@ -24,10 +24,10 @@ public class UsernameController {
   @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<RestException> checkUsername(@RequestParam("username") String username) {
     if (!accountService.existsByUsername(username)) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
       RestException restException = new RestException(RestExceptionCodes.USERNAME_IS_TAKEN, "Username is taken");
-      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(restException, HttpStatus.OK);
     }
   }
 }
