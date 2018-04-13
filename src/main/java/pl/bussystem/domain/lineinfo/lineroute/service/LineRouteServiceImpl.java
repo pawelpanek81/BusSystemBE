@@ -35,7 +35,7 @@ public class LineRouteServiceImpl implements LineRouteService {
     if (lineRouteSequence < 2) {
       throw new RouteSequenceLessThan2Exception("Route sequence must be greater or equal 2");
     }
-    if (lineRouteSequence > busLineRoutes.get(busLineRoutes.size() - 1).getSequence() + 1) {
+    if (lineRouteSequence > busLineRoutes.get(0).getSequence() + 1) {
       throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
     }
     if (lineRouteEntity.getDriveTime() < 0) {
@@ -45,11 +45,19 @@ public class LineRouteServiceImpl implements LineRouteService {
         .anyMatch(lr -> lr.getBusStop().getId().equals(lineRouteEntity.getBusStop().getId()))) {
       throw new BusLineContainsBusStopException("This bus line already contains this bus stop");
     }
-    for (LineRouteEntity lineRoute : busLineRoutes) {
+    for (LineRouteEntity lineRoute : busLineRoutes) { // from last to first
       if (lineRoute.getSequence() > lineRouteSequence &&
           lineRoute.getDriveTime() < lineRouteEntity.getDriveTime()) {
-        throw new InvalidDriveTimeException("You should drive to this stop before next");
+        // if route tells that time to drive him is greater than any before
+        throw new InvalidDriveTimeException("You should drive to this stop before next stop");
       }
+      if (lineRoute.getSequence() < lineRouteSequence &&
+          lineRoute.getDriveTime() > lineRouteEntity.getDriveTime()) {
+        throw new InvalidDriveTimeException("You should drive to this stop after previous stop");
+      }
+    }
+
+    for (LineRouteEntity lineRoute : busLineRoutes) {
       if (lineRoute.getSequence() >= lineRouteSequence) {
         lineRoute.setSequence(lineRoute.getSequence() + 1);
         lineRouteRepository.saveAndFlush(lineRoute);
