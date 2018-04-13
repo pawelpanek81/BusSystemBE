@@ -47,14 +47,14 @@ public class LineRouteServiceImplTest {
     LineRouteEntity lineRoute3 = new LineRouteEntity(3, bus_line3, null, null, null);
     List<LineRouteEntity> lineRoutes = Arrays.asList(lineRoute1, lineRoute2, lineRoute3);
 
-    when(lineRouteRepositoryMock.findAll()).thenReturn(lineRoutes);
+    when(lineRouteRepositoryMock.findAllByOrderBySequence()).thenReturn(lineRoutes);
     when(busLineServiceMock.notExistsById(1)).thenReturn(false);
 
     List<LineRouteEntity> expected = new ArrayList<>(Arrays.asList(lineRoute1, lineRoute2));
 
     //when
     List<LineRouteEntity> actual = lineRouteService.readByBusLineId(1);
-    verify(lineRouteRepositoryMock, times(1)).findAll();
+    verify(lineRouteRepositoryMock, times(1)).findAllByOrderBySequence();
     verify(busLineServiceMock, times(1)).notExistsById(1);
 
     //then

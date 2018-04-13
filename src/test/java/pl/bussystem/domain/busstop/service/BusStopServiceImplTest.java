@@ -53,7 +53,7 @@ public class BusStopServiceImplTest {
     BusLineEntity busLine1 = new BusLineEntity(1, "N1", busStop1, busStop3, 60);
     LineRouteEntity lineRoute = new LineRouteEntity(1, busLine1, busStop2, 1, 30);
 
-    when(lineRouteRepositoryMock.findAll()).thenReturn(Collections.singletonList(lineRoute));
+    when(lineRouteRepositoryMock.findAllByOrderBySequence()).thenReturn(Collections.singletonList(lineRoute));
     when(busLineServiceMock.readById(1)).thenReturn(busLine1);
     when(busLineServiceMock.notExistsById(1)).thenReturn(false);
 
@@ -61,7 +61,7 @@ public class BusStopServiceImplTest {
 
     // when
     List<BusStopEntity> actual = busStopService.readByBusLineId(1);
-    verify(lineRouteRepositoryMock, times(1)).findAll();
+    verify(lineRouteRepositoryMock, times(1)).findAllByOrderBySequence();
     verify(busLineServiceMock, times(1)).readById(1);
     verify(busLineServiceMock, times(1)).notExistsById(1);
 
