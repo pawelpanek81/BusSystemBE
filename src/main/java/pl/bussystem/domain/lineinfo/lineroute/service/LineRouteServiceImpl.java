@@ -32,29 +32,29 @@ public class LineRouteServiceImpl implements LineRouteService {
     List<LineRouteEntity> busLineRoutes = this.readByBusLineId(lineRouteEntity.getBusLine().getId());
     busLineRoutes.sort(((o1, o2) -> o2.getSequence() - o1.getSequence()));
     Integer lineRouteSequence = lineRouteEntity.getSequence();
+    Integer lineRouteDriveTime = lineRouteEntity.getDriveTime();
+
     if (lineRouteSequence < 2) {
       throw new RouteSequenceLessThan2Exception("Route sequence must be greater or equal 2");
     }
     if (lineRouteSequence > busLineRoutes.get(0).getSequence() + 1) {
       throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
     }
-    if (lineRouteEntity.getDriveTime() < 0) {
+    if (lineRouteDriveTime < 0) {
       throw new InvalidDriveTimeException("Drive time must be greater or equal 0");
     }
     if (busLineRoutes.stream()
         .anyMatch(lr -> lr.getBusStop().getId().equals(lineRouteEntity.getBusStop().getId()))) {
       throw new BusLineContainsBusStopException("This bus line already contains this bus stop");
     }
-    for (LineRouteEntity lineRoute : busLineRoutes) { // from last to first
-      if (lineRoute.getSequence() > lineRouteSequence &&
-          lineRoute.getDriveTime() < lineRouteEntity.getDriveTime()) {
-        // if route tells that time to drive him is greater than any before
-        throw new InvalidDriveTimeException("You should drive to this stop before next stop");
-      }
-      if (lineRoute.getSequence() < lineRouteSequence &&
-          lineRoute.getDriveTime() > lineRouteEntity.getDriveTime()) {
-        throw new InvalidDriveTimeException("You should drive to this stop after previous stop");
-      }
+    if (busLineRoutes.stream()
+        .anyMatch(lr -> lr.getSequence() > lineRouteSequence && lr.getDriveTime() < lineRouteDriveTime)) {
+      throw new InvalidDriveTimeException("You should drive to this stop before next stop");
+    }
+    if (busLineRoutes.stream()
+        .anyMatch(lr -> lr.getSequence() < lineRouteSequence &&
+            lr.getDriveTime() > lineRouteDriveTime)) {
+      throw new InvalidDriveTimeException("You should drive to this stop after previous stop");
     }
 
     for (LineRouteEntity lineRoute : busLineRoutes) {
