@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
+import pl.bussystem.domain.lineinfo.lineroute.exception.BusLineContainsBusStopException;
+import pl.bussystem.domain.lineinfo.lineroute.exception.InvalidDriveTimeException;
+import pl.bussystem.domain.lineinfo.lineroute.exception.RouteSequenceGreaterThanLastPlusOneException;
+import pl.bussystem.domain.lineinfo.lineroute.exception.RouteSequenceLessThan2Exception;
 import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineinfo.lineroute.persistence.repository.LineRouteRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -30,19 +33,22 @@ public class LineRouteServiceImpl implements LineRouteService {
     busLineRoutes.sort(((o1, o2) -> o2.getSequence() - o1.getSequence()));
     Integer lineRouteSequence = lineRouteEntity.getSequence();
     if (lineRouteSequence < 2) {
-      throw new IllegalArgumentException("Route sequence must be greater or equal 2");
+      throw new RouteSequenceLessThan2Exception("Route sequence must be greater or equal 2");
+    }
+    if (lineRouteSequence > busLineRoutes.get(busLineRoutes.size() - 1).getSequence() + 1) {
+      throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
     }
     if (lineRouteEntity.getDriveTime() < 0) {
-      throw new IllegalArgumentException("Drive time must be greater than 0");
+      throw new InvalidDriveTimeException("Drive time must be greater or equal 0");
     }
     if (busLineRoutes.stream()
         .anyMatch(lr -> lr.getBusStop().getId().equals(lineRouteEntity.getBusStop().getId()))) {
-      throw new IllegalArgumentException("This bus line already contains this bus stop");
+      throw new BusLineContainsBusStopException("This bus line already contains this bus stop");
     }
     for (LineRouteEntity lineRoute : busLineRoutes) {
       if (lineRoute.getSequence() > lineRouteSequence &&
           lineRoute.getDriveTime() < lineRouteEntity.getDriveTime()) {
-        throw new IllegalArgumentException("You should drive to this stop before next");
+        throw new InvalidDriveTimeException("You should drive to this stop before next");
       }
       if (lineRoute.getSequence() >= lineRouteSequence) {
         lineRoute.setSequence(lineRoute.getSequence() + 1);

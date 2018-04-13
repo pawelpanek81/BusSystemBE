@@ -17,8 +17,7 @@ import pl.bussystem.domain.lineinfo.busline.mapper.ScheduleMapper;
 import pl.bussystem.domain.lineinfo.busline.model.dto.*;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
-import pl.bussystem.domain.lineinfo.lineroute.exception.NoSuchBusLineException;
-import pl.bussystem.domain.lineinfo.lineroute.exception.NoSuchBusStopException;
+import pl.bussystem.domain.lineinfo.lineroute.exception.*;
 import pl.bussystem.domain.lineinfo.lineroute.mapper.LineRouteMapper;
 import pl.bussystem.domain.lineinfo.lineroute.model.dto.CreateLineRouteDTO;
 import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
@@ -128,9 +127,46 @@ class BusLineController {
     try {
       lineRouteEntity = lineRouteMapper.mapToLineRouteEntity(lineRouteDTO);
       lineRouteService.create(lineRouteEntity);
-    } catch (NoSuchBusLineException | NoSuchBusStopException | IllegalArgumentException e) {
-      return new ResponseEntity<>(HttpStatus.CONFLICT);
+    } catch (NoSuchBusLineException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.BUS_LINE_WITH_GIVEN_ID_DOES_NOT_EXISTS,
+          "bus line with this id does not exists");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+
+    } catch (NoSuchBusStopException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.BUS_STOP_WITH_GIVEN_ID_DOES_NOT_EXISTS,
+          "bus stop with this id does not exists");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    } catch (BusLineContainsBusStopException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.BUS_LINE_CONTAINS_BUS_STOP,
+          "bus line contains this bus stop");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+
+    } catch (DriveTimeLessThenZeroException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.DRIVE_TIME_LESS_THAN_0,
+          "drive time is less than 0");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    } catch (InvalidDriveTimeException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.INVALID_DRIVE_TIME,
+          "invalid drive time (less than 0 or greater than can be");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    } catch (RouteSequenceGreaterThanLastPlusOneException e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.ROUTE_SEQUENCE_GREATER_THAN_CAN_BE,
+          "route sequence must be in natural order (without empty spaces like 1,2, 8)");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
+    } catch (RouteSequenceLessThan2Exception e) {
+      RestException restException = new RestException(
+          RestExceptionCodes.ROUTE_SEQUENCE_LESS_THAN_2,
+          "route sequnce must be >= 2");
+      return new ResponseEntity<>(restException, HttpStatus.CONFLICT);
     }
+
+
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
