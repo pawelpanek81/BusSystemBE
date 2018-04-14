@@ -171,7 +171,7 @@ class BusLineController {
   }
 
   @RequestMapping(value = "{busLineID}/routes/{routeID}", method = RequestMethod.DELETE)
-  //  @Secured(value = {"ROLE_ADMIN"})
+  @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<?> deleteRoute(@PathVariable Integer busLineID,
                                 @PathVariable Integer routeID) {
     BusLineEntity busLine;
