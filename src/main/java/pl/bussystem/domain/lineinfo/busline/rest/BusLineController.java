@@ -170,6 +170,19 @@ class BusLineController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
+  @RequestMapping(value = "{busLineID}/routes/{routeID}", method = RequestMethod.DELETE)
+  @Secured(value = {"ROLE_ADMIN"})
+  ResponseEntity<?> deleteRoute(@PathVariable Integer busLineID,
+                                @PathVariable Integer routeID) {
+    BusLineEntity busLine;
+    try {
+      lineRouteService.deleteByBusLineIdAndLineRouteId(busLineID, routeID);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
   @RequestMapping(value = "{id}/schedules", method = RequestMethod.GET)
   ResponseEntity<List<ReadScheduleDTO>> readSchedules(@PathVariable Integer id) {
     List<ScheduleEntity> scheduleEntities;

@@ -102,17 +102,4 @@ class LineRouteController {
     return new ResponseEntity<>(lineRouteDTOS, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity<RestException> deleteById(@PathVariable Integer id) {
-    try {
-      lineRouteService.deleteById(id);
-    } catch (NoSuchElementException e) {
-      RestException restException = new RestException(
-          RestExceptionCodes.LINE_ROUTE_WITH_GIVEN_ID_DOES_NOT_EXISTS,
-          "Line route with id: " + id + " does not exists!");
-      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
-    }
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
 }
