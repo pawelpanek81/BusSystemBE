@@ -1,4 +1,4 @@
-package pl.bussystem.security.payment.model.dto.payload;
+package pl.bussystem.security.payment.model.payu.orders;
 
 import lombok.*;
 
@@ -7,8 +7,10 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPayload {
+public class Product {
   private String name;
   private String unitPrice;
   private String quantity;
+  private String virtual;
+  private String listingDate;
 }

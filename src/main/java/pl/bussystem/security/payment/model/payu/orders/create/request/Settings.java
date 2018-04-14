@@ -1,4 +1,4 @@
-package pl.bussystem.security.payment.model.dto.payload;
+package pl.bussystem.security.payment.model.payu.orders.create.request;
 
 import lombok.*;
 
@@ -7,6 +7,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SettingsPayload {
+public class Settings {
   String invoiceDisabled;
 }

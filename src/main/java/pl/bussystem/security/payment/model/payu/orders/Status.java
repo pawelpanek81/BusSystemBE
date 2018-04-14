@@ -1,4 +1,4 @@
-package pl.bussystem.security.payment.model.dto.response;
+package pl.bussystem.security.payment.model.payu.orders;
 
 import lombok.*;
 
@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatusResponse {
+public class Status {
   private String statusCode;
+  private String statusDesc;
 }
