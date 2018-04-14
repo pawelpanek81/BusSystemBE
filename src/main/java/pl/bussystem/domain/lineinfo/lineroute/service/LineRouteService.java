@@ -9,7 +9,7 @@ public interface LineRouteService {
 
   List<LineRouteEntity> read();
 
-  void deleteById(Integer id);
+  void deleteByBusLineIdAndLineRouteId(Integer busLineId, Integer lineRouteId);
 
   List<LineRouteEntity> readByBusLineId(Integer id);
 
