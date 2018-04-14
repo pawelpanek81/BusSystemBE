@@ -1,6 +1,7 @@
 package pl.bussystem.domain.busstop.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -62,6 +63,8 @@ class BusStopController {
       RestException exceptionDTO = new RestException(RestExceptionCodes.BUS_STOP_WITH_GIVEN_ID_DOES_NOT_EXISTS,
           "Bus stop with this id don't exists in database");
       return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
+    } catch (DataIntegrityViolationException e) {
+      return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
     return new ResponseEntity<>(HttpStatus.OK);
   }

@@ -5,22 +5,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import pl.bussystem.domain.busline.busline.persistence.entity.BusLineEntity;
-import pl.bussystem.domain.busline.lineroute.persistence.entity.LineRouteEntity;
-import pl.bussystem.domain.busline.lineroute.persistence.repository.LineRouteRepository;
-import pl.bussystem.domain.busline.lineroute.service.LineRouteService;
-import pl.bussystem.domain.busline.lineroute.service.LineRouteServiceImpl;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
-import pl.bussystem.domain.busstop.persistence.repository.BusStopRepository;
+import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
+import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
+import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.lineinfo.lineroute.persistence.repository.LineRouteRepository;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusStopServiceImplTest {
@@ -28,14 +27,14 @@ public class BusStopServiceImplTest {
   private LineRouteService lineRouteService;
 
   @Mock
-  private BusStopRepository busStopRepositoryMock;
-  @Mock
   private LineRouteRepository lineRouteRepositoryMock;
+  @Mock
+  private BusLineService busLineServiceMock;
 
   @Before
   public void setUp() {
-    this.lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock, null);
-    this.busStopService = new BusStopServiceImpl(busStopRepositoryMock, lineRouteService, null);
+    this.lineRouteService = new LineRouteServiceImpl(lineRouteRepositoryMock, busLineServiceMock);
+    this.busStopService = new BusStopServiceImpl(null, lineRouteService, busLineServiceMock);
   }
 
   @Test
@@ -54,16 +53,20 @@ public class BusStopServiceImplTest {
     BusLineEntity busLine1 = new BusLineEntity(1, "N1", busStop1, busStop3, 60);
     LineRouteEntity lineRoute = new LineRouteEntity(1, busLine1, busStop2, 1, 30);
 
-    when(busStopRepositoryMock.findAll()).thenReturn(busStops);
-    when(lineRouteRepositoryMock.findAll()).thenReturn(Collections.singletonList(lineRoute));
+    when(lineRouteRepositoryMock.findAllByOrderBySequence()).thenReturn(Collections.singletonList(lineRoute));
+    when(busLineServiceMock.readById(1)).thenReturn(busLine1);
+    when(busLineServiceMock.notExistsById(1)).thenReturn(false);
 
     List<BusStopEntity> expected = Arrays.asList(busStop1, busStop2, busStop3);
 
     // when
     List<BusStopEntity> actual = busStopService.readByBusLineId(1);
+    verify(lineRouteRepositoryMock, times(1)).findAllByOrderBySequence();
+    verify(busLineServiceMock, times(1)).readById(1);
+    verify(busLineServiceMock, times(1)).notExistsById(1);
 
     // then
-    assertEquals(actual.size(), expected.size());
     assertThat(actual, is(expected));
+    verifyNoMoreInteractions(lineRouteRepositoryMock, busLineServiceMock);
   }
 }

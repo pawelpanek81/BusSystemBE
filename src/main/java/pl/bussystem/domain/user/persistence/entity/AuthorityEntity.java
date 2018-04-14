@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class AuthorityEntity {
   @Id
   @SequenceGenerator(name = "authorities_generator",
-      sequenceName = "authorities_id_seq", initialValue = 7)
+      sequenceName = "authorities_id_seq", initialValue = 8)
   @GeneratedValue(generator = "authorities_generator")
   @Column(name = "id", nullable = false)
   private Integer id;

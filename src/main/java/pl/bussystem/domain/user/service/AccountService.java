@@ -23,4 +23,5 @@ public interface AccountService {
 
   AccountEntity updateAccount(AccountEntity accountEntity);
 
+  Integer getIdByUsername(String username);
 }

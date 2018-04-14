@@ -26,6 +26,12 @@ public class RestExceptionCodes {
   public static final int LINE_ROUTE_WITH_GIVEN_ID_DOES_NOT_EXISTS = 9;
   public static final int BUS_STOP_ID_IN_LINE_ROUTE_DOES_NOT_EXISTS = 10;
   public static final int BUS_LINE_ID_IN_LINE_ROUTE_DOES_NOT_EXISTS = 11;
+  public static final int BUS_LINE_CONTAINS_BUS_STOP = 15;
+  public static final int DRIVE_TIME_LESS_THAN_0 = 16;
+  public static final int INVALID_DRIVE_TIME = 17;
+  public static final int ROUTE_SEQUENCE_GREATER_THAN_CAN_BE = 18;
+  public static final int ROUTE_SEQUENCE_LESS_THAN_2 = 19;
+
 
   /* BUSES */
   public static final int BUS_WITH_GIVEN_REGISTRATION_NUMBER_EXISTS = 4;

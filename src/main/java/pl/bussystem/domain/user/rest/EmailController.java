@@ -24,10 +24,10 @@ public class EmailController {
   @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<RestException> checkEmail(@RequestParam("email") String email) {
     if (!accountService.existsByEmail(email)) {
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
       RestException restException = new RestException(RestExceptionCodes.EMAIL_IS_ALREADY_USED, "Email is already used");
-      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(restException, HttpStatus.OK);
     }
   }
 }

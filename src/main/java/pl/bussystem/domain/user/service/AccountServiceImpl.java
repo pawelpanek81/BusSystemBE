@@ -68,6 +68,15 @@ class AccountServiceImpl implements AccountService {
     return accountRepository.save(accountEntity);
   }
 
+  @Override
+  public Integer getIdByUsername(String username) {
+    AccountEntity account = accountRepository.findByUsername(username);
+    if (account != null) {
+      return account.getId();
+    }
+    return null;
+  }
+
   private static <T, R> Supplier<R> bind(Function<T, R> fn, T val) {
     return () -> fn.apply(val);
   }
