@@ -1,7 +1,7 @@
 package pl.bussystem.security.payment.model.payu.orders.create.response;
 
 import lombok.*;
-import pl.bussystem.security.payment.model.payu.orders.Status;
+import pl.bussystem.security.payment.model.payu.common.Status;
 
 @AllArgsConstructor
 @NoArgsConstructor

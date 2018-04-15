@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Response {
+public class AuthenticationResponse {
   private String access_token;
   private String token_type;
   private Integer expires_in;

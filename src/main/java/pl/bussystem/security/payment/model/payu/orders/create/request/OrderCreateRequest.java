@@ -1,9 +1,9 @@
 package pl.bussystem.security.payment.model.payu.orders.create.request;
 
 import lombok.*;
-import pl.bussystem.security.payment.model.payu.orders.Buyer;
-import pl.bussystem.security.payment.model.payu.orders.PayMethod;
-import pl.bussystem.security.payment.model.payu.orders.Product;
+import pl.bussystem.security.payment.model.payu.common.Buyer;
+import pl.bussystem.security.payment.model.payu.common.PayMethod;
+import pl.bussystem.security.payment.model.payu.common.Product;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pl.bussystem.security.payment.model.payu.orders;
+package pl.bussystem.security.payment.model.payu.common;
 
 import lombok.*;
 
