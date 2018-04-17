@@ -183,8 +183,8 @@ INSERT INTO public.buses(
   id, brand, model, registration_number, seats)
   VALUES (1, 'Mercedes', 'Sprinter', 'RTA XD1337', 15);
 INSERT INTO public.bus_rides(
-  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver)
-VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null);
+  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price)
+VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600);
 
 INSERT INTO public.tickets(
   id, date_time, email, name, paid, phone, price, returned, surname, bus_ride, user_account)
