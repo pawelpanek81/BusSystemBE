@@ -16,4 +16,5 @@ public class ReadScheduleDTO {
   private String code;
   private Time startHour;
   private Boolean enabled;
+  private Double driveNettoPrice;
 }
