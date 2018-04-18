@@ -3,6 +3,7 @@ package pl.bussystem.security.payment.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class PayController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> pay(PaymentDTO dto, HttpServletRequest request) {
+  public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
     OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
     return paymentService.payForATicket(order);
   }
