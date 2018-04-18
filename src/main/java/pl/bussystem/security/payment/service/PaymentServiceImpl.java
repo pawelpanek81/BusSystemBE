@@ -8,7 +8,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +20,7 @@ import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCrea
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.rest.API;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 @Service
@@ -86,8 +86,11 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Override
-  public void consumeNotification(Notification notification) {
+  public void consumeNotification(Notification notification, HttpServletRequest request) {
     // TODO SIGNATURE CHECKING
+
+
+    System.out.println(notification);
   }
 
   @Override // TODO ASPECT

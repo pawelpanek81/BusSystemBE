@@ -6,6 +6,7 @@ import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TicketServiceImpl implements TicketService {
@@ -24,5 +25,10 @@ public class TicketServiceImpl implements TicketService {
   @Override
   public List<TicketEntity> read() {
     return ticketRepository.findAll();
+  }
+
+  @Override
+  public Optional<TicketEntity> readById(Integer id) {
+    return ticketRepository.findById(id);
   }
 }

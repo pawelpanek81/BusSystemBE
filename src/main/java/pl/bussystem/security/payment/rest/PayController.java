@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import pl.bussystem.security.payment.mapper.OrderCreateRequestMapper;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.common.Buyer;
 import pl.bussystem.security.payment.model.payu.common.Product;
@@ -14,59 +15,31 @@ import pl.bussystem.security.payment.model.payu.orders.create.request.Settings;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.service.PaymentService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 @RestController
 @RequestMapping(value = "api/v1.0/payments")
 public class PayController {
   private PaymentService paymentService;
+  private OrderCreateRequestMapper orderCreateRequest;
 
   @Autowired
-  public PayController(PaymentService paymentService) {
+  public PayController(PaymentService paymentService,
+                       OrderCreateRequestMapper orderCreateRequest) {
     this.paymentService = paymentService;
+    this.orderCreateRequest = orderCreateRequest;
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> pay(PaymentDTO dto) {
-    OrderCreateRequest orderCreateRequest = OrderCreateRequest.builder()
-        .notifyUrl("https://your.eshop.com/notify")
-        .customerIp("127.0.0.1")
-        .merchantPosId("300746")
-        .description("RTV market")
-        .currencyCode("PLN")
-        .totalAmount("21000")
-        .buyer(
-            Buyer.builder()
-                .email("john.doe@example.com")
-                .phone("654111654")
-                .firstName("John")
-                .lastName("Doe")
-                .language("pl")
-                .build())
-        .settings(
-            Settings.builder()
-                .invoiceDisabled(Boolean.TRUE.toString())
-                .build())
-        .products(
-            Arrays.asList(
-                Product.builder()
-                    .name("Wireless Mouse for Laptop")
-                    .unitPrice("15000")
-                    .quantity("1")
-                    .build(),
-                Product.builder()
-                    .name("HDMI cable")
-                    .unitPrice("6000")
-                    .quantity("1")
-                    .build()))
-        .build();
-
-    return paymentService.payForATicket(orderCreateRequest);
+  public ResponseEntity<?> pay(PaymentDTO dto, HttpServletRequest request) {
+    OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
+    return paymentService.payForATicket(order);
   }
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)
-  public ResponseEntity<?> authorize(Notification notification) {
-    paymentService.consumeNotification(notification);
+  public ResponseEntity<?> authorize(Notification notification, HttpServletRequest request) {
+    paymentService.consumeNotification(notification, request);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }
