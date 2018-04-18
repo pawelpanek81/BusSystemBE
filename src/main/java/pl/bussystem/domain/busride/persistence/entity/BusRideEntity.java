@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BusRideEntity {
   @Id
   @SequenceGenerator(name = "bus_rides_generator",
-      sequenceName = "bus_rides_id_seq", initialValue = 1)
+      sequenceName = "bus_rides_id_seq", initialValue = 2)
   @GeneratedValue(generator = "bus_rides_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
@@ -33,15 +34,18 @@ public class BusRideEntity {
   @JoinColumn(name = "bus_line", nullable = false)
   private BusLineEntity busLine;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "primary_driver", nullable = false)
+  @ManyToOne
+  @JoinColumn(name = "primary_driver")
   private AccountEntity primaryDriver;
 
   @ManyToOne
   @JoinColumn(name = "secondary_driver")
   private AccountEntity secondaryDriver;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "bus", nullable = false)
+  @Column(name = "drive_netto_price", nullable = false)
+  private Double driveNettoPrice;
+
+  @ManyToOne
+  @JoinColumn(name = "bus")
   private BusEntity bus;
 }
