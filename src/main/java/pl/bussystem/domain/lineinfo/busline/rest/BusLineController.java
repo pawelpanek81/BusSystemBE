@@ -174,7 +174,6 @@ class BusLineController {
   @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<?> deleteRoute(@PathVariable Integer busLineID,
                                 @PathVariable Integer routeID) {
-    BusLineEntity busLine;
     try {
       lineRouteService.deleteByBusLineIdAndLineRouteId(busLineID, routeID);
     } catch (NoSuchElementException e) {
@@ -195,6 +194,16 @@ class BusLineController {
         .map(ScheduleMapper.mapToReadScheduleDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(schedules, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{busLineID}/schedules/{scheduleId}", method = RequestMethod.DELETE)
+  ResponseEntity<?> deleteSchedule(@PathVariable Integer busLineID, @PathVariable Integer scheduleId) {
+    try {
+      scheduleService.deleteByBusLineIdAndScheduleId(busLineID, scheduleId);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @RequestMapping(value = "{id}/stops", method = RequestMethod.GET)

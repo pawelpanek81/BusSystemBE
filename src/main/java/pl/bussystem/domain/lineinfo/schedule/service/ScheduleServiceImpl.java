@@ -9,6 +9,7 @@ import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepo
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,5 +52,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     return allScheduleEntities.stream()
         .filter(se -> se.getBusLine().getId().equals(id))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public void deleteByBusLineIdAndScheduleId(Integer busLineID, Integer scheduleId) {
+    Optional<ScheduleEntity> optionalOfSchedule = scheduleRepository
+        .findOneByBusLineIdAndId(busLineID, scheduleId);
+
+    if (!optionalOfSchedule.isPresent()) {
+      throw new NoSuchElementException("Schedule with bus line id: " + busLineID +
+          " and schedule id: " + scheduleId + " does not exists!");
+    }
+
+    ScheduleEntity scheduleEntity = optionalOfSchedule.get();
+
+    scheduleRepository.delete(scheduleEntity);
   }
 }

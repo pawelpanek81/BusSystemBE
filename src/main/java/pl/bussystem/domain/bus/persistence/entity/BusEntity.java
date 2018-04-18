@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class BusEntity {
   @Id
   @SequenceGenerator(name = "buses_generator",
-      sequenceName = "buses_id_seq", initialValue = 1)
+      sequenceName = "buses_id_seq", initialValue = 7)
   @GeneratedValue(generator = "buses_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
