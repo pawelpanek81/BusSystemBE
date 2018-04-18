@@ -33,7 +33,7 @@ class BusRideController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
-//  @Secured(value = {"ROLE_ADMIN"})
+  @Secured(value = {"ROLE_ADMIN"})
   ResponseEntity<RestException> create(@RequestBody @Valid CreateBusRideDTO dto) {
     BusRideEntity busRideEntity = busRideMapper.mapToBusRideEntity(dto);
     busRideService.create(busRideEntity);
