@@ -142,50 +142,62 @@ VALUES (9, 10, 9, 2, 12);
 
 --SCHEDULES
 -- dla L1 Tarnobrzeg -> Rzeszów
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (1, '1-7', true, '8:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (2, '1-7', true, '9:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (3, '1-7', true, '10:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (4, '1-7', true, '11:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (5, '1-7', true, '12:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (6, '1-7', true, '13:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (7, '1-7', true, '14:00', 1);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (8, '1-7', true, '15:00', 1);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (1, '1-7', true, '8:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (2, '1-7', true, '9:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (3, '1-7', true, '10:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (4, '1-7', true, '11:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (5, '1-7', true, '12:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (6, '1-7', true, '13:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (7, '1-7', true, '14:00', 1, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (8, '1-7', true, '15:00', 1, 1000);
 
 -- dla L1 Rzeszów -> Tarnobrzeg
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (9, '1-7', true, '8:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (10, '1-7', true, '9:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (11, '1-7', true, '10:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (12, '1-7', true, '11:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (13, '1-7', true, '12:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (14, '1-7', true, '13:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (15, '1-7', true, '14:00', 2);
-INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line)
-  VALUES (16, '1-7', true, '15:00', 2);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (9, '1-7', true, '8:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (10, '1-7', true, '9:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (11, '1-7', true, '10:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (12, '1-7', true, '11:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (13, '1-7', true, '12:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (14, '1-7', true, '13:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (15, '1-7', true, '14:00', 2, 1000);
+INSERT INTO public.schedules(id, code, enabled, start_hour, bus_line, drive_netto_price)
+  VALUES (16, '1-7', true, '15:00', 2, 1000);
+
+
+-- BUSES
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (1, 'Mercedes', 'Sprinter', 'RTA 1234', 10);
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (2, 'Autosan', 'H9-33', 'RTA 4422', 23);
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (3, 'Autosan', 'H9-35', 'RTA 4421', 23);
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (4, 'Autosan', 'H9-15', 'RTA 8888', 23);
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (5, 'Autosan', 'H9-21', 'RTA 2221', 23);
+INSERT INTO public.buses(id, brand, model, registration_number, seats)
+  VALUES (6, 'Autosan', 'H9-21', 'RTA 2222', 23);
+
+INSERT INTO public.bus_rides(
+  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price)
+VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600);
 
 
 -- EXPERIMENTAL TICKETS
-INSERT INTO public.buses(
-  id, brand, model, registration_number, seats)
-  VALUES (1, 'Mercedes', 'Sprinter', 'RTA XD1337', 15);
-INSERT INTO public.bus_rides(
-  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver)
-VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null);
-
 INSERT INTO public.tickets(
   id, date_time, email, name, paid, phone, price, returned, surname, bus_ride, user_account)
 VALUES (1, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, false, 'Kowalski', 1, null);

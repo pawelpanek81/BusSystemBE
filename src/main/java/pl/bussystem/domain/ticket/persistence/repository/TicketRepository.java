@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 
 @Repository
-interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
+public interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
 }

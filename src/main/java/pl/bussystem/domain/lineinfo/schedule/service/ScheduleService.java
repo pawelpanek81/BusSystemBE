@@ -12,4 +12,6 @@ public interface ScheduleService {
   void deleteById(Integer id);
 
   List<ScheduleEntity> readByBusLineId(Integer id);
+
+  void deleteByBusLineIdAndScheduleId(Integer busLineID, Integer scheduleId);
 }

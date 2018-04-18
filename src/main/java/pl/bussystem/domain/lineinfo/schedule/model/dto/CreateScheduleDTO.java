@@ -25,4 +25,7 @@ public class CreateScheduleDTO {
 
   @NotNull
   private Boolean enabled;
+
+  @NotNull
+  private Double driveNettoPrice;
 }

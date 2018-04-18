@@ -13,10 +13,13 @@ import pl.bussystem.domain.lineinfo.lineroute.persistence.repository.LineRouteRe
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class LineRouteServiceImpl implements LineRouteService {
+  private static final int MINIMUM_SEQUENCE = 2;
+  private static final int MINIMUM_DRIVE_TIME = 0;
   private LineRouteRepository lineRouteRepository;
   private BusLineService busLineService;
 
@@ -34,13 +37,13 @@ public class LineRouteServiceImpl implements LineRouteService {
     Integer lineRouteSequence = lineRouteEntity.getSequence();
     Integer lineRouteDriveTime = lineRouteEntity.getDriveTime();
 
-    if (lineRouteSequence < 2) {
+    if (lineRouteSequence < MINIMUM_SEQUENCE) {
       throw new RouteSequenceLessThan2Exception("Route sequence must be greater or equal 2");
     }
     if (lineRouteSequence > busLineRoutes.get(0).getSequence() + 1) {
       throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
     }
-    if (lineRouteDriveTime < 0) {
+    if (lineRouteDriveTime < MINIMUM_DRIVE_TIME) {
       throw new InvalidDriveTimeException("Drive time must be greater or equal 0");
     }
     if (busLineRoutes.stream()
@@ -72,12 +75,25 @@ public class LineRouteServiceImpl implements LineRouteService {
   }
 
   @Override
-  public void deleteById(Integer id) {
-    try {
-      lineRouteRepository.deleteById(id);
-    } catch (EmptyResultDataAccessException e) {
-      throw new NoSuchElementException("Line route with id: " + id + " does not exists!");
+  public void deleteByBusLineIdAndLineRouteId(Integer busLineId, Integer lineRouteId) {
+    Optional<LineRouteEntity> optionalOfLineRouteEntity =
+        lineRouteRepository.findOneByBusLineIdAndId(busLineId, lineRouteId);
+
+    if (!optionalOfLineRouteEntity.isPresent()) {
+      throw new NoSuchElementException("Line route with bus line id: " + busLineId +
+          " and line route id: " + lineRouteId + " does not exists!");
     }
+
+    LineRouteEntity lineRouteEntity = optionalOfLineRouteEntity.get();
+
+    List<LineRouteEntity> busLineRoutes = this.readByBusLineId(lineRouteEntity.getBusLine().getId());
+    lineRouteRepository.delete(lineRouteEntity);
+    for (int i = lineRouteEntity.getSequence() - 1; i < busLineRoutes.size() - 2; i++) {
+      LineRouteEntity lineRoute = busLineRoutes.get(i);
+      lineRoute.setSequence(lineRoute.getSequence() - 1);
+      lineRouteRepository.saveAndFlush(lineRoute);
+    }
+
   }
 
   @Override
