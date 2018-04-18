@@ -34,4 +34,7 @@ public class ScheduleEntity {
 
   @Column(name = "enabled", nullable = false)
   private Boolean enabled;
+
+  @Column(name = "drive_netto_price", nullable = false)
+  private Double driveNettoPrice;
 }

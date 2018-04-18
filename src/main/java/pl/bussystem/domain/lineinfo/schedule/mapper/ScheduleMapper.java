@@ -28,7 +28,8 @@ public class ScheduleMapper {
           BusLineMapper.mapToReadBusLineDTO.apply(entity.getBusLine()),
           entity.getCode(),
           entity.getStartHour(),
-          entity.getEnabled()
+          entity.getEnabled(),
+          entity.getDriveNettoPrice()
       );
 
   public ScheduleEntity mapToScheduleEntity(CreateScheduleDTO dto) {
@@ -43,6 +44,7 @@ public class ScheduleMapper {
         .code(dto.getCode())
         .startHour(dto.getStartHour())
         .enabled(dto.getEnabled())
+        .driveNettoPrice(dto.getDriveNettoPrice())
         .build();
   }
 }
