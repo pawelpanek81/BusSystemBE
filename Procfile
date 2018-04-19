@@ -1,1 +1,1 @@
-web: java -Dspring.datasource.url=$DBADDR -Dspring.datasource.username=$DBUSR -Dspring.datasource.password=$DBPW -Dspring.mail.username=$MAILPW -Dspring.mail.password=$MAILUSR -Dserver.port=$PORT -jar target/bussystem-0.0.1-SNAPSHOT.jar
+web: java -Dspring.datasource.url=$DBADDR -Dspring.datasource.username=$DBUSR -Dspring.datasource.password=$DBPW -Dspring.mail.username=$MAILPW -Dspring.mail.password=$MAILUSR -Dserver.port=$PORT -agentlib:jdwp=transport=dt_socket,server=y,address=9090,suspend=n -jar target/bussystem-0.0.1-SNAPSHOT.jar
