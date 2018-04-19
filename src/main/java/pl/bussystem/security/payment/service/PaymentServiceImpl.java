@@ -8,10 +8,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
@@ -21,6 +24,8 @@ import pl.bussystem.security.payment.model.payu.orders.notification.Notification
 import pl.bussystem.security.payment.rest.API;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
 @Service
@@ -64,14 +69,14 @@ public class PaymentServiceImpl implements PaymentService {
   @Autowired
   public PaymentServiceImpl(Credentials credentials) {
     this.credentials = credentials;
-      try {
-        lastSuccessfullyAuthDateTime = LocalDateTime.now();
-        this.authResponse = this.authenticate();
-      } catch (HttpClientErrorException e) {
-        System.out.println(e.getStatusCode());
-        System.out.println(e.getResponseBodyAsString());
-        this.lastSuccessfullyAuthDateTime = null;
-      }
+    try {
+      lastSuccessfullyAuthDateTime = LocalDateTime.now();
+      this.authResponse = this.authenticate();
+    } catch (HttpClientErrorException e) {
+      System.out.println(e.getStatusCode());
+      System.out.println(e.getResponseBodyAsString());
+      this.lastSuccessfullyAuthDateTime = null;
+    }
   }
 
   @Override
@@ -93,13 +98,23 @@ public class PaymentServiceImpl implements PaymentService {
   @Override
   public void consumeNotification(Notification notification, HttpServletRequest request) {
     // TODO SIGNATURE CHECKING
+    String stringToHash = "test";
 
+    PasswordEncoder encoder = new MessageDigestPasswordEncoder("MD5");
+    Method digest = ReflectionUtils.findMethod(MessageDigestPasswordEncoder.class, "digest", String.class, CharSequence.class);
+    ReflectionUtils.makeAccessible(digest);
+    String encoded = null;
+    try {
+      encoded = (String) digest.invoke(encoder, "", stringToHash);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      e.printStackTrace();
+    }
 
-    System.out.println(notification);
+    Integer i = 5;
   }
 
   @Override // TODO ASPECT
-    public Boolean isAuthenticationTokenExpired() {
+  public Boolean isAuthenticationTokenExpired() {
     return LocalDateTime.now().isAfter(lastSuccessfullyAuthDateTime.plusSeconds(authResponse.getExpires_in()));
   }
 
