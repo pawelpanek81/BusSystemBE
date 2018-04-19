@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.security.payment.mapper.OrderCreateRequestMapper;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
+import pl.bussystem.security.payment.model.dto.TicketDTO;
 import pl.bussystem.security.payment.model.payu.common.Buyer;
 import pl.bussystem.security.payment.model.payu.common.Product;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
@@ -33,7 +34,14 @@ public class PayController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
+  public ResponseEntity<?> pay(HttpServletRequest request) { //@RequestBody PaymentDTO dto,
+    PaymentDTO dto = new PaymentDTO(
+        new TicketDTO(1, "1000"),
+        null,
+        1,
+        "asd"
+    );
+
     OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
     return paymentService.payForATicket(order);
   }
