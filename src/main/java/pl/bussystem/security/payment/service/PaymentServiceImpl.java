@@ -32,22 +32,27 @@ public class PaymentServiceImpl implements PaymentService {
   @Getter
   @Setter
   @Component
-
   static class Credentials {
     private final String grant_type;
+    private final String pos_id;
     private final String client_id;
+    private final String second_key;
     private final String client_secret;
 
     public Credentials(@Value("${payu.grant_type}") String grant_type,
+                       @Value("${payu.pos_id}") String pos_id,
                        @Value("${payu.client_id}") String client_id,
+                       @Value("${payu.second_key}") String second_key,
                        @Value("${payu.client_secret}") String client_secret) {
       this.grant_type = grant_type;
+      this.pos_id = pos_id;
       this.client_id = client_id;
+      this.second_key = second_key;
       this.client_secret = client_secret;
     }
 
 
-    MultiValueMap<String, String> getAsMultiValueMap() {
+    MultiValueMap<String, String> getAuthenticationAsMap() {
       MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
       data.add("grant_type", grant_type);
       data.add("client_id", client_id);
@@ -75,7 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-    MultiValueMap<String, String> requestBody = credentials.getAsMultiValueMap();
+    MultiValueMap<String, String> requestBody = credentials.getAuthenticationAsMap();
 
     HttpEntity<?> request = new HttpEntity<>(requestBody, headers);
 
