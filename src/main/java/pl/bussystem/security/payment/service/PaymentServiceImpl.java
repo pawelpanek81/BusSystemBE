@@ -32,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
   @Getter
   @Setter
   @Component
-  static class Credentials {
+  public static class Credentials {
     private final String grant_type;
     private final String pos_id;
     private final String client_id;

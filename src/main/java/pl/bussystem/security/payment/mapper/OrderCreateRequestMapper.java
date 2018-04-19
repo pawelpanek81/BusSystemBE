@@ -1,7 +1,6 @@
 package pl.bussystem.security.payment.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.service.TicketService;
@@ -11,6 +10,7 @@ import pl.bussystem.security.payment.model.payu.common.Buyer;
 import pl.bussystem.security.payment.model.payu.common.Product;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.create.request.Settings;
+import pl.bussystem.security.payment.service.PaymentServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -18,14 +18,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static pl.bussystem.security.payment.rest.API.PAYMENTS_NOTIFY_URL;
+
+
 @Component
 public class OrderCreateRequestMapper {
-  @Value("${payu.pos_id}")
-  private String merchantPosID;
+  private PaymentServiceImpl.Credentials credentials;
   private TicketService ticketService;
 
   @Autowired
-  public OrderCreateRequestMapper(TicketService ticketService) {
+  public OrderCreateRequestMapper(PaymentServiceImpl.Credentials credentials,
+                                  TicketService ticketService) {
+    this.credentials = credentials;
     this.ticketService = ticketService;
   }
 
@@ -59,36 +63,36 @@ public class OrderCreateRequestMapper {
     products.add(Product.builder()
         .name("Bilet nr: " + ticketFrom.get().getId())
         .unitPrice(paymentDTO.getFromTicket().getTicketPrice())
-        .quantity("1")
+        .quantity(paymentDTO.getNumberOfPassengers().toString())
         .build());
 
     ticketTo.ifPresent(ticketEntity -> products.add(
         Product.builder()
             .name("Bilet nr: " + ticketEntity.getId())
             .unitPrice(paymentDTO.getToTicket().getTicketPrice())
-            .quantity("1")
+            .quantity(paymentDTO.getNumberOfPassengers().toString())
             .build()
     ));
 
     return OrderCreateRequest.builder()
-        .notifyUrl("http://januszpol-rest.herokuapp.com/api/v1.0/payments/notify")
+        .notifyUrl(PAYMENTS_NOTIFY_URL)
         .customerIp(req.getRemoteAddr())
-        .merchantPosId(merchantPosID)
-        .description("Sprzedaż biletu")
+        .merchantPosId(credentials.getPos_id())
+        .description(ticketTo.isPresent() ? "Sprzedaż biletów" : "Sprzedaż biletu")
         .currencyCode("PLN")
         .totalAmount(this.getTotalAmount(paymentDTO))
         .buyer(
             Buyer.builder()
                 .email(ticketFrom.get().getEmail())
-                .phone(ticketFrom.get().getPhone())
-                .firstName(ticketFrom.get().getName())
-                .lastName(ticketFrom.get().getSurname())
-                .language("pl")
+                .phone(ticketFrom.get().getPhone()) // optional
+                .firstName(ticketFrom.get().getName()) // optional
+                .lastName(ticketFrom.get().getSurname()) // optional
+                .language("pl") // optional
                 .build())
         .settings(
             Settings.builder()
                 .invoiceDisabled(Boolean.TRUE.toString())
-                .build())
+                .build()) // optional
         .products(products)
         .build();
   }
