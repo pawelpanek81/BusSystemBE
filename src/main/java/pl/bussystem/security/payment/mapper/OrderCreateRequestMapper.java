@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Component
 public class OrderCreateRequestMapper {
-  @Value("${payu.pos_id]")
+  @Value("${payu.pos_id}")
   private String merchantPosID;
   private TicketService ticketService;
 
@@ -45,7 +45,10 @@ public class OrderCreateRequestMapper {
 
   public OrderCreateRequest createOrder(PaymentDTO paymentDTO, HttpServletRequest req) {
     Optional<TicketEntity> ticketFrom = ticketService.readById(paymentDTO.getFromTicket().getTicketId());
-    Optional<TicketEntity> ticketTo = ticketService.readById(paymentDTO.getToTicket().getTicketId());
+    Optional<TicketEntity> ticketTo = Optional.empty();
+    if (paymentDTO.getToTicket() != null) {
+      ticketTo = ticketService.readById(paymentDTO.getToTicket().getTicketId());
+    }
 
     if (!ticketFrom.isPresent()) {
       throw new NoSuchElementException("Ticket with id: " +
