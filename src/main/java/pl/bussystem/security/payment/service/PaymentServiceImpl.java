@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -28,9 +29,7 @@ import pl.bussystem.security.payment.model.payu.orders.notification.Notification
 import pl.bussystem.security.payment.rest.API;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -131,9 +130,8 @@ public class PaymentServiceImpl implements PaymentService {
       e.printStackTrace();
     }
 
-    try (Writer writer = new FileWriter("request.json")) {
-      Gson gson = new GsonBuilder().create();
-      gson.toJson(request, writer);
+    try (PrintWriter out = new PrintWriter("request.json")) {
+      out.println(IOUtils.toString(request.getReader()));
     } catch (IOException e) {
       e.printStackTrace();
     }
