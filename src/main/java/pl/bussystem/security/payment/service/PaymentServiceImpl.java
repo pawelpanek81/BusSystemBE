@@ -1,8 +1,8 @@
 package pl.bussystem.security.payment.service;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,9 @@ import pl.bussystem.security.payment.model.payu.orders.notification.Notification
 import pl.bussystem.security.payment.rest.API;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -123,13 +124,16 @@ public class PaymentServiceImpl implements PaymentService {
     List<Product> products = notification.getOrder().getProducts();
     products.forEach(product -> System.out.println(product.getName()));
 
-    mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-    File notificationFile = new File("notification.json");
-    File requestFile = new File("request.json");
-    try {
-      // Serialize Java object info JSON file.
-      mapper.writeValue(notificationFile, notification);
-      mapper.writeValue(requestFile, request);
+    try (Writer writer = new FileWriter("notification.json")) {
+      Gson gson = new GsonBuilder().create();
+      gson.toJson(notification, writer);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    try (Writer writer = new FileWriter("request.json")) {
+      Gson gson = new GsonBuilder().create();
+      gson.toJson(request, writer);
     } catch (IOException e) {
       e.printStackTrace();
     }
