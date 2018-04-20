@@ -28,7 +28,6 @@ import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCrea
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.rest.API;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -104,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Override
-  public void consumeNotification(Notification notification, HttpServletRequest request) {
+  public void consumeNotification(Notification notification, HttpEntity<String> request) {
     // TODO SIGNATURE CHECKING
     String stringToHash = "test";
 
@@ -130,8 +129,9 @@ public class PaymentServiceImpl implements PaymentService {
       e.printStackTrace();
     }
 
-    try (PrintWriter out = new PrintWriter("request.json")) {
-      out.println(IOUtils.toString(request.getReader()));
+    try (Writer writer = new FileWriter("request.json")) {
+      Gson gson = new GsonBuilder().create();
+      gson.toJson(request, writer);
     } catch (IOException e) {
       e.printStackTrace();
     }
