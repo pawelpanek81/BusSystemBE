@@ -1,5 +1,7 @@
 package pl.bussystem.security.payment.service;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -121,6 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
     List<Product> products = notification.getOrder().getProducts();
     products.forEach(product -> System.out.println(product.getName()));
 
+    mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     File notificationFile = new File("notification.json");
     File requestFile = new File("request.json");
     try {
