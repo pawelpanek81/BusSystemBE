@@ -44,7 +44,7 @@ public class PayController {
   }
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)
-  public ResponseEntity<?> authorize(Notification notification, HttpServletRequest request) {
+  public ResponseEntity<?> authorize(@RequestBody Notification notification, HttpServletRequest request) {
     paymentService.consumeNotification(notification, request);
     return new ResponseEntity<>(HttpStatus.OK);
   }

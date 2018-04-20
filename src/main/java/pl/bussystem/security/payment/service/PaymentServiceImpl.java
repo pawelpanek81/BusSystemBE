@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.bussystem.security.payment.model.payu.common.Product;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -111,6 +113,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     Integer i = 5;
+
+    List<Product> products = notification.getOrder().getProducts();
+    products.forEach(System.out::println);
   }
 
   @Override // TODO ASPECT
