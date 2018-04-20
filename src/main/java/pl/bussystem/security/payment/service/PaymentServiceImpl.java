@@ -1,5 +1,6 @@
 package pl.bussystem.security.payment.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import pl.bussystem.security.payment.model.payu.orders.notification.Notification
 import pl.bussystem.security.payment.rest.API;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -35,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
   private Credentials credentials;
   private AuthenticationResponse authResponse;
   private LocalDateTime lastSuccessfullyAuthDateTime;
+  private ObjectMapper mapper = new ObjectMapper();
 
   @Getter
   @Setter
@@ -116,6 +120,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     List<Product> products = notification.getOrder().getProducts();
     products.forEach(product -> System.out.println(product.getName()));
+
+    File notificationFile = new File("notification.json");
+    File requestFile = new File("request.json");
+    try {
+      // Serialize Java object info JSON file.
+      mapper.writeValue(notificationFile, notification);
+      mapper.writeValue(requestFile, request);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override // TODO ASPECT
