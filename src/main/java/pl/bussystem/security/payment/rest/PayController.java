@@ -49,12 +49,12 @@ public class PayController {
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)
   public ResponseEntity<?> authorize(HttpEntity<String> request) {
-    try {
-      Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
-      paymentService.consumeNotification(notification, request);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
+      paymentService.consumeNotification(null, request);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -119,8 +119,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     Integer i = 5;
 
-    List<Product> products = notification.getOrder().getProducts();
-    products.forEach(product -> System.out.println(product.getName()));
+//    List<Product> products = notification.getOrder().getProducts();
+//    products.forEach(product -> System.out.println(product.getName()));
 
     try (Writer writer = new FileWriter("notification.json")) {
       Gson gson = new GsonBuilder().create();
