@@ -25,4 +25,5 @@ public class Order {
   private String status;
   private Buyer buyer;
   private List<Product> products;
+  private PayMethod payMethod;
 }
