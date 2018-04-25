@@ -1,6 +1,7 @@
 package pl.bussystem.domain.busride.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.domain.busride.mapper.BusRideMapper;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
+import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
@@ -49,5 +51,13 @@ class BusRideController {
         .collect(Collectors.toList());
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/generated", method = RequestMethod.POST)
+  ResponseEntity<?> createFromScheduleAndTime(@RequestBody
+    @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
+      busRideService.autoCreate(dto);
+
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }
