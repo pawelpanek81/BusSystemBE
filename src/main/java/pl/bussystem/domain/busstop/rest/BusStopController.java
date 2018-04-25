@@ -1,6 +1,7 @@
 package pl.bussystem.domain.busstop.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,8 @@ class BusStopController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  ResponseEntity<List<ReadBusStopDTO>> read(@RequestParam(required = false) Integer fromId) {
+  @Cacheable("busStops")
+  public ResponseEntity<List<ReadBusStopDTO>> read(@RequestParam(required = false) Integer fromId) {
     List<BusStopEntity> busStops;
 
     if (fromId != null) {
@@ -70,7 +72,10 @@ class BusStopController {
         List<LineRouteEntity> lineRoutes = lineRouteService.readByBusLineId(busline.getId());
 
         if (busline.getFrom().getId().equals(fromId)) {
-          List<BusStopEntity> stopsFromRoute = lineRoutes.stream().map(LineRouteEntity::getBusStop).collect(Collectors.toList());
+          List<BusStopEntity> stopsFromRoute = lineRoutes.stream()
+              .map(LineRouteEntity::getBusStop)
+              .collect(Collectors.toList());
+
           busStops.addAll(stopsFromRoute);
           busStops.add(busline.getTo());
         } else {
