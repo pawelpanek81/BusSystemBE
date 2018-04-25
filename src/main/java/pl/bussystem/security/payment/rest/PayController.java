@@ -42,7 +42,7 @@ public class PayController {
         1,
         "asd"
     );
-
+    paymentService.checkFrontendSignature(dto);
     OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
     return paymentService.payForATicket(order);
   }

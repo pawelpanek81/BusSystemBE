@@ -2,6 +2,7 @@ package pl.bussystem.security.payment.service;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
@@ -20,4 +21,6 @@ public interface PaymentService {
   Boolean isAuthenticatedSuccessfully();
 
   void renewAuthentication();
+
+  Boolean checkFrontendSignature(PaymentDTO dto);
 }

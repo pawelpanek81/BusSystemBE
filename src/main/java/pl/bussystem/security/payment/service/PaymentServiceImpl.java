@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,18 +20,22 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import pl.bussystem.security.payment.model.payu.common.Product;
+import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.rest.API;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -104,9 +107,45 @@ public class PaymentServiceImpl implements PaymentService {
 
   @Override
   public void consumeNotification(Notification notification, HttpEntity<String> request) {
-    // TODO SIGNATURE CHECKING
-    String stringToHash = "test";
+    String openPayuSignatureHeader = request.getHeaders().get("openpayu-signature").get(0);
+    Map<String, String> openPayuSignature = new LinkedHashMap<>();
+    for (String keyValue : openPayuSignatureHeader.split(";")) {
+      String[] pairs = keyValue.split("=", 2);
+      openPayuSignature.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
+    }
+    String expectedSignature = openPayuSignature.get("signature");
 
+    String actualSignature = md5(request.getBody() + credentials.getSecond_key());
+
+    if (!expectedSignature.equals(actualSignature)) {
+      throw new RuntimeException("expectedSignature different than actualSignature");
+    }
+
+    if (!openPayuSignature.get("algorithm").equals("MD5")) {
+      throw new NotImplementedException();
+    }
+
+    if (notification.getOrder().getStatus().equals("COMPLETED")) {
+      //TODO implement
+    }
+
+
+//    try (Writer writer = new FileWriter("notification.json")) {
+//      Gson gson = new GsonBuilder().create();
+//      gson.toJson(notification, writer);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//
+//    try (Writer writer = new FileWriter("request.json")) {
+//      Gson gson = new GsonBuilder().create();
+//      gson.toJson(request, writer);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+  }
+
+  private String md5(String stringToHash) {
     PasswordEncoder encoder = new MessageDigestPasswordEncoder("MD5");
     Method digest = ReflectionUtils.findMethod(MessageDigestPasswordEncoder.class, "digest", String.class, CharSequence.class);
     ReflectionUtils.makeAccessible(digest);
@@ -116,25 +155,7 @@ public class PaymentServiceImpl implements PaymentService {
     } catch (IllegalAccessException | InvocationTargetException e) {
       e.printStackTrace();
     }
-
-    Integer i = 5;
-
-//    List<Product> products = notification.getOrder().getProducts();
-//    products.forEach(product -> System.out.println(product.getName()));
-
-    try (Writer writer = new FileWriter("notification.json")) {
-      Gson gson = new GsonBuilder().create();
-      gson.toJson(notification, writer);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    try (Writer writer = new FileWriter("request.json")) {
-      Gson gson = new GsonBuilder().create();
-      gson.toJson(request, writer);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    return encoded;
   }
 
   @Override // TODO ASPECT
@@ -158,6 +179,11 @@ public class PaymentServiceImpl implements PaymentService {
       this.lastSuccessfullyAuthDateTime = null;
       throw new RuntimeException("Authentication error");
     }
+  }
+
+  @Override
+  public Boolean checkFrontendSignature(PaymentDTO dto) {
+    return null;
   }
 
   @Override
