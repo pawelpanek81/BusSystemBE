@@ -14,4 +14,6 @@ public interface BusStopService {
   List<BusStopEntity> readByBusLineId(Integer id);
 
   List<BusStopEntity> readUnusedByBusLineId(Integer id);
+
+  BusStopEntity readById(Integer fromId);
 }

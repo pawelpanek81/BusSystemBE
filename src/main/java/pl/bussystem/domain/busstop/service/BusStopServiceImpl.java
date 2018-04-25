@@ -79,4 +79,9 @@ public class BusStopServiceImpl implements BusStopService {
         .filter(bs -> !busStopsIdsUsedByBusLine.contains(bs.getId()))
         .collect(Collectors.toList());
   }
+
+  @Override
+  public BusStopEntity readById(Integer fromId) {
+    return busStopRepository.findById(fromId).orElse(null);
+  }
 }
