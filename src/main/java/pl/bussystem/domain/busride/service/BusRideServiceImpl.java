@@ -78,6 +78,16 @@ public class BusRideServiceImpl implements BusRideService {
     return returnedBusRides;
   }
 
+  @Override
+  public BusRideEntity readById(Integer id) {
+    return busRideRepository.findById(id).orElse(null);
+  }
+
+  @Override
+  public BusRideEntity update(BusRideEntity busRideEntity) {
+    return busRideRepository.save(busRideEntity);
+  }
+
   private List<BusRideEntity> getRidesFromSchedule(ScheduleEntity schedule,
                                                    LocalDateTime startDateTime,
                                                    LocalDateTime endDateTime,

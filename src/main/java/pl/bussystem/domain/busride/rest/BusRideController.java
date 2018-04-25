@@ -1,24 +1,24 @@
 package pl.bussystem.domain.busride.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.mapper.BusRideMapper;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
+import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,12 +26,15 @@ import java.util.stream.Collectors;
 class BusRideController {
   private BusRideService busRideService;
   private BusRideMapper busRideMapper;
+  private AccountRepository accountRepository;
 
   @Autowired
   public BusRideController(BusRideService busRideService,
-                           BusRideMapper busRideMapper) {
+                           BusRideMapper busRideMapper,
+                           AccountRepository accountRepository) {
     this.busRideService = busRideService;
     this.busRideMapper = busRideMapper;
+    this.accountRepository = accountRepository;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -55,9 +58,26 @@ class BusRideController {
 
   @RequestMapping(value = "/generated", method = RequestMethod.POST)
   ResponseEntity<?> createFromScheduleAndTime(@RequestBody
-    @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
-      busRideService.autoCreate(dto);
-
+                                              @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
+    busRideService.autoCreate(dto);
     return new ResponseEntity<>(HttpStatus.OK);
   }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+  ResponseEntity<?> updateDrivers(@PathVariable Integer id, @RequestBody Map<String, Object> fields) {
+    BusRideEntity busRideEntity = busRideService.readById(id);
+
+    fields.forEach((k, v) -> {
+      if (k.equals("primaryDriver") || k.equals("secondaryDriver")) {
+        v = accountRepository.findById((Integer) v).orElse(null);
+        Field field = ReflectionUtils.findField(BusRideEntity.class, k);
+        field.setAccessible(true);
+        ReflectionUtils.setField(field, busRideEntity, v);
+        field.setAccessible(false);
+      }
+    });
+    busRideService.update(busRideEntity);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
 }

@@ -11,4 +11,8 @@ public interface BusRideService {
   List<BusRideEntity> read();
 
   List<BusRideEntity> autoCreate(CreateBusRideFromScheduleAndDatesDTO dto);
+
+  BusRideEntity readById(Integer id);
+
+  BusRideEntity update(BusRideEntity busRideEntity);
 }
