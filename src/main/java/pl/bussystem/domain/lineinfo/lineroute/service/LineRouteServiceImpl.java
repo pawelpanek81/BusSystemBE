@@ -1,7 +1,6 @@
 package pl.bussystem.domain.lineinfo.lineroute.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
 import pl.bussystem.domain.lineinfo.lineroute.exception.BusLineContainsBusStopException;
@@ -37,35 +36,44 @@ public class LineRouteServiceImpl implements LineRouteService {
     Integer lineRouteSequence = lineRouteEntity.getSequence();
     Integer lineRouteDriveTime = lineRouteEntity.getDriveTime();
 
+    if (busLineRoutes.size() == 0 && lineRouteEntity.getSequence() != 2) {
+      throw new RuntimeException("First sequence must be 2");
+    }
+
+
     if (lineRouteSequence < MINIMUM_SEQUENCE) {
       throw new RouteSequenceLessThan2Exception("Route sequence must be greater or equal 2");
     }
-    if (lineRouteSequence > busLineRoutes.get(0).getSequence() + 1) {
-      throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
-    }
+
     if (lineRouteDriveTime < MINIMUM_DRIVE_TIME) {
       throw new InvalidDriveTimeException("Drive time must be greater or equal 0");
     }
-    if (busLineRoutes.stream()
-        .anyMatch(lr -> lr.getBusStop().getId().equals(lineRouteEntity.getBusStop().getId()))) {
-      throw new BusLineContainsBusStopException("This bus line already contains this bus stop");
-    }
-    if (busLineRoutes.stream()
-        .anyMatch(lr -> lr.getSequence() > lineRouteSequence && lr.getDriveTime() < lineRouteDriveTime)) {
-      throw new InvalidDriveTimeException("You should drive to this stop before next stop");
-    }
-    if (busLineRoutes.stream()
-        .anyMatch(lr -> lr.getSequence() < lineRouteSequence &&
-            lr.getDriveTime() > lineRouteDriveTime)) {
-      throw new InvalidDriveTimeException("You should drive to this stop after previous stop");
-    }
 
-    for (LineRouteEntity lineRoute : busLineRoutes) {
-      if (lineRoute.getSequence() >= lineRouteSequence) {
-        lineRoute.setSequence(lineRoute.getSequence() + 1);
-        lineRouteRepository.saveAndFlush(lineRoute);
+    if (busLineRoutes.size() > 0) {
+      if (lineRouteSequence > busLineRoutes.get(0).getSequence() + 1) {
+        throw new RouteSequenceGreaterThanLastPlusOneException("Route sequence cannot be greater than last sequence  + 1");
+      }
+      if (busLineRoutes.stream()
+          .anyMatch(lr -> lr.getBusStop().getId().equals(lineRouteEntity.getBusStop().getId()))) {
+        throw new BusLineContainsBusStopException("This bus line already contains this bus stop");
+      }
+      if (busLineRoutes.stream()
+          .anyMatch(lr -> lr.getSequence() >= lineRouteSequence && lr.getDriveTime() < lineRouteDriveTime)) {
+        throw new InvalidDriveTimeException("You should drive to this stop before next stop");
+      }
+      if (busLineRoutes.stream()
+          .anyMatch(lr -> lr.getSequence() < lineRouteSequence &&
+              lr.getDriveTime() > lineRouteDriveTime)) {
+        throw new InvalidDriveTimeException("You should drive to this stop after previous stop");
+      }
+      for (LineRouteEntity lineRoute : busLineRoutes) {
+        if (lineRoute.getSequence() >= lineRouteSequence) {
+          lineRoute.setSequence(lineRoute.getSequence() + 1);
+          lineRouteRepository.saveAndFlush(lineRoute);
+        }
       }
     }
+
     return lineRouteRepository.saveAndFlush(lineRouteEntity);
   }
 
@@ -88,7 +96,7 @@ public class LineRouteServiceImpl implements LineRouteService {
 
     List<LineRouteEntity> busLineRoutes = this.readByBusLineId(lineRouteEntity.getBusLine().getId());
     lineRouteRepository.delete(lineRouteEntity);
-    for (int i = lineRouteEntity.getSequence() - 1; i < busLineRoutes.size() - 2; i++) {
+    for (int i = lineRouteEntity.getSequence() - 1; i < busLineRoutes.size(); i++) {
       LineRouteEntity lineRoute = busLineRoutes.get(i);
       lineRoute.setSequence(lineRoute.getSequence() - 1);
       lineRouteRepository.saveAndFlush(lineRoute);
