@@ -48,4 +48,7 @@ public class BusRideEntity {
   @ManyToOne
   @JoinColumn(name = "bus")
   private BusEntity bus;
+
+  @Column(name = "active", nullable = false)
+  private Boolean active;
 }
