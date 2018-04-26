@@ -90,9 +90,9 @@ class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public List<AccountEntity> findByUserType(String userType) {
+  public List<AccountEntity> readByUserType(String userType) {
     List<AuthorityEntity> authorities = authorityRepository.findByAuthority(userType);
-    List<AccountEntity> accounts = authorities.parallelStream()
+    List<AccountEntity> accounts = authorities.stream()
         .map(authority -> authority.getAccount())
         .collect(Collectors.toList());
     return accounts;

@@ -26,5 +26,5 @@ public interface AccountService {
 
   Integer getIdByUsername(String username);
 
-  List<AccountEntity> findByUserType(String userType);
+  List<AccountEntity> readByUserType(String userType);
 }

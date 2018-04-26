@@ -120,10 +120,10 @@ class AccountController {
 
   @RequestMapping(method = RequestMethod.GET, value = "")
   @Secured(value = {"ROLE_ADMIN"})
-  ResponseEntity readUsersByType(@RequestParam("type") String userType) {
+  ResponseEntity<List<ReadUserDTO>> readUsersByType(@RequestParam("type") String userType) {
 
-    List<ReadUserDTO> listOfUsers = accountService.findByUserType(userType)
-        .parallelStream().map(user -> UserMapper.mapToReadUserDTO.apply(user))
+    List<ReadUserDTO> listOfUsers = accountService.readByUserType(userType)
+        .stream().map(user -> UserMapper.mapToReadUserDTO.apply(user))
         .collect(Collectors.toList());
 
 
