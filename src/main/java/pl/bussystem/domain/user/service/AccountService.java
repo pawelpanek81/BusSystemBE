@@ -3,6 +3,7 @@ package pl.bussystem.domain.user.service;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 
 import java.security.Principal;
+import java.util.List;
 
 public interface AccountService {
   AccountEntity create(AccountEntity accountEntity);
@@ -24,4 +25,6 @@ public interface AccountService {
   AccountEntity updateAccount(AccountEntity accountEntity);
 
   Integer getIdByUsername(String username);
+
+  List<AccountEntity> readByUserType(String userType);
 }
