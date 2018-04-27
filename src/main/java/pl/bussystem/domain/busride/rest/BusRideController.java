@@ -70,13 +70,6 @@ class BusRideController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/jd", method = RequestMethod.POST)
-  ResponseEntity<?> jd(@RequestBody LocalDateTime localDateTime) {
-    logger.info(localDateTime.toString());
-    logger.info(TimeZone.getDefault().toString());
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
   @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
   ResponseEntity<?> updateDrivers(@PathVariable Integer id, @RequestBody Map<String, Object> fields) {
     BusRideEntity busRideEntity = busRideService.readById(id);
