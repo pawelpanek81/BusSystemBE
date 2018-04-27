@@ -143,6 +143,10 @@ public class BusRideServiceImpl implements BusRideService {
       LocalTime startJourneyLocalTime = startJourneySqlTime.toLocalTime();
       LocalTime endJourneyLocalTime = startJourneyLocalTime.plusMinutes(busLineEntity.getDriveTime());
 
+      if (LocalDateTime.of(javaDay, startJourneyLocalTime).isBefore(startDateTime)) {
+        continue;
+      }
+
       if (LocalDateTime.of(javaDay, endJourneyLocalTime).isAfter(endDateTime)) {
         continue;
       }
