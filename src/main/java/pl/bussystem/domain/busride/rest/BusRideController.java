@@ -50,4 +50,14 @@ class BusRideController {
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
+
+  @RequestMapping(value = "/upcoming", method = RequestMethod.GET)
+  ResponseEntity<List<ReadBusRideDTO>> readUpcoming() {
+    List<BusRideEntity> busRides = busRideService.readUpcomingRides();
+    List<ReadBusRideDTO> dtos = busRides.stream()
+        .map(BusRideMapper.mapToReadBusRideDTO)
+        .collect(Collectors.toList());
+
+    return new ResponseEntity<>(dtos, HttpStatus.OK);
+  }
 }

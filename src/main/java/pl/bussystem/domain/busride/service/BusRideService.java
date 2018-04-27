@@ -8,4 +8,6 @@ public interface BusRideService {
   BusRideEntity create(BusRideEntity busRideEntity);
 
   List<BusRideEntity> read();
+
+  List<BusRideEntity> readUpcomingRides();
 }
