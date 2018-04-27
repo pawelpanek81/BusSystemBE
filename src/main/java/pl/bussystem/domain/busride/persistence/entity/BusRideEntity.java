@@ -50,5 +50,5 @@ public class BusRideEntity {
   private BusEntity bus;
 
   @Column(name = "active", nullable = false)
-  private Boolean active;
+  private Boolean active = false;
 }
