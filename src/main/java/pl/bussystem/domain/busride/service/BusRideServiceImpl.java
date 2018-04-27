@@ -1,6 +1,5 @@
 package pl.bussystem.domain.busride.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
@@ -16,6 +15,7 @@ import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity
 import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
+import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -31,16 +31,18 @@ public class BusRideServiceImpl implements BusRideService {
   private BusRideRepository busRideRepository;
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
+  private TicketRepository tickerRepository;
   private LineRouteService lineRouteService;
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
                             ScheduleRepository scheduleRepository,
-                            LineRouteService lineRouteService) {
+                            TicketRepository tickerRepository, LineRouteService lineRouteService) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
+    this.tickerRepository = tickerRepository;
     this.lineRouteService = lineRouteService;
   }
 
@@ -157,10 +159,16 @@ public class BusRideServiceImpl implements BusRideService {
     return routes.stream().map(route -> route.getBusStop()).collect(Collectors.toList());
   }
 
-  public Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo){
+  @Override
+  public Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo) {
     List<BusStopEntity> busStopEntities = this.readAllStops(ride);
     Integer fromIndex = busStopEntities.indexOf(stopFrom);
     Integer toIndex = busStopEntities.indexOf(stopTo);
     return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
+  }
+
+  @Override
+  public Integer freeSeats(BusRideEntity ride) {
+    return ride.getBus().getSeats() - tickerRepository.findByBusRide(ride).size();
   }
 }

@@ -20,4 +20,7 @@ public interface BusRideService {
   List<BusStopEntity> readAllStops(BusRideEntity ride);
 
   Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo);
+
+  Integer freeSeats(BusRideEntity ride);
+
 }

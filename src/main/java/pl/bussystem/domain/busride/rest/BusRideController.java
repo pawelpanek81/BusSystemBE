@@ -88,27 +88,28 @@ class BusRideController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/search", method = RequestMethod.POST)
+  @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<BusJourneySearchDTO> searchForRides(@RequestParam("from") int from,
-                                                      @RequestParam("to") int to,
-                                                      @RequestParam("departureDate") LocalDate departureDate,
-                                                      @RequestParam("returnDate") LocalDate returnDate) {
+                                                     @RequestParam("to") int to,
+                                                     @RequestParam("departureDate") LocalDate departureDate,
+                                                     @RequestParam("returnDate") LocalDate returnDate,
+                                                     @RequestParam("seats") Integer seats) {
 
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
     List<ReadBusRideDTO> departureRides = busRideService.read().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(departureDate))
         .filter(ride -> busRideService.containConnection(ride, stopFrom, stopTo))
+        .filter(ride -> busRideService.freeSeats(ride) >= seats)
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
 
     List<ReadBusRideDTO> returnRides = busRideService.read().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
         .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
+        .filter(ride -> busRideService.freeSeats(ride) >= seats)
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
-
-
 
     return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides), HttpStatus.OK);
   }
