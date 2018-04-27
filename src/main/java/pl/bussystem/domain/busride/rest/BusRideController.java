@@ -19,9 +19,10 @@ import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,6 +67,13 @@ class BusRideController {
     logger.info("/generated StartDateTime: " + dto.getStartDateTime().toString());
     logger.info("/generated EndDateTime: " + dto.getEndDateTime().toString());
     busRideService.autoCreate(dto);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/jd", method = RequestMethod.POST)
+  ResponseEntity<?> jd(@RequestBody LocalDateTime localDateTime) {
+    logger.info(localDateTime.toString());
+    logger.info(TimeZone.getDefault().toString());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
