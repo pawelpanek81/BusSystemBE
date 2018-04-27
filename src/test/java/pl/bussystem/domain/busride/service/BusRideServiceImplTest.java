@@ -13,6 +13,7 @@ import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineReposi
 import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
+import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.sql.Time;
 import java.time.LocalDate;
@@ -38,6 +39,9 @@ public class BusRideServiceImplTest {
 
   @Mock
   private BusRideRepository busRideRepository;
+
+  @Mock
+  private TicketRepository tickerRepository;
 
   @Mock
   private LineRouteService lineRouteService;

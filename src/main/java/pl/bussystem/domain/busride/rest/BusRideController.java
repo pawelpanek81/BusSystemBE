@@ -15,13 +15,12 @@ import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
-import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
+import org.joda.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,13 +87,13 @@ class BusRideController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "/search", method = RequestMethod.GET)
   ResponseEntity<BusJourneySearchDTO> searchForRides(@RequestParam("from") int from,
                                                      @RequestParam("to") int to,
                                                      @RequestParam("departureDate") LocalDate departureDate,
                                                      @RequestParam("returnDate") LocalDate returnDate,
                                                      @RequestParam("seats") Integer seats) {
-
+    System.out.println(new LocalDate());
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
     List<ReadBusRideDTO> departureRides = busRideService.read().stream()
