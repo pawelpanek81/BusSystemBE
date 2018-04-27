@@ -76,7 +76,9 @@ public class BusRideServiceImpl implements BusRideService {
     List<BusRideEntity> createdBusRides = new ArrayList<>();
 
     for (ScheduleEntity schedule : scheduleEntities) {
-      if (!schedule.getEnabled()) continue;
+      if (!schedule.getEnabled()) {
+        throw new IllegalArgumentException("Schedule must be actived");
+      }
 
       List<BusRideEntity> ridesFromSchedule = this.getRidesFromSchedule(
           schedule,
@@ -129,13 +131,13 @@ public class BusRideServiceImpl implements BusRideService {
       LocalDate day = startDate.withFieldAdded(DurationFieldType.days(), i);
       java.time.LocalDate javaDay = java.time.LocalDate.of(day.getYear(), day.getMonthOfYear(), day.getDayOfMonth());
 
-      if (daysFromCode.stream()
-          .map(DayOfWeek::getValue)
-          .noneMatch(integer -> integer.equals(day.getDayOfWeek()))) {
+      if (getNow().isAfter(startDateTime)) {
         continue;
       }
 
-      if (getNow().isAfter(startDateTime)) {
+      if (daysFromCode.stream()
+          .map(DayOfWeek::getValue)
+          .noneMatch(integer -> integer.equals(day.getDayOfWeek()))) {
         continue;
       }
 
@@ -175,11 +177,18 @@ public class BusRideServiceImpl implements BusRideService {
   private List<DayOfWeek> getDaysOfWeek(String code) {
     List<DayOfWeek> days = new ArrayList<>();
 
-    Integer firstNumber = Integer.valueOf(code.substring(0, 1));
-    Integer lastNumber = Integer.valueOf(code.substring(2, 3));
+    if (code.contains("-")) {
+      Integer firstNumber = Integer.valueOf(code.substring(0, 1));
+      Integer lastNumber = Integer.valueOf(code.substring(2, 3));
+      for (int i = firstNumber; i <= lastNumber; i++) {
+        days.add(DayOfWeek.of(i));
+      }
 
-    for (int i = firstNumber; i <= lastNumber; i++) {
-      days.add(DayOfWeek.of(i));
+    } else {
+      String[] numbers = code.split(",");
+      for (String i : numbers) {
+        days.add(DayOfWeek.of(Integer.valueOf(i)));
+      }
     }
 
     return days;
