@@ -1,6 +1,7 @@
 package pl.bussystem.domain.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.user.exception.AmbiguousRolesException;
@@ -10,6 +11,8 @@ import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.domain.user.persistence.repository.AuthorityRepository;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.List;
@@ -91,6 +94,18 @@ class AccountServiceImpl implements AccountService {
 
   @Override
   public List<AccountEntity> readByUserType(String userType) {
+    Map<String, String> rolesMap = new HashMap<String, String>()
+    {
+      {
+        put("user", "ROLE_USER");
+        put("driver", "ROLE_DRIVER");
+        put("bok", "ROLE_BOK");
+        put("admin", "ROLE_ADMIN");
+      }
+    };
+
+    userType = rolesMap.get(userType);
+
     List<AuthorityEntity> authorities = authorityRepository.findByAuthority(userType);
     List<AccountEntity> accounts = authorities.stream()
         .map(authority -> authority.getAccount())
