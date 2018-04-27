@@ -149,6 +149,7 @@ public class BusRideServiceImpl implements BusRideService {
               .endDateTime(
                   LocalDateTime.of(javaDay, endJourneyLocalTime)
               )
+              .active(false)
               .build()
       );
     }
