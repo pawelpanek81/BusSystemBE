@@ -1,6 +1,7 @@
 package pl.bussystem.domain.lineinfo.busline.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
@@ -19,6 +20,7 @@ public class BusLineServiceImpl implements BusLineService {
   }
 
   @Override
+  @CacheEvict("busStops")
   public BusLineEntity create(BusLineEntity busLineEntity) {
     return busLineRepository.save(busLineEntity);
   }
@@ -29,6 +31,7 @@ public class BusLineServiceImpl implements BusLineService {
   }
 
   @Override
+  @CacheEvict("busStops")
   public void deleteById(Integer id) {
     try {
       busLineRepository.deleteById(id);
