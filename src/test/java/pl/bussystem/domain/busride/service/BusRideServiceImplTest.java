@@ -14,9 +14,7 @@ import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,9 +36,11 @@ public class BusRideServiceImplTest {
   @Mock
   private BusRideRepository busRideRepository;
 
+  private Clock clock = Clock.fixed(Instant.parse("2018-04-25T00:00:00.00Z"), ZoneId.of("UTC"));
+
   @Before
   public void setUp() {
-    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository);
+    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository, clock);
   }
 
   @Test
@@ -79,7 +79,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           2,
           LocalDateTime.of(
@@ -94,7 +95,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           3,
           LocalDateTime.of(
@@ -109,7 +111,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           4,
           LocalDateTime.of(
@@ -124,7 +127,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           5,
           LocalDateTime.of(
@@ -139,7 +143,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           6,
           LocalDateTime.of(
@@ -154,7 +159,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           7,
           LocalDateTime.of(
@@ -169,7 +175,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
       add(new BusRideEntity(
           8,
           LocalDateTime.of(
@@ -184,7 +191,8 @@ public class BusRideServiceImplTest {
           null,
           null,
           1000.0,
-          null));
+          null,
+          true));
     }};
 
     when(busLineRepository.findById(1)).thenReturn(Optional.of(n1));
