@@ -1,7 +1,6 @@
 package pl.bussystem.domain.user.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.user.exception.AmbiguousRolesException;
@@ -12,10 +11,10 @@ import pl.bussystem.domain.user.persistence.repository.AuthorityRepository;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,8 +93,7 @@ class AccountServiceImpl implements AccountService {
 
   @Override
   public List<AccountEntity> readByUserType(String userType) {
-    Map<String, String> rolesMap = new HashMap<String, String>()
-    {
+    Map<String, String> rolesMap = new HashMap<String, String>() {
       {
         put("user", "ROLE_USER");
         put("driver", "ROLE_DRIVER");
