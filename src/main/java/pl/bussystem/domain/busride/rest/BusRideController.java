@@ -1,6 +1,5 @@
 package pl.bussystem.domain.busride.rest;
 
-import com.sun.media.jfxmedia.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,9 +60,13 @@ class BusRideController {
   @RequestMapping(value = "/generated", method = RequestMethod.POST)
   ResponseEntity<?> createFromScheduleAndTime(@RequestBody
                                               @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
-    Logger.logMsg(Logger.INFO, "Got Start Date: " + dto.getStartDateTime().toString());
-    Logger.logMsg(Logger.INFO, "Got End Date: " + dto.getEndDateTime().toString());
     busRideService.autoCreate(dto);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/checkDate", method = RequestMethod.POST)
+  ResponseEntity<?> checkInputDate(@RequestBody ZonedDateTime date) {
+    System.out.println("Data: " + date.toString());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
