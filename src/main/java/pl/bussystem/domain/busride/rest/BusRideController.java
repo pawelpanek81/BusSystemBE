@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.mapper.BusRideMapper;
+import pl.bussystem.domain.busride.model.dto.BusJourneySearchDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
@@ -88,24 +89,28 @@ class BusRideController {
   }
 
   @RequestMapping(value = "/search", method = RequestMethod.POST)
-  ResponseEntity<List<ReadBusRideDTO>> searchForRides(@RequestParam("from") int from,
+  ResponseEntity<BusJourneySearchDTO> searchForRides(@RequestParam("from") int from,
                                                       @RequestParam("to") int to,
-                                                      @RequestParam("date") LocalDate date) {
+                                                      @RequestParam("departureDate") LocalDate departureDate,
+                                                      @RequestParam("returnDate") LocalDate returnDate) {
 
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
-    List<ReadBusRideDTO> rides = busRideService.read().stream()
-        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(date))
-        .filter(ride -> {
-          List<BusStopEntity> busStopEntities = busRideService.readAllStops(ride);
-          Integer fromIndex = busStopEntities.indexOf(stopFrom);
-          Integer toIndex = busStopEntities.indexOf(stopTo);
-          return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
-        })
+    List<ReadBusRideDTO> departureRides = busRideService.read().stream()
+        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(departureDate))
+        .filter(ride -> busRideService.containConnection(ride, stopFrom, stopTo))
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
 
-    return new ResponseEntity<>(rides, HttpStatus.OK);
+    List<ReadBusRideDTO> returnRides = busRideService.read().stream()
+        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
+        .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
+        .map(BusRideMapper.mapToReadBusRideDTO)
+        .collect(Collectors.toList());
+
+
+
+    return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides), HttpStatus.OK);
   }
 
 }

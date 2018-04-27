@@ -1,5 +1,6 @@
 package pl.bussystem.domain.busride.service;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
@@ -154,5 +155,12 @@ public class BusRideServiceImpl implements BusRideService {
     routes.add(0, new LineRouteEntity(null, null, ride.getBusLine().getFrom(), 1, null));
     routes.add(routes.size(), new LineRouteEntity(null, null, ride.getBusLine().getTo(), routes.size(), null));
     return routes.stream().map(route -> route.getBusStop()).collect(Collectors.toList());
+  }
+
+  public Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo){
+    List<BusStopEntity> busStopEntities = this.readAllStops(ride);
+    Integer fromIndex = busStopEntities.indexOf(stopFrom);
+    Integer toIndex = busStopEntities.indexOf(stopTo);
+    return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
   }
 }

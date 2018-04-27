@@ -17,5 +17,7 @@ public interface BusRideService {
 
   BusRideEntity update(BusRideEntity busRideEntity);
 
-  public List<BusStopEntity> readAllStops(BusRideEntity ride);
+  List<BusStopEntity> readAllStops(BusRideEntity ride);
+
+  Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo);
 }
