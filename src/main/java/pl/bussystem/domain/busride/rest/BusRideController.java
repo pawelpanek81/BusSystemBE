@@ -12,11 +12,15 @@ import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDT
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
+import pl.bussystem.domain.busstop.service.BusStopService;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,14 +31,17 @@ class BusRideController {
   private BusRideService busRideService;
   private BusRideMapper busRideMapper;
   private AccountRepository accountRepository;
+  private BusStopService busStopService;
 
   @Autowired
   public BusRideController(BusRideService busRideService,
                            BusRideMapper busRideMapper,
-                           AccountRepository accountRepository) {
+                           AccountRepository accountRepository,
+                           BusStopService busStopService) {
     this.busRideService = busRideService;
     this.busRideMapper = busRideMapper;
     this.accountRepository = accountRepository;
+    this.busStopService = busStopService;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -78,6 +85,27 @@ class BusRideController {
     });
     busRideService.update(busRideEntity);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/search", method = RequestMethod.POST)
+  ResponseEntity<List<ReadBusRideDTO>> searchForRides(@RequestParam("from") int from,
+                                                      @RequestParam("to") int to,
+                                                      @RequestParam("date") LocalDate date) {
+
+    BusStopEntity stopFrom = busStopService.readById(from);
+    BusStopEntity stopTo = busStopService.readById(to);
+    List<ReadBusRideDTO> rides = busRideService.read().stream()
+        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(date))
+        .filter(ride -> {
+          List<BusStopEntity> busStopEntities = busRideService.readAllStops(ride);
+          Integer fromIndex = busStopEntities.indexOf(stopFrom);
+          Integer toIndex = busStopEntities.indexOf(stopTo);
+          return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
+        })
+        .map(BusRideMapper.mapToReadBusRideDTO)
+        .collect(Collectors.toList());
+
+    return new ResponseEntity<>(rides, HttpStatus.OK);
   }
 
 }

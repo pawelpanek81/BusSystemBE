@@ -2,6 +2,7 @@ package pl.bussystem.domain.busride.service;
 
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface BusRideService {
   BusRideEntity readById(Integer id);
 
   BusRideEntity update(BusRideEntity busRideEntity);
+
+  public List<BusStopEntity> readAllStops(BusRideEntity ride);
 }

@@ -10,6 +10,7 @@ import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 
@@ -38,9 +39,12 @@ public class BusRideServiceImplTest {
   @Mock
   private BusRideRepository busRideRepository;
 
+  @Mock
+  private LineRouteService lineRouteService;
+
   @Before
   public void setUp() {
-    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository);
+    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository, lineRouteService);
   }
 
   @Test

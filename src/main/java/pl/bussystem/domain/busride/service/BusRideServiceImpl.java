@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
+import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -26,14 +30,17 @@ public class BusRideServiceImpl implements BusRideService {
   private BusRideRepository busRideRepository;
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
+  private LineRouteService lineRouteService;
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
-                            ScheduleRepository scheduleRepository) {
+                            ScheduleRepository scheduleRepository,
+                            LineRouteService lineRouteService) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
+    this.lineRouteService = lineRouteService;
   }
 
   @Override
@@ -139,5 +146,13 @@ public class BusRideServiceImpl implements BusRideService {
     }
     return returnedBusRides;
 
+  }
+
+  @Override
+  public List<BusStopEntity> readAllStops(BusRideEntity ride) {
+    List<LineRouteEntity> routes = lineRouteService.readByBusLineId(ride.getBusLine().getId());
+    routes.add(0, new LineRouteEntity(null, null, ride.getBusLine().getFrom(), 1, null));
+    routes.add(routes.size(), new LineRouteEntity(null, null, ride.getBusLine().getTo(), routes.size(), null));
+    return routes.stream().map(route -> route.getBusStop()).collect(Collectors.toList());
   }
 }
