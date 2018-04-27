@@ -1,5 +1,7 @@
 package pl.bussystem.domain.busride.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ class BusRideController {
   private BusRideService busRideService;
   private BusRideMapper busRideMapper;
   private AccountRepository accountRepository;
+  private static final Logger logger = LoggerFactory.getLogger(BusRideController.class);
 
   @Autowired
   public BusRideController(BusRideService busRideService,
@@ -60,13 +63,9 @@ class BusRideController {
   @RequestMapping(value = "/generated", method = RequestMethod.POST)
   ResponseEntity<?> createFromScheduleAndTime(@RequestBody
                                               @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
+    logger.info("/generated StartDateTime: " + dto.getStartDateTime().toString());
+    logger.info("/generated EndDateTime: " + dto.getEndDateTime().toString());
     busRideService.autoCreate(dto);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
-
-  @RequestMapping(value = "/checkDate", method = RequestMethod.POST)
-  ResponseEntity<?> checkInputDate(@RequestBody ZonedDateTime date) {
-    System.out.println("Data: " + date.toString());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

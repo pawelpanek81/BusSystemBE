@@ -4,6 +4,8 @@ import lombok.Setter;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
@@ -31,6 +33,7 @@ public class BusRideServiceImpl implements BusRideService {
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
   private Clock clock;
+  private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
@@ -57,6 +60,8 @@ public class BusRideServiceImpl implements BusRideService {
   public List<BusRideEntity> autoCreate(CreateBusRideFromScheduleAndDatesDTO dto) {
     LocalDateTime startDateTimePoint = dto.getStartDateTime();
     LocalDateTime endDateTimePoint = dto.getEndDateTime();
+    logger.info("autoCreate: startDateTimePoint: " + startDateTimePoint.toString());
+    logger.info("autoCreate: endDateTimePoint: " + endDateTimePoint.toString());
 
     BusLineEntity busLineEntity = busLineRepository.findById(dto.getBusLine())
         .orElseThrow(() -> new NoSuchElementException("Bus Line with id: " + dto.getBusLine() + " does not exists"));
@@ -112,6 +117,9 @@ public class BusRideServiceImpl implements BusRideService {
 
     LocalDate startDate = new LocalDate(startDateTime.getYear(), startDateTime.getMonthValue(), startDateTime.getDayOfMonth());
     LocalDate endDate = new LocalDate(endDateTime.getYear(), endDateTime.getMonthValue(), endDateTime.getDayOfMonth());
+
+    logger.info("getRidesFromSchedule() startDate " + startDate.toString());
+    logger.info("getRidesFromSchedule() endDate " + endDate.toString());
 
     int days = Days.daysBetween(startDate, endDate).getDays();
 
