@@ -1,5 +1,6 @@
 package pl.bussystem.domain.busride.rest;
 
+import com.sun.media.jfxmedia.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,8 @@ class BusRideController {
   @RequestMapping(value = "/generated", method = RequestMethod.POST)
   ResponseEntity<?> createFromScheduleAndTime(@RequestBody
                                               @Valid CreateBusRideFromScheduleAndDatesDTO dto) {
+    Logger.logMsg(Logger.INFO, "Got Start Date: " + dto.getStartDateTime().toString());
+    Logger.logMsg(Logger.INFO, "Got End Date: " + dto.getEndDateTime().toString());
     busRideService.autoCreate(dto);
     return new ResponseEntity<>(HttpStatus.OK);
   }
