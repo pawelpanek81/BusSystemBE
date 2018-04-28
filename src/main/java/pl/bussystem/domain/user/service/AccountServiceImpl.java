@@ -105,9 +105,8 @@ class AccountServiceImpl implements AccountService {
     userType = rolesMap.get(userType);
 
     List<AuthorityEntity> authorities = authorityRepository.findByAuthority(userType);
-    List<AccountEntity> accounts = authorities.stream()
-        .map(authority -> authority.getAccount())
+    return authorities.stream()
+        .map(AuthorityEntity::getAccount)
         .collect(Collectors.toList());
-    return accounts;
   }
 }
