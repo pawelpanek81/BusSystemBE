@@ -1,6 +1,7 @@
 package pl.bussystem.domain.busstop.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +12,10 @@ import pl.bussystem.domain.busstop.model.dto.CreateBusStopDTO;
 import pl.bussystem.domain.busstop.model.dto.ReadBusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
-import pl.bussystem.rest.exception.RestExceptionCodes;
+import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.rest.exception.RestException;
+import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,10 +26,16 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v1.0/bus-stops")
 class BusStopController {
   private BusStopService busStopService;
+  private BusLineService busLineService;
+  private LineRouteService lineRouteService;
 
   @Autowired
-  public BusStopController(BusStopService busStopService) {
+  public BusStopController(BusStopService busStopService,
+                           BusLineService busLineService,
+                           LineRouteService lineRouteService) {
     this.busStopService = busStopService;
+    this.busLineService = busLineService;
+    this.lineRouteService = lineRouteService;
   }
 
 
@@ -47,8 +56,12 @@ class BusStopController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  ResponseEntity <List<ReadBusStopDTO>> readAll() {
-    List<BusStopEntity> busStops = busStopService.read();
+  @Cacheable("busStops")
+  public ResponseEntity<List<ReadBusStopDTO>> read(@RequestParam(required = false) Integer fromId) {
+    List<BusStopEntity> busStops;
+
+    busStops = fromId != null ? busStopService.readBusStopsAvailableFrom(fromId) : busStopService.read();
+
     List<ReadBusStopDTO> busStopDTOS = busStops.stream()
         .map(BusStopMapper.mapToReadBusStopDTO)
         .collect(Collectors.toList());
