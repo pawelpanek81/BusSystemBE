@@ -12,15 +12,12 @@ import pl.bussystem.domain.busstop.model.dto.CreateBusStopDTO;
 import pl.bussystem.domain.busstop.model.dto.ReadBusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
-import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
-import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
 import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -63,39 +60,8 @@ class BusStopController {
   public ResponseEntity<List<ReadBusStopDTO>> read(@RequestParam(required = false) Integer fromId) {
     List<BusStopEntity> busStops;
 
-    if (fromId != null) {
-      List<BusLineEntity> busLines = busLineService.read();
-      BusStopEntity from = busStopService.readById(fromId);
-      busStops = new ArrayList<>();
+    busStops = fromId != null ? busStopService.readBusStopsAvailableFrom(fromId) : busStopService.read();
 
-      for (BusLineEntity busline : busLines) {
-        List<LineRouteEntity> lineRoutes = lineRouteService.readByBusLineId(busline.getId());
-
-        if (busline.getFrom().getId().equals(fromId)) {
-          List<BusStopEntity> stopsFromRoute = lineRoutes.stream()
-              .map(LineRouteEntity::getBusStop)
-              .collect(Collectors.toList());
-
-          busStops.addAll(stopsFromRoute);
-          busStops.add(busline.getTo());
-        } else {
-          for (int i = 0; i < lineRoutes.size(); i++) {
-            if (lineRoutes.get(i).getBusStop().getId().equals(from.getId())) {
-              List<BusStopEntity> stops = lineRoutes.subList(i + 1, lineRoutes.size()).stream()
-                  .map(LineRouteEntity::getBusStop)
-                  .collect(Collectors.toList());
-
-              busStops.addAll(stops);
-              busStops.add(busline.getTo());
-              break;
-            }
-          }
-        }
-      }
-    } else {
-      busStops = busStopService.read();
-
-    }
     List<ReadBusStopDTO> busStopDTOS = busStops.stream()
         .map(BusStopMapper.mapToReadBusStopDTO)
         .collect(Collectors.toList());
