@@ -20,7 +20,7 @@ import pl.bussystem.rest.exception.RestException;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,20 +93,19 @@ class BusRideController {
                                                      @RequestParam("departureDate") LocalDate departureDate,
                                                      @RequestParam("returnDate") LocalDate returnDate,
                                                      @RequestParam("seats") Integer seats) {
-    System.out.println(new LocalDate());
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
     List<ReadBusRideDTO> departureRides = busRideService.read().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(departureDate))
         .filter(ride -> busRideService.containConnection(ride, stopFrom, stopTo))
-        .filter(ride -> busRideService.freeSeats(ride) >= seats)
+        .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
 
     List<ReadBusRideDTO> returnRides = busRideService.read().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
         .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
-        .filter(ride -> busRideService.freeSeats(ride) >= seats)
+        .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
 

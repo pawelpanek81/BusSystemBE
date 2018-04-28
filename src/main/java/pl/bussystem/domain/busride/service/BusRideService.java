@@ -17,10 +17,8 @@ public interface BusRideService {
 
   BusRideEntity update(BusRideEntity busRideEntity);
 
-  List<BusStopEntity> readAllStops(BusRideEntity ride);
-
   Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo);
 
-  Integer freeSeats(BusRideEntity ride);
+  Integer getFreeSeats(BusRideEntity ride);
 
 }

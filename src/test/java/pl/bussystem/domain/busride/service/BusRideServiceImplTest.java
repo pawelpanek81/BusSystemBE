@@ -48,7 +48,7 @@ public class BusRideServiceImplTest {
 
   @Before
   public void setUp() {
-    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository, tickerRepository, lineRouteService);
+    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository, tickerRepository, lineRouteService, busStopService);
   }
 
   @Test

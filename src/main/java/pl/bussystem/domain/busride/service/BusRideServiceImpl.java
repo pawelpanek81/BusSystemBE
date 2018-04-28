@@ -9,6 +9,7 @@ import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDT
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
+import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
 import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
@@ -33,17 +34,21 @@ public class BusRideServiceImpl implements BusRideService {
   private ScheduleRepository scheduleRepository;
   private TicketRepository tickerRepository;
   private LineRouteService lineRouteService;
+  private BusStopService busStopService;
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
                             ScheduleRepository scheduleRepository,
-                            TicketRepository tickerRepository, LineRouteService lineRouteService) {
+                            TicketRepository tickerRepository,
+                            LineRouteService lineRouteService,
+                            BusStopService busStopService) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
     this.tickerRepository = tickerRepository;
     this.lineRouteService = lineRouteService;
+    this.busStopService = busStopService;
   }
 
   @Override
@@ -152,23 +157,15 @@ public class BusRideServiceImpl implements BusRideService {
   }
 
   @Override
-  public List<BusStopEntity> readAllStops(BusRideEntity ride) {
-    List<LineRouteEntity> routes = lineRouteService.readByBusLineId(ride.getBusLine().getId());
-    routes.add(0, new LineRouteEntity(null, null, ride.getBusLine().getFrom(), 1, null));
-    routes.add(routes.size(), new LineRouteEntity(null, null, ride.getBusLine().getTo(), routes.size(), null));
-    return routes.stream().map(route -> route.getBusStop()).collect(Collectors.toList());
-  }
-
-  @Override
   public Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo) {
-    List<BusStopEntity> busStopEntities = this.readAllStops(ride);
+    List<BusStopEntity> busStopEntities = busStopService.readByBusLineId(ride.getBusLine().getId());
     Integer fromIndex = busStopEntities.indexOf(stopFrom);
     Integer toIndex = busStopEntities.indexOf(stopTo);
     return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
   }
 
   @Override
-  public Integer freeSeats(BusRideEntity ride) {
+  public Integer getFreeSeats(BusRideEntity ride) {
     return ride.getBus().getSeats() - tickerRepository.findByBusRide(ride).size();
   }
 }
