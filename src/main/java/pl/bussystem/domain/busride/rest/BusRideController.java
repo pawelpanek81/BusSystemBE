@@ -21,6 +21,8 @@ import pl.bussystem.rest.exception.RestException;
 import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -90,25 +92,32 @@ class BusRideController {
   @RequestMapping(value = "/search", method = RequestMethod.GET)
   ResponseEntity<BusJourneySearchDTO> searchForRides(@RequestParam("from") int from,
                                                      @RequestParam("to") int to,
-                                                     @RequestParam("departureDate") LocalDate departureDate,
-                                                     @RequestParam("returnDate") LocalDate returnDate,
+                                                     @RequestParam("departureDate") String departureDateText,
+                                                     @RequestParam(value = "returnDate", required = false) String returnDateText,
                                                      @RequestParam("seats") Integer seats) {
+    LocalDate departureDate = LocalDate.parse(departureDateText);
+    LocalDateTime timeNow = LocalDateTime.now();
+
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
     List<ReadBusRideDTO> departureRides = busRideService.read().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(departureDate))
+        .filter(ride -> ride.getStartDateTime().isAfter(timeNow))
         .filter(ride -> busRideService.containConnection(ride, stopFrom, stopTo))
         .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());
 
-    List<ReadBusRideDTO> returnRides = busRideService.read().stream()
-        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
-        .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
-        .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
-        .map(BusRideMapper.mapToReadBusRideDTO)
-        .collect(Collectors.toList());
-
+    List<ReadBusRideDTO> returnRides = new ArrayList<>();
+    if (returnDateText != null) {
+      LocalDate returnDate = LocalDate.parse(returnDateText);
+      returnRides = busRideService.read().stream()
+          .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
+          .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
+          .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
+          .map(BusRideMapper.mapToReadBusRideDTO)
+          .collect(Collectors.toList());
+    }
     return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides), HttpStatus.OK);
   }
 
