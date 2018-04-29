@@ -98,16 +98,18 @@ class BusRideController {
   }
 
   @RequestMapping(value = "/search", method = RequestMethod.GET)
-  ResponseEntity<BusJourneySearchDTO> searchForRides(@RequestParam("from") int from,
-                                                     @RequestParam("to") int to,
-                                                     @RequestParam("departureDate") String departureDateText,
-                                                     @RequestParam(value = "returnDate", required = false) String returnDateText,
-                                                     @RequestParam("seats") Integer seats) {
+  ResponseEntity<?> searchForRides(@RequestParam("from") int from,
+                                   @RequestParam("to") int to,
+                                   @RequestParam("departureDate") String departureDateText,
+                                   @RequestParam(value = "returnDate", required = false) String returnDateText,
+                                   @RequestParam("seats") Integer seats) {
     LocalDate departureDate;
     try {
       departureDate = LocalDate.parse(departureDateText);
-    } catch (DateTimeException e){
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    } catch (DateTimeException e) {
+      RestException restException = new RestException(RestExceptionCodes.INVALID_TIME_FORMAT,
+          "Given departure date is invalid");
+      return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
     }
     LocalDateTime timeNow = LocalDateTime.now();
 
@@ -127,8 +129,10 @@ class BusRideController {
       LocalDate returnDate;
       try {
         returnDate = LocalDate.parse(returnDateText);
-      } catch (DateTimeException e){
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      } catch (DateTimeException e) {
+        RestException restException = new RestException(RestExceptionCodes.INVALID_TIME_FORMAT,
+            "Given return date is invalid");
+        return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
       }
       returnRides = busRideService.read().stream()
           .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))

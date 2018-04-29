@@ -21,7 +21,6 @@ public class RestExceptionCodes {
   public static final int SCHEDULE_WITH_GIVEN_ID_DOES_NOT_EXISTS = 14;
 
 
-
   /* LINE ROUTES */
   public static final int LINE_ROUTE_WITH_GIVEN_ID_DOES_NOT_EXISTS = 9;
   public static final int BUS_STOP_ID_IN_LINE_ROUTE_DOES_NOT_EXISTS = 10;
@@ -39,14 +38,16 @@ public class RestExceptionCodes {
 
   /* BUS RIDES */
 
+
   /* TICKETS */
 
 
-  /* BUS RIDES */
-
-
   /* NEWS */
-  public static final int NEWS_WITH_GIVEN_ID_DOES_NOT_EXISTS = 7;
+  public static final int NEWS_WITH_GIVEN_ID_DOES_NOT_EXISTS = 20;
+
+
+  /* OTHER */
+  public static final int INVALID_TIME_FORMAT = 21;
 
 
 }
