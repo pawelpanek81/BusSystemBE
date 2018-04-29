@@ -1,8 +1,11 @@
 package pl.bussystem.domain.busride.service;
 
+import lombok.Setter;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
@@ -19,11 +22,14 @@ import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepo
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.sql.Time;
+import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,22 +39,23 @@ public class BusRideServiceImpl implements BusRideService {
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
   private TicketRepository tickerRepository;
-  private LineRouteService lineRouteService;
   private BusStopService busStopService;
+  private Clock clock;
+  private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
                             ScheduleRepository scheduleRepository,
                             TicketRepository tickerRepository,
-                            LineRouteService lineRouteService,
-                            BusStopService busStopService) {
+                            BusStopService busStopService,
+                            Clock clock) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
     this.tickerRepository = tickerRepository;
-    this.lineRouteService = lineRouteService;
     this.busStopService = busStopService;
+    this.clock = clock;
   }
 
   @Override
@@ -63,39 +70,46 @@ public class BusRideServiceImpl implements BusRideService {
 
   @Override
   public List<BusRideEntity> autoCreate(CreateBusRideFromScheduleAndDatesDTO dto) {
-    LocalDateTime startDateTime = dto.getStartDateTime();
-    LocalDateTime endDateTime = dto.getEndDateTime();
+    LocalDateTime startDateTimePoint = dto.getStartDateTime();
+    LocalDateTime endDateTimePoint = dto.getEndDateTime();
+    logger.info("autoCreate: startDateTimePoint: " + startDateTimePoint.toString());
+    logger.info("autoCreate: endDateTimePoint: " + endDateTimePoint.toString());
 
-    BusLineEntity busLineEntity = busLineRepository.findById(dto.getBusLine()).orElse(null);
+    BusLineEntity busLineEntity = busLineRepository.findById(dto.getBusLine())
+        .orElseThrow(() -> new NoSuchElementException("Bus Line with id: " + dto.getBusLine() + " does not exists"));
 
-    List<Integer> schedulesIds = dto.getSchedulesIds();
+    List<Integer> idsOfSchedules = dto.getSchedulesIds();
 
-    List<ScheduleEntity> scheduleEntities = schedulesIds.stream()
-        .map(id -> scheduleRepository.findById(id).orElse(null))
+    List<ScheduleEntity> scheduleEntities = idsOfSchedules.stream()
+        .map(id -> scheduleRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Schedule with id: " + id + "does not exists")))
         .collect(toList());
 
-    List<BusRideEntity> returnedBusRides = new ArrayList<>();
+    List<BusRideEntity> createdBusRides = new ArrayList<>();
 
     for (ScheduleEntity schedule : scheduleEntities) {
+      if (!schedule.getEnabled()) {
+        throw new IllegalArgumentException("Schedule must be actived");
+      }
+
       List<BusRideEntity> ridesFromSchedule = this.getRidesFromSchedule(
           schedule,
-          startDateTime,
-          endDateTime,
+          startDateTimePoint,
+          endDateTimePoint,
           busLineEntity
       );
-      returnedBusRides.addAll(ridesFromSchedule);
+      createdBusRides.addAll(ridesFromSchedule);
     }
 
-    for (BusRideEntity entity : returnedBusRides) {
-      busRideRepository.save(entity);
-    }
+    createdBusRides.forEach(entity -> busRideRepository.save(entity));
 
-    return returnedBusRides;
+    return createdBusRides;
   }
 
   @Override
   public BusRideEntity readById(Integer id) {
-    return busRideRepository.findById(id).orElse(null);
+    return busRideRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Bus Ride with id: " + id + " does not exists"));
   }
 
   @Override
@@ -107,53 +121,89 @@ public class BusRideServiceImpl implements BusRideService {
                                                    LocalDateTime startDateTime,
                                                    LocalDateTime endDateTime,
                                                    BusLineEntity busLineEntity) {
-    Time startHour = schedule.getStartHour();
-    String code = schedule.getCode();
+    String scheduleCode = schedule.getCode();
     Double driveNettoPrice = schedule.getDriveNettoPrice();
-    Boolean enabled = schedule.getEnabled();
+    Boolean scheduleEnabled = schedule.getEnabled();
+
+    if (!scheduleEnabled) throw new IllegalArgumentException("Schedule must be enabled");
 
     List<BusRideEntity> returnedBusRides = new ArrayList<>();
 
     LocalDate startDate = new LocalDate(startDateTime.getYear(), startDateTime.getMonthValue(), startDateTime.getDayOfMonth());
     LocalDate endDate = new LocalDate(endDateTime.getYear(), endDateTime.getMonthValue(), endDateTime.getDayOfMonth());
 
+    logger.info("getRidesFromSchedule() startDate " + startDate.toString());
+    logger.info("getRidesFromSchedule() endDate " + endDate.toString());
+
     int days = Days.daysBetween(startDate, endDate).getDays();
-    List<LocalDate> dates = new ArrayList<LocalDate>(days);
+
+    List<DayOfWeek> daysFromCode = getDaysOfWeek(scheduleCode);
+
     for (int i = 0; i <= days; i++) {
-      LocalDate d = startDate.withFieldAdded(DurationFieldType.days(), i);
+      LocalDate day = startDate.withFieldAdded(DurationFieldType.days(), i);
+      java.time.LocalDate javaDay = java.time.LocalDate.of(day.getYear(), day.getMonthOfYear(), day.getDayOfMonth());
 
-      Time endJourneyLocalTime = schedule.getStartHour();
+      if (getNow().isAfter(startDateTime)) {
+        continue;
+      }
 
-      LocalTime localtime = endJourneyLocalTime.toLocalTime();
-      localtime = localtime.plusMinutes(busLineEntity.getDriveTime());
-      endJourneyLocalTime = Time.valueOf(localtime);
+      if (daysFromCode.stream()
+          .map(DayOfWeek::getValue)
+          .noneMatch(integer -> integer.equals(day.getDayOfWeek()))) {
+        continue;
+      }
 
+      Time startJourneySqlTime = schedule.getStartHour();
+      LocalTime startJourneyLocalTime = startJourneySqlTime.toLocalTime();
+      LocalTime endJourneyLocalTime = startJourneyLocalTime.plusMinutes(busLineEntity.getDriveTime());
+
+      if (LocalDateTime.of(javaDay, startJourneyLocalTime).isBefore(startDateTime)) {
+        continue;
+      }
+
+      if (LocalDateTime.of(javaDay, endJourneyLocalTime).isAfter(endDateTime)) {
+        continue;
+      }
 
       returnedBusRides.add(
           BusRideEntity.builder()
               .busLine(busLineEntity)
-              .driveNettoPrice(schedule.getDriveNettoPrice())
+              .driveNettoPrice(driveNettoPrice)
               .startDateTime(
-                  LocalDateTime.of(
-                      d.getYear(), d.getMonthOfYear(), d.getDayOfMonth(),
-                      schedule.getStartHour().getHours(),
-                      schedule.getStartHour().getMinutes(),
-                      schedule.getStartHour().getSeconds()
-                  )
+                  LocalDateTime.of(javaDay, startJourneyLocalTime)
               )
               .endDateTime(
-                  LocalDateTime.of(
-                      d.getYear(), d.getMonthOfYear(), d.getDayOfMonth(),
-                      endJourneyLocalTime.getHours(),
-                      endJourneyLocalTime.getMinutes(),
-                      endJourneyLocalTime.getSeconds()
-                  )
+                  LocalDateTime.of(javaDay, endJourneyLocalTime)
               )
+              .active(false)
               .build()
       );
     }
     return returnedBusRides;
+  }
 
+  private LocalDateTime getNow() {
+    return LocalDateTime.now(clock);
+  }
+
+  private List<DayOfWeek> getDaysOfWeek(String code) {
+    List<DayOfWeek> days = new ArrayList<>();
+
+    if (code.contains("-")) {
+      Integer firstNumber = Integer.valueOf(code.substring(0, 1));
+      Integer lastNumber = Integer.valueOf(code.substring(2, 3));
+      for (int i = firstNumber; i <= lastNumber; i++) {
+        days.add(DayOfWeek.of(i));
+      }
+
+    } else {
+      String[] numbers = code.split(",");
+      for (String i : numbers) {
+        days.add(DayOfWeek.of(Integer.valueOf(i)));
+      }
+    }
+
+    return days;
   }
 
   @Override

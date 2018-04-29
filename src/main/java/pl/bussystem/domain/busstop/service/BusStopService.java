@@ -13,6 +13,8 @@ public interface BusStopService {
 
   List<BusStopEntity> readByBusLineId(Integer id);
 
+  List<BusStopEntity> readBusStopsAvailableFrom(Integer fromId);
+
   List<BusStopEntity> readUnusedByBusLineId(Integer id);
 
   BusStopEntity readById(Integer fromId);

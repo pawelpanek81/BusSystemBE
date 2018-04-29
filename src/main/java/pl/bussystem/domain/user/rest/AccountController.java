@@ -18,6 +18,8 @@ import pl.bussystem.rest.exception.RestExceptionCodes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1.0/users")
@@ -114,5 +116,17 @@ class AccountController {
     AccountEntity newAccData = UserMapper.mapToAccountEntity(prevAccData, dto);
     accountService.updateAccount(newAccData);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "")
+  @Secured(value = {"ROLE_ADMIN"})
+  ResponseEntity<List<ReadUserDTO>> readUsersByType(@RequestParam("type") String userType) {
+
+    List<ReadUserDTO> listOfUsers = accountService.readByUserType(userType)
+        .stream().map(user -> UserMapper.mapToReadUserDTO.apply(user))
+        .collect(Collectors.toList());
+
+
+    return new ResponseEntity<>(listOfUsers, HttpStatus.OK);
   }
 }

@@ -1,6 +1,7 @@
 package pl.bussystem.domain.lineinfo.lineroute.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
 import pl.bussystem.domain.lineinfo.lineroute.exception.BusLineContainsBusStopException;
@@ -30,6 +31,7 @@ public class LineRouteServiceImpl implements LineRouteService {
   }
 
   @Override
+  @CacheEvict("busStops")
   public LineRouteEntity create(LineRouteEntity lineRouteEntity) {
     List<LineRouteEntity> busLineRoutes = this.readByBusLineId(lineRouteEntity.getBusLine().getId());
     busLineRoutes.sort(((o1, o2) -> o2.getSequence() - o1.getSequence()));
@@ -83,6 +85,7 @@ public class LineRouteServiceImpl implements LineRouteService {
   }
 
   @Override
+  @CacheEvict("busStops")
   public void deleteByBusLineIdAndLineRouteId(Integer busLineId, Integer lineRouteId) {
     Optional<LineRouteEntity> optionalOfLineRouteEntity =
         lineRouteRepository.findOneByBusLineIdAndId(busLineId, lineRouteId);

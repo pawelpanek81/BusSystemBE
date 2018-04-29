@@ -189,8 +189,8 @@ INSERT INTO public.buses(id, brand, model, registration_number, seats)
   VALUES (6, 'Autosan', 'H9-21', 'RTA 2222', 23);
 
 INSERT INTO public.bus_rides(
-  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price)
-VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600);
+  id, end_date_time, start_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
+VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600, FALSE);
 
 
 -- EXPERIMENTAL TICKETS
