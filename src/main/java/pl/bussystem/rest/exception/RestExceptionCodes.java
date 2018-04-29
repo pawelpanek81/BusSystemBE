@@ -47,7 +47,5 @@ public class RestExceptionCodes {
 
 
   /* OTHER */
-  public static final int INVALID_TIME_FORMAT = 21;
-
 
 }

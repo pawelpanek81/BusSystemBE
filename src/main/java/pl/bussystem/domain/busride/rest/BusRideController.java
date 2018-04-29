@@ -3,18 +3,18 @@ package pl.bussystem.domain.busride.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.mapper.BusRideMapper;
-import pl.bussystem.domain.busride.model.dto.BusJourneySearchDTO;
-import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
-import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
-import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
+import pl.bussystem.domain.busride.model.dto.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
+import pl.bussystem.domain.busstop.mapper.BusStopMapper;
+import pl.bussystem.domain.busstop.model.dto.ReadBusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
@@ -100,49 +100,33 @@ class BusRideController {
   @RequestMapping(value = "/search", method = RequestMethod.GET)
   ResponseEntity<?> searchForRides(@RequestParam("from") int from,
                                    @RequestParam("to") int to,
-                                   @RequestParam("departureDate") String departureDateText,
-                                   @RequestParam(value = "returnDate", required = false) String returnDateText,
+                                   @RequestParam("departureDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
+                                   @RequestParam(name = "returnDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate,
                                    @RequestParam("seats") Integer seats) {
-    LocalDate departureDate;
-    try {
-      departureDate = LocalDate.parse(departureDateText);
-    } catch (DateTimeException e) {
-      RestException restException = new RestException(RestExceptionCodes.INVALID_TIME_FORMAT,
-          "Given departure date is invalid");
-      return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
-    }
-    LocalDateTime timeNow = LocalDateTime.now();
 
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
-    List<ReadBusRideDTO> departureRides = busRideService.read().stream()
-        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(departureDate))
-        .filter(ride -> ride.getStartDateTime().isAfter(timeNow))
-        .filter(ride -> busRideService.containConnection(ride, stopFrom, stopTo))
-        .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
-        .filter(BusRideEntity::getActive)
-        .map(BusRideMapper.mapToReadBusRideDTO)
+    ReadBusStopDTO stopFromDTO = BusStopMapper.mapToReadBusStopDTO.apply(stopFrom);
+    ReadBusStopDTO stopToDTO = BusStopMapper.mapToReadBusStopDTO.apply(stopTo);
+
+    List<BusTripSearchDTO> departureRides = busRideService
+        .readActiveRidesFromToWhereEnoughtSeats(stopFrom, stopTo, departureDate,
+            seats, LocalDateTime.now())
+        .stream()
+        .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopFrom, stopTo)))
         .collect(Collectors.toList());
 
-    List<ReadBusRideDTO> returnRides = new ArrayList<>();
-    if (returnDateText != null) {
-      LocalDate returnDate;
-      try {
-        returnDate = LocalDate.parse(returnDateText);
-      } catch (DateTimeException e) {
-        RestException restException = new RestException(RestExceptionCodes.INVALID_TIME_FORMAT,
-            "Given return date is invalid");
-        return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
-      }
-      returnRides = busRideService.read().stream()
-          .filter(ride -> ride.getStartDateTime().toLocalDate().equals(returnDate))
-          .filter(ride -> busRideService.containConnection(ride, stopTo, stopFrom))
-          .filter(ride -> busRideService.getFreeSeats(ride) >= seats)
-          .filter(BusRideEntity::getActive)
-          .map(BusRideMapper.mapToReadBusRideDTO)
+    List<BusTripSearchDTO> returnRides = new ArrayList<>();
+    if (returnDate != null && departureRides.size() > 0) {
+      System.out.println(departureRides.get(0).getEndDateTime());
+      returnRides = busRideService
+          .readActiveRidesFromToWhereEnoughtSeats(stopTo, stopFrom, returnDate,
+              seats, departureRides.get(0).getEndDateTime())
+          .stream()
+          .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopTo, stopFrom)))
           .collect(Collectors.toList());
     }
-    return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides), HttpStatus.OK);
+    return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides, stopFromDTO, stopToDTO), HttpStatus.OK);
   }
 
 }

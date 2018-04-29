@@ -4,6 +4,8 @@ import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDT
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BusRideService {
@@ -20,5 +22,10 @@ public interface BusRideService {
   Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo);
 
   Integer getFreeSeats(BusRideEntity ride);
+
+  List<BusRideEntity> readActiveRidesFromToWhereEnoughtSeats(BusStopEntity stopFrom, BusStopEntity stopTo,
+                                                             LocalDate date, Integer seats,
+                                                             LocalDateTime minimalTime);
+  Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo);
 
 }

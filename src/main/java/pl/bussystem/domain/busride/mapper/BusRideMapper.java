@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
+import pl.bussystem.domain.busride.model.dto.BusTripSearchDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
@@ -38,6 +39,16 @@ public class BusRideMapper {
           entity.getEndDateTime(),
           entity.getBusLine().getId()
       );
+
+  public static BusTripSearchDTO mapToBusTripSearchDTO (BusRideEntity entity, Double price) {
+    return new BusTripSearchDTO(
+        entity.getId(),
+        entity.getBusLine().getId(),
+        entity.getStartDateTime(),
+        entity.getEndDateTime(),
+        price
+    );
+  }
 
   public BusRideEntity mapToBusRideEntity(CreateBusRideDTO dto) {
     Optional<BusLineEntity> optionalOfBusLineEntity = Optional.empty();

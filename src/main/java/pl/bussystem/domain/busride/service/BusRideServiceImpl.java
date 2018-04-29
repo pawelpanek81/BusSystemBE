@@ -218,4 +218,24 @@ public class BusRideServiceImpl implements BusRideService {
   public Integer getFreeSeats(BusRideEntity ride) {
     return ride.getBus().getSeats() - tickerRepository.findByBusRide(ride).size();
   }
+
+  @Override
+  public List<BusRideEntity> readActiveRidesFromToWhereEnoughtSeats(BusStopEntity stopFrom, BusStopEntity stopTo,
+                                                                    java.time.LocalDate date, Integer seats,
+                                                                    LocalDateTime minimalTime) {
+
+    return read().stream()
+        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(date))
+        .filter(ride -> ride.getStartDateTime().isAfter(minimalTime))
+        .filter(ride -> containConnection(ride, stopFrom, stopTo))
+        .filter(ride -> getFreeSeats(ride) >= seats)
+        .filter(BusRideEntity::getActive)
+        .collect(toList());
+  }
+
+  @Override
+  public Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo) {
+    /* need calculator logix */
+    return busRideEntity.getDriveNettoPrice();
+  }
 }
