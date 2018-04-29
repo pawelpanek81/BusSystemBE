@@ -23,13 +23,11 @@ import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
 import java.lang.reflect.Field;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @RestController
@@ -100,12 +98,30 @@ class BusRideController {
   @RequestMapping(value = "/search", method = RequestMethod.GET)
   ResponseEntity<?> searchForRides(@RequestParam("from") int from,
                                    @RequestParam("to") int to,
-                                   @RequestParam("departureDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
-                                   @RequestParam(name = "returnDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate,
+                                   @RequestParam("departureDate")
+                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
+                                   @RequestParam(name = "returnDate", required = false)
+                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate,
                                    @RequestParam("seats") Integer seats) {
 
     BusStopEntity stopFrom = busStopService.readById(from);
     BusStopEntity stopTo = busStopService.readById(to);
+    if (stopFrom == null) {
+      RestException restException = new RestException(RestExceptionCodes.BUS_STOP_WITH_GIVEN_ID_DOES_NOT_EXISTS,
+          "There is no stop with ID " + from);
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
+    if (stopTo == null) {
+      RestException restException = new RestException(RestExceptionCodes.BUS_STOP_WITH_GIVEN_ID_DOES_NOT_EXISTS,
+          "There is no stop with ID " + to);
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
+    if (seats == null || seats < 1){
+      RestException restException = new RestException(RestExceptionCodes.INVALID_NUMBER_OF_SEATS,
+          "You must specify number of seats and it have to be grater than 0");
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
+
     ReadBusStopDTO stopFromDTO = BusStopMapper.mapToReadBusStopDTO.apply(stopFrom);
     ReadBusStopDTO stopToDTO = BusStopMapper.mapToReadBusStopDTO.apply(stopTo);
 
@@ -117,8 +133,7 @@ class BusRideController {
         .collect(Collectors.toList());
 
     List<BusTripSearchDTO> returnRides = new ArrayList<>();
-    if (returnDate != null && departureRides.size() > 0) {
-      System.out.println(departureRides.get(0).getEndDateTime());
+    if (returnDate != null && !departureRides.isEmpty()) {
       returnRides = busRideService
           .readActiveRidesFromToWhereEnoughtSeats(stopTo, stopFrom, returnDate,
               seats, departureRides.get(0).getEndDateTime())

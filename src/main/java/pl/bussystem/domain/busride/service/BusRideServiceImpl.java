@@ -1,6 +1,5 @@
 package pl.bussystem.domain.busride.service;
 
-import lombok.Setter;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
@@ -15,8 +14,6 @@ import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
-import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity;
-import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
@@ -28,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
 
 import static java.util.stream.Collectors.toList;
@@ -38,7 +34,7 @@ public class BusRideServiceImpl implements BusRideService {
   private BusRideRepository busRideRepository;
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
-  private TicketRepository tickerRepository;
+  private TicketRepository ticketRepository;
   private BusStopService busStopService;
   private Clock clock;
   private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
@@ -47,13 +43,13 @@ public class BusRideServiceImpl implements BusRideService {
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
                             ScheduleRepository scheduleRepository,
-                            TicketRepository tickerRepository,
+                            TicketRepository ticketRepository,
                             BusStopService busStopService,
                             Clock clock) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
-    this.tickerRepository = tickerRepository;
+    this.ticketRepository = ticketRepository;
     this.busStopService = busStopService;
     this.clock = clock;
   }
@@ -216,7 +212,7 @@ public class BusRideServiceImpl implements BusRideService {
 
   @Override
   public Integer getFreeSeats(BusRideEntity ride) {
-    return ride.getBus().getSeats() - tickerRepository.findByBusRide(ride).size();
+    return ride.getBus().getSeats() - ticketRepository.findByBusRide(ride).size();
   }
 
   @Override

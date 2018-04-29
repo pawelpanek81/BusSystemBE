@@ -37,6 +37,7 @@ public class RestExceptionCodes {
   public static final int BUS_WITH_GIVEN_ID_DOES_NOT_EXISTS = 6;
 
   /* BUS RIDES */
+  public static final int INVALID_NUMBER_OF_SEATS = 21;
 
 
   /* TICKETS */
@@ -47,5 +48,6 @@ public class RestExceptionCodes {
 
 
   /* OTHER */
+
 
 }
