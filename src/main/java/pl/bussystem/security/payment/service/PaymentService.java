@@ -8,6 +8,8 @@ import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreat
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 
+import java.util.Map;
+
 public interface PaymentService {
 
   AuthenticationResponse authenticate();
@@ -21,6 +23,8 @@ public interface PaymentService {
   Boolean isAuthenticatedSuccessfully();
 
   void renewAuthentication();
+
+  Boolean isSignatureValid(HttpEntity<String> request, Map<String, String> openPayuSignature);
 
   Boolean checkFrontendSignature(PaymentDTO dto);
 }

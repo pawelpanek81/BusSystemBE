@@ -1,8 +1,5 @@
 package pl.bussystem.security.payment.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.bussystem.domain.ticket.service.TicketService;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
@@ -28,9 +26,6 @@ import pl.bussystem.security.payment.model.payu.orders.notification.Notification
 import pl.bussystem.security.payment.rest.API;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -42,7 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
   private Credentials credentials;
   private AuthenticationResponse authResponse;
   private LocalDateTime lastSuccessfullyAuthDateTime;
-  private ObjectMapper mapper = new ObjectMapper();
+  private TicketService ticketService;
 
   @Getter
   @Setter
@@ -77,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Autowired
-  public PaymentServiceImpl(Credentials credentials) {
+  public PaymentServiceImpl(Credentials credentials, TicketService ticketService) {
     this.credentials = credentials;
     try {
       lastSuccessfullyAuthDateTime = LocalDateTime.now();
@@ -87,6 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
       System.out.println(e.getResponseBodyAsString());
       this.lastSuccessfullyAuthDateTime = null;
     }
+    this.ticketService = ticketService;
   }
 
   @Override
@@ -113,36 +109,25 @@ public class PaymentServiceImpl implements PaymentService {
       String[] pairs = keyValue.split("=", 2);
       openPayuSignature.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
     }
-    String expectedSignature = openPayuSignature.get("signature");
-
-    String actualSignature = md5(request.getBody() + credentials.getSecond_key());
-
-    if (!expectedSignature.equals(actualSignature)) {
-      throw new RuntimeException("expectedSignature different than actualSignature");
-    }
 
     if (!openPayuSignature.get("algorithm").equals("MD5")) {
       throw new NotImplementedException();
     }
 
-    if (notification.getOrder().getStatus().equals("COMPLETED")) {
-      //TODO implement
+    if (!isSignatureValid(request, openPayuSignature)) {
+      throw new RuntimeException("expectedSignature different than actualSignature");
     }
 
+    if (notification.getOrder().getStatus().equals("COMPLETED")) {
+      Integer extOrderId = Integer.valueOf(notification.getOrder().getExtOrderId());
+      ticketService.makeTicketPaid(extOrderId);
+    }
+  }
 
-//    try (Writer writer = new FileWriter("notification.json")) {
-//      Gson gson = new GsonBuilder().create();
-//      gson.toJson(notification, writer);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//
-//    try (Writer writer = new FileWriter("request.json")) {
-//      Gson gson = new GsonBuilder().create();
-//      gson.toJson(request, writer);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
+  public Boolean isSignatureValid(HttpEntity<String> request, Map<String, String> openPayuSignature) {
+    String expectedSignature = openPayuSignature.get("signature");
+    String actualSignature = md5(request.getBody() + credentials.getSecond_key());
+    return expectedSignature.equals(actualSignature);
   }
 
   private String md5(String stringToHash) {
@@ -158,7 +143,7 @@ public class PaymentServiceImpl implements PaymentService {
     return encoded;
   }
 
-  @Override // TODO ASPECT
+  @Override
   public Boolean isAuthenticationTokenExpired() {
     return LocalDateTime.now().isAfter(lastSuccessfullyAuthDateTime.plusSeconds(authResponse.getExpires_in()));
   }
@@ -183,12 +168,12 @@ public class PaymentServiceImpl implements PaymentService {
 
   @Override
   public Boolean checkFrontendSignature(PaymentDTO dto) {
-    return null;
+    return true;
   }
 
   @Override
   public ResponseEntity<OrderCreateResponse> payForATicket(OrderCreateRequest orderCreateRequest) {
-    if (!this.isAuthenticatedSuccessfully() || this.isAuthenticationTokenExpired()) { // TODO ASPECT
+    if (!this.isAuthenticatedSuccessfully() || this.isAuthenticationTokenExpired()) {
       this.renewAuthentication();
     }
 

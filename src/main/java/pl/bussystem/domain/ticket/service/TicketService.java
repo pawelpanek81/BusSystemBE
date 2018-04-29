@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface TicketService {
   TicketEntity create(TicketEntity ticketEntity);
   List<TicketEntity> read();
-
   Optional<TicketEntity> readById(Integer id);
+  void makeTicketPaid(Integer ticketId);
 }

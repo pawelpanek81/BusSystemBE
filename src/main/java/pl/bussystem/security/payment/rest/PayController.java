@@ -3,7 +3,6 @@ package pl.bussystem.security.payment.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.bussystem.security.payment.mapper.OrderCreateRequestMapper;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
-import pl.bussystem.security.payment.model.dto.TicketDTO;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.service.PaymentService;
@@ -35,26 +33,22 @@ public class PayController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> pay(HttpServletRequest request) { //@RequestBody PaymentDTO dto,
-    PaymentDTO dto = new PaymentDTO(
-        new TicketDTO(1, "1000"),
-        null,
-        1,
-        "asd"
-    );
-    paymentService.checkFrontendSignature(dto);
+  public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
+    if (paymentService.checkFrontendSignature(dto)) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
     return paymentService.payForATicket(order);
   }
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)
   public ResponseEntity<?> authorize(HttpEntity<String> request) {
-//    try {
-//      Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
-      paymentService.consumeNotification(null, request);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
+    try {
+      Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
+      paymentService.consumeNotification(notification, request);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

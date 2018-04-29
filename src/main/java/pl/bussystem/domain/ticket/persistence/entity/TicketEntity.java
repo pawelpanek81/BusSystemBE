@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class TicketEntity {
   @Id
   @SequenceGenerator(name = "tickets_generator",

@@ -26,6 +26,4 @@ public class Order {
   private Buyer buyer;
   private List<Product> products;
   private PayMethod payMethod;
-  private String localReceiptDateTime;
-  private List<Property> properties;
 }

@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-class Property {
+public class Property {
   private String name;
   private String value;
 }
