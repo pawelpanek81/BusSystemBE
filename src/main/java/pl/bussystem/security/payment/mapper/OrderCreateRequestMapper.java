@@ -74,7 +74,12 @@ public class OrderCreateRequestMapper {
             .build()
     ));
 
+    String externalOrderId = "dev1" +
+        ticketFrom.get().getId().toString() +
+        ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("");
+
     return OrderCreateRequest.builder()
+        .extOrderId(externalOrderId)
         .notifyUrl(PAYMENTS_NOTIFY_URL)
         .customerIp(req.getRemoteAddr())
         .merchantPosId(credentials.getPos_id())

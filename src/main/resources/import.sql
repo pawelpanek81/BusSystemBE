@@ -199,5 +199,8 @@ VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600);
 
 -- EXPERIMENTAL TICKETS
 INSERT INTO public.tickets(
-  id, date_time, email, name, paid, phone, price, returned, surname, bus_ride, user_account)
-VALUES (1, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, false, 'Kowalski', 1, null);
+  id, date_time, email, name, paid, phone, price, seats, surname, bus_ride, user_account)
+VALUES (3000, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, 1, 'Kowalski', 1, null);
+INSERT INTO public.tickets(
+  id, date_time, email, name, paid, phone, price, seats, surname, bus_ride, user_account)
+VALUES (3001, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, 1, 'Kowalski', 1, null);

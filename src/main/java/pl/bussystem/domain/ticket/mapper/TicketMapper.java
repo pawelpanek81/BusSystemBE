@@ -23,8 +23,7 @@ public class TicketMapper {
           entity.getDateTime(),
           entity.getPrice(),
           BusRideMapper.mapToReadBusRideDTO.apply(entity.getBusRide()),
-          entity.getPaid(),
-          entity.getReturned()
+          entity.getPaid()
       );
 
   public TicketEntity mapToTicketEntity(CreateTicketDTO dto) {

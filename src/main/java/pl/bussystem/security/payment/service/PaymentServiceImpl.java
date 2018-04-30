@@ -2,6 +2,8 @@ package pl.bussystem.security.payment.service;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -38,6 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
   private AuthenticationResponse authResponse;
   private LocalDateTime lastSuccessfullyAuthDateTime;
   private TicketService ticketService;
+  private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
   @Getter
   @Setter
@@ -78,6 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
       lastSuccessfullyAuthDateTime = LocalDateTime.now();
       this.authResponse = this.authenticate();
     } catch (HttpClientErrorException e) {
+      logger.error("PayU Authentication error");
       System.out.println(e.getStatusCode());
       System.out.println(e.getResponseBodyAsString());
       this.lastSuccessfullyAuthDateTime = null;
@@ -111,16 +115,28 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     if (!openPayuSignature.get("algorithm").equals("MD5")) {
+      logger.error("PayU used other than MD5 algorithm in signature");
       throw new NotImplementedException();
     }
 
     if (!isSignatureValid(request, openPayuSignature)) {
+      logger.error("Signature not valid");
       throw new RuntimeException("expectedSignature different than actualSignature");
     }
 
     if (notification.getOrder().getStatus().equals("COMPLETED")) {
-      Integer extOrderId = Integer.valueOf(notification.getOrder().getExtOrderId());
-      ticketService.makeTicketPaid(extOrderId);
+      logger.info("Got COMPLETED notification, trying to make ticket paid");
+      String extOrderId = notification.getOrder().getExtOrderId();
+
+      String[] ticketIds = extOrderId.split(",");
+      Integer ticketToId = Integer.valueOf(ticketIds[0]);
+      Integer ticketTo = ticketIds.length == 2 ? Integer.valueOf(ticketIds[1]) : null;
+
+      ticketService.makeTicketPaid(ticketToId);
+      if (ticketTo != null) {
+        ticketService.makeTicketPaid(ticketTo);
+      }
+      logger.info("Making paid done...");
     }
   }
 
@@ -130,6 +146,7 @@ public class PaymentServiceImpl implements PaymentService {
     return expectedSignature.equals(actualSignature);
   }
 
+  @SuppressWarnings("deprecation")
   private String md5(String stringToHash) {
     PasswordEncoder encoder = new MessageDigestPasswordEncoder("MD5");
     Method digest = ReflectionUtils.findMethod(MessageDigestPasswordEncoder.class, "digest", String.class, CharSequence.class);

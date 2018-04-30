@@ -22,5 +22,4 @@ public class ReadTicketDTO {
   private Double price;
   private ReadBusRideDTO busRide;
   private Boolean paid;
-  private Boolean returned;
 }
