@@ -1,6 +1,5 @@
 package pl.bussystem.domain.busride.service;
 
-import lombok.Setter;
 import org.joda.time.Days;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalDate;
@@ -11,10 +10,13 @@ import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
+import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
+import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.sql.Time;
 import java.time.Clock;
@@ -32,6 +34,8 @@ public class BusRideServiceImpl implements BusRideService {
   private BusRideRepository busRideRepository;
   private BusLineRepository busLineRepository;
   private ScheduleRepository scheduleRepository;
+  private TicketRepository ticketRepository;
+  private BusStopService busStopService;
   private Clock clock;
   private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
 
@@ -39,10 +43,14 @@ public class BusRideServiceImpl implements BusRideService {
   public BusRideServiceImpl(BusRideRepository busRideRepository,
                             BusLineRepository busLineRepository,
                             ScheduleRepository scheduleRepository,
+                            TicketRepository ticketRepository,
+                            BusStopService busStopService,
                             Clock clock) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
+    this.ticketRepository = ticketRepository;
+    this.busStopService = busStopService;
     this.clock = clock;
   }
 
@@ -192,5 +200,38 @@ public class BusRideServiceImpl implements BusRideService {
     }
 
     return days;
+  }
+
+  @Override
+  public Boolean containConnection(BusRideEntity ride, BusStopEntity stopFrom, BusStopEntity stopTo) {
+    List<BusStopEntity> busStopEntities = busStopService.readByBusLineId(ride.getBusLine().getId());
+    Integer fromIndex = busStopEntities.indexOf(stopFrom);
+    Integer toIndex = busStopEntities.indexOf(stopTo);
+    return fromIndex != -1 && toIndex != -1 && fromIndex < toIndex;
+  }
+
+  @Override
+  public Integer getFreeSeats(BusRideEntity ride) {
+    return ride.getBus().getSeats() - ticketRepository.findByBusRide(ride).size();
+  }
+
+  @Override
+  public List<BusRideEntity> readActiveRidesFromToWhereEnoughtSeats(BusStopEntity stopFrom, BusStopEntity stopTo,
+                                                                    java.time.LocalDate date, Integer seats,
+                                                                    LocalDateTime minimalTime) {
+
+    return read().stream()
+        .filter(ride -> ride.getStartDateTime().toLocalDate().equals(date))
+        .filter(ride -> ride.getStartDateTime().isAfter(minimalTime))
+        .filter(ride -> containConnection(ride, stopFrom, stopTo))
+        .filter(ride -> getFreeSeats(ride) >= seats)
+        .filter(BusRideEntity::getActive)
+        .collect(toList());
+  }
+
+  @Override
+  public Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo) {
+    /* need calculator logix */
+    return busRideEntity.getDriveNettoPrice();
   }
 }

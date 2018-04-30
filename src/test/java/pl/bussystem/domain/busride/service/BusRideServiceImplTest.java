@@ -8,10 +8,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
+import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
+import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
+import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 
 import java.sql.Time;
 import java.time.*;
@@ -36,11 +39,21 @@ public class BusRideServiceImplTest {
   @Mock
   private BusRideRepository busRideRepository;
 
+  @Mock
+  private TicketRepository tickerRepository;
+
+  @Mock
+  private LineRouteService lineRouteService;
+
+  @Mock
+  private BusStopService busStopService;
+
   private Clock clock = Clock.fixed(Instant.parse("2018-04-25T00:00:00.00Z"), ZoneId.of("UTC"));
 
   @Before
   public void setUp() {
-    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository, clock);
+    busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository,
+        tickerRepository, busStopService, clock);
   }
 
   @Test
