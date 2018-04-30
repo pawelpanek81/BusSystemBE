@@ -76,7 +76,7 @@ public class OrderCreateRequestMapper {
           paymentDTO.getFromTicket().getTicketId() + " does not exists");
     }
 
-    if (ticketFrom.get().getPaid() || ticketTo.isPresent() && !ticketTo.get().getPaid()) {
+    if (ticketFrom.get().getPaid() || (ticketTo.isPresent() && ticketTo.get().getPaid())) {
       logger.error("One of the ticket is alreaty paid");
       throw new RuntimeException("One of the ticket is already paid");
     }
