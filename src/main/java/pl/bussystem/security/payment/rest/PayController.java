@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import pl.bussystem.security.payment.mapper.OrderCreateRequestMapper;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
@@ -20,7 +19,7 @@ import pl.bussystem.security.payment.service.PaymentService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-@RestController
+@Controller
 @RequestMapping(value = "api/v1.0/payments")
 public class PayController {
   private PaymentService paymentService;
@@ -36,6 +35,7 @@ public class PayController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
+  @ResponseBody
   public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
     OrderCreateRequest order;
     if (!paymentService.isFrontendSignatureValid(dto)) {
@@ -52,6 +52,7 @@ public class PayController {
   }
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)
+  @ResponseBody
   public ResponseEntity<?> notify(HttpEntity<String> request) {
     try {
       Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
@@ -60,5 +61,16 @@ public class PayController {
       e.printStackTrace();
     }
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/continue", method = RequestMethod.GET)
+  public ModelAndView continuePayment(@RequestParam(value = "error", required = false) Integer error) {
+    ModelAndView mav = new ModelAndView("paymentStatus");
+    if (error == null) {
+      mav.addObject("status", "Płatność zakończona pomyślnie, możesz zamknąć kartę");
+    } else {
+      mav.addObject("status", "Wystąpił błąd podczas płatności");
+    }
+    return mav;
   }
 }

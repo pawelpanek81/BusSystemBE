@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static pl.bussystem.security.payment.rest.API.PAYMENTS_CONTINUE_URL;
 import static pl.bussystem.security.payment.rest.API.PAYMENTS_NOTIFY_URL;
 
 
@@ -116,6 +117,7 @@ public class OrderCreateRequestMapper {
     return OrderCreateRequest.builder()
         .extOrderId(externalOrderId)
         .notifyUrl(PAYMENTS_NOTIFY_URL)
+        .continueUrl(PAYMENTS_CONTINUE_URL)
         .customerIp(req.getRemoteAddr())
         .merchantPosId(credentials.getPos_id())
         .description(ticketTo.isPresent() ? "Sprzedaż biletów" : "Sprzedaż biletu")
