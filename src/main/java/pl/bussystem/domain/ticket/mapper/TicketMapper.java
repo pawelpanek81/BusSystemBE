@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 @Component
 public class TicketMapper {
-  public static Function<? super TicketEntity, ? extends ReadTicketDTO> mapToReadTicektDTO =
+  public static Function<? super TicketEntity, ? extends ReadTicketDTO> mapToReadTicketDTO =
       entity -> new ReadTicketDTO(
           entity.getId(),
           UserMapper.mapToReadUserDTO.apply(entity.getUserAccount()),
