@@ -10,9 +10,12 @@ import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 import pl.bussystem.domain.user.persistence.repository.AuthorityRepository;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 class AccountServiceImpl implements AccountService {
@@ -86,5 +89,24 @@ class AccountServiceImpl implements AccountService {
     if (authorities.size() != 1)
       throw new AmbiguousRolesException("User should have exactly one role!");
     return authorities.get(0).getAuthority().substring(5);
+  }
+
+  @Override
+  public List<AccountEntity> readByUserType(String userType) {
+    Map<String, String> rolesMap = new HashMap<String, String>() {
+      {
+        put("user", "ROLE_USER");
+        put("driver", "ROLE_DRIVER");
+        put("bok", "ROLE_BOK");
+        put("admin", "ROLE_ADMIN");
+      }
+    };
+
+    userType = rolesMap.get(userType);
+
+    List<AuthorityEntity> authorities = authorityRepository.findByAuthority(userType);
+    return authorities.stream()
+        .map(AuthorityEntity::getAccount)
+        .collect(Collectors.toList());
   }
 }

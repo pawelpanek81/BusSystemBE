@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class BusRideEntity {
   @Id
   @SequenceGenerator(name = "bus_rides_generator",
-      sequenceName = "bus_rides_id_seq", initialValue = 2)
+      sequenceName = "bus_rides_id_seq", initialValue = 9)
   @GeneratedValue(generator = "bus_rides_generator")
   @Column(name = "id", nullable = false)
   private Integer id;
@@ -48,4 +48,7 @@ public class BusRideEntity {
   @ManyToOne
   @JoinColumn(name = "bus")
   private BusEntity bus;
+
+  @Column(name = "active", nullable = false)
+  private Boolean active = false;
 }
