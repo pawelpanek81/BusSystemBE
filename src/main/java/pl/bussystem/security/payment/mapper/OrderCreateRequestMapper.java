@@ -71,8 +71,14 @@ public class OrderCreateRequestMapper {
     }
 
     if (!ticketFrom.isPresent()) {
+      logger.error("Ticket with id: " + paymentDTO.getFromTicket().getTicketId() + " does not exists");
       throw new NoSuchElementException("Ticket with id: " +
           paymentDTO.getFromTicket().getTicketId() + " does not exists");
+    }
+
+    if (ticketFrom.get().getPaid() || ticketTo.isPresent() && !ticketTo.get().getPaid()) {
+      logger.error("One of the ticket is alreaty paid");
+      throw new RuntimeException("One of the ticket is already paid");
     }
 
     if (!ticketFrom.get().getPrice().equals(Double.valueOf(paymentDTO.getFromTicket().getTicketPrice()))) {
