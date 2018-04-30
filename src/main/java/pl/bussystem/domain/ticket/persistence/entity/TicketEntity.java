@@ -45,13 +45,13 @@ public class TicketEntity {
   @Column(name = "price", nullable = false)
   private Double price;
 
+  @Column(name = "seats", nullable = false)
+  private Integer seats;
+
   @ManyToOne(optional = false)
   @JoinColumn(name = "bus_ride", nullable = false)
   private BusRideEntity busRide;
 
   @Column(name = "paid", nullable = false)
   private Boolean paid;
-
-  @Column(name = "returned", nullable = false)
-  private Boolean returned;
 }
