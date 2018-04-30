@@ -60,8 +60,16 @@ class BusRideController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  ResponseEntity<List<ReadBusRideDTO>> readAll() {
-    List<BusRideEntity> busRides = busRideService.read();
+  ResponseEntity<List<ReadBusRideDTO>> readAll(@RequestParam(value = "type", required = false) String type) {
+    List<BusRideEntity> busRides = new ArrayList<>();
+    if (type == null) {
+      busRides = busRideService.read();
+    } else if (type.equals("active")) {
+      busRides = busRideService.readActive();
+    } else if (type.equals("inactive")) {
+      busRides = busRideService.readInactive();
+    }
+
     List<ReadBusRideDTO> dtos = busRides.stream()
         .map(BusRideMapper.mapToReadBusRideDTO)
         .collect(Collectors.toList());

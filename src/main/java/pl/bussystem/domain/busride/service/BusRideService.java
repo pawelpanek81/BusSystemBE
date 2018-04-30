@@ -28,4 +28,7 @@ public interface BusRideService {
                                                              LocalDateTime minimalTime);
   Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo);
 
+  List<BusRideEntity> readActive();
+
+  List<BusRideEntity> readInactive();
 }

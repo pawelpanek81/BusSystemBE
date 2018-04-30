@@ -61,7 +61,7 @@ public class BusRideServiceImpl implements BusRideService {
 
   @Override
   public List<BusRideEntity> read() {
-    return busRideRepository.findAll();
+    return busRideRepository.findAllByOrderByStartDateTimeAsc();
   }
 
   @Override
@@ -233,5 +233,15 @@ public class BusRideServiceImpl implements BusRideService {
   public Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo) {
     /* need calculator logix */
     return busRideEntity.getDriveNettoPrice();
+  }
+
+  @Override
+  public List<BusRideEntity> readActive() {
+    return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(Boolean.TRUE);
+  }
+
+  @Override
+  public List<BusRideEntity> readInactive() {
+    return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(Boolean.FALSE);
   }
 }
