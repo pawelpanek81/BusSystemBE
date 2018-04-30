@@ -111,7 +111,7 @@ public class OrderCreateRequestMapper {
     String externalOrderId =
         ticketFrom.get().getId().toString() +
         ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("")
-        + ",dev_1";
+        + ",dev_2";
 
     return OrderCreateRequest.builder()
         .extOrderId(externalOrderId)
