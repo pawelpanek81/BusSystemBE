@@ -26,5 +26,5 @@ public interface PaymentService {
 
   Boolean isSignatureValid(HttpEntity<String> request, Map<String, String> openPayuSignature);
 
-  Boolean checkFrontendSignature(PaymentDTO dto);
+  Boolean isFrontendSignatureValid(PaymentDTO dto);
 }

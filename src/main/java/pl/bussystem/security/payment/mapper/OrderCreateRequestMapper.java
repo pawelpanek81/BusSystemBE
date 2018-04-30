@@ -1,5 +1,7 @@
 package pl.bussystem.security.payment.mapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
@@ -25,6 +27,7 @@ import static pl.bussystem.security.payment.rest.API.PAYMENTS_NOTIFY_URL;
 public class OrderCreateRequestMapper {
   private PaymentServiceImpl.Credentials credentials;
   private TicketService ticketService;
+  private static final Logger logger = LoggerFactory.getLogger(OrderCreateRequestMapper.class);
 
   @Autowired
   public OrderCreateRequestMapper(PaymentServiceImpl.Credentials credentials,
@@ -34,14 +37,14 @@ public class OrderCreateRequestMapper {
   }
 
   private String getTotalAmount(PaymentDTO dto) {
-    Integer price = 0;
+    Double price = 0.0;
     TicketDTO fromTicket = dto.getFromTicket();
     TicketDTO toTicket = dto.getToTicket();
 
-    price = Integer.valueOf(fromTicket.getTicketPrice());
+    price = Double.valueOf(fromTicket.getTicketPrice());
 
     if (toTicket != null) {
-      price += Integer.valueOf(toTicket.getTicketPrice());
+      price += Double.valueOf(toTicket.getTicketPrice());
     }
 
     return price.toString();
@@ -59,24 +62,44 @@ public class OrderCreateRequestMapper {
           paymentDTO.getFromTicket().getTicketId() + " does not exists");
     }
 
+    if (!ticketFrom.get().getPrice().equals(Double.valueOf(paymentDTO.getFromTicket().getTicketPrice()))) {
+      logger.error("Invalid ticket from price");
+      throw new RuntimeException("Invalid ticket from price");
+    }
+    if (ticketTo.isPresent() && !ticketTo.get().getPrice().equals(Double.valueOf(paymentDTO.getToTicket().getTicketPrice()))) {
+      logger.error("Invalid ticket to price");
+      throw new RuntimeException("Invalid ticket to price");
+    }
+
+    if (!ticketFrom.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
+      logger.error("Invalid ticket to number of seats (passengers)");
+      throw new RuntimeException("Invalid ticket to number of seats (passengers)");
+    }
+
+    if (ticketTo.isPresent() && !ticketTo.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
+      logger.error("Invalid ticket from number of seats (passengers)");
+      throw new RuntimeException("Invalid ticket from number of seats (passengers)");
+    }
+
     List<Product> products = new ArrayList<>();
     products.add(Product.builder()
         .name("Bilet nr: " + ticketFrom.get().getId())
         .unitPrice(paymentDTO.getFromTicket().getTicketPrice())
-        .quantity(paymentDTO.getNumberOfPassengers().toString())
+        .quantity(String.valueOf(1))
         .build());
 
     ticketTo.ifPresent(ticketEntity -> products.add(
         Product.builder()
             .name("Bilet nr: " + ticketEntity.getId())
             .unitPrice(paymentDTO.getToTicket().getTicketPrice())
-            .quantity(paymentDTO.getNumberOfPassengers().toString())
+            .quantity(String.valueOf(1))
             .build()
     ));
 
-    String externalOrderId = "dev1" +
+    String externalOrderId =
         ticketFrom.get().getId().toString() +
-        ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("");
+        ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("")
+        + ",dev_1";
 
     return OrderCreateRequest.builder()
         .extOrderId(externalOrderId)

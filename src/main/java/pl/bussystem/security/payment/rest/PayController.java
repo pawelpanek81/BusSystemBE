@@ -32,12 +32,17 @@ public class PayController {
     this.orderCreateRequest = orderCreateRequest;
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
+  @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
-    if (paymentService.checkFrontendSignature(dto)) {
+    OrderCreateRequest order;
+    if (!paymentService.isFrontendSignatureValid(dto)) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    OrderCreateRequest order = orderCreateRequest.createOrder(dto, request);
+    try {
+      order = orderCreateRequest.createOrder(dto, request);
+    } catch (RuntimeException e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     return paymentService.payForATicket(order);
   }
 

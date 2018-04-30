@@ -26,7 +26,6 @@ import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreat
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.rest.API;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -116,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     if (!openPayuSignature.get("algorithm").equals("MD5")) {
       logger.error("PayU used other than MD5 algorithm in signature");
-      throw new NotImplementedException();
+      throw new RuntimeException("Not implemented");
     }
 
     if (!isSignatureValid(request, openPayuSignature)) {
@@ -184,7 +183,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Override
-  public Boolean checkFrontendSignature(PaymentDTO dto) {
+  public Boolean isFrontendSignatureValid(PaymentDTO dto) {
     return true;
   }
 
