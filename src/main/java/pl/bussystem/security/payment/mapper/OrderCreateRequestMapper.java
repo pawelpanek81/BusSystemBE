@@ -46,8 +46,20 @@ public class OrderCreateRequestMapper {
     if (toTicket != null) {
       price += Double.valueOf(toTicket.getTicketPrice());
     }
+    return convertPriceToSmallestUnit(price);
+  }
 
-    return price.toString();
+  private String convertPriceToSmallestUnit(Double dPrice) {
+    dPrice = dPrice * 100;
+    Integer returnPrice = dPrice.intValue();
+    return String.valueOf(returnPrice);
+  }
+
+  private String convertPriceToSmallestUnit(String price) {
+    Double dPrice = Double.valueOf(price);
+    dPrice = dPrice * 100;
+    Integer returnPrice = dPrice.intValue();
+    return String.valueOf(returnPrice);
   }
 
   public OrderCreateRequest createOrder(PaymentDTO paymentDTO, HttpServletRequest req) {
@@ -84,14 +96,14 @@ public class OrderCreateRequestMapper {
     List<Product> products = new ArrayList<>();
     products.add(Product.builder()
         .name("Bilet nr: " + ticketFrom.get().getId())
-        .unitPrice(paymentDTO.getFromTicket().getTicketPrice())
+        .unitPrice(convertPriceToSmallestUnit(paymentDTO.getFromTicket().getTicketPrice()))
         .quantity(String.valueOf(1))
         .build());
 
     ticketTo.ifPresent(ticketEntity -> products.add(
         Product.builder()
             .name("Bilet nr: " + ticketEntity.getId())
-            .unitPrice(paymentDTO.getToTicket().getTicketPrice())
+            .unitPrice(convertPriceToSmallestUnit(paymentDTO.getToTicket().getTicketPrice()))
             .quantity(String.valueOf(1))
             .build()
     ));

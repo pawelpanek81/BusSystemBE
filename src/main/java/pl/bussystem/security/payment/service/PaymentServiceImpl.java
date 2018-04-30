@@ -10,7 +10,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -147,8 +146,8 @@ public class PaymentServiceImpl implements PaymentService {
 
   @SuppressWarnings("deprecation")
   private String md5(String stringToHash) {
-    PasswordEncoder encoder = new MessageDigestPasswordEncoder("MD5");
-    Method digest = ReflectionUtils.findMethod(MessageDigestPasswordEncoder.class, "digest", String.class, CharSequence.class);
+    PasswordEncoder encoder = new org.springframework.security.crypto.password.MessageDigestPasswordEncoder("MD5");
+    Method digest = ReflectionUtils.findMethod(org.springframework.security.crypto.password.MessageDigestPasswordEncoder.class, "digest", String.class, CharSequence.class);
     ReflectionUtils.makeAccessible(digest);
     String encoded = null;
     try {

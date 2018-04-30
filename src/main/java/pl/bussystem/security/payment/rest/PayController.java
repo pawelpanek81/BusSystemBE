@@ -1,6 +1,8 @@
 package pl.bussystem.security.payment.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ public class PayController {
   private PaymentService paymentService;
   private OrderCreateRequestMapper orderCreateRequest;
   private ObjectMapper objectMapper = new ObjectMapper();
+  private static final Logger logger = LoggerFactory.getLogger(PayController.class);
 
   @Autowired
   public PayController(PaymentService paymentService,
@@ -36,11 +39,13 @@ public class PayController {
   public ResponseEntity<?> pay(@RequestBody PaymentDTO dto, HttpServletRequest request) {
     OrderCreateRequest order;
     if (!paymentService.isFrontendSignatureValid(dto)) {
+      logger.error("Frontend signature fail");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     try {
       order = orderCreateRequest.createOrder(dto, request);
     } catch (RuntimeException e) {
+      logger.error("Create order fail");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     return paymentService.payForATicket(order);
