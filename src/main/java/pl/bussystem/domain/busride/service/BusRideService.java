@@ -36,4 +36,6 @@ public interface BusRideService {
   Page<BusRideEntity> readInactive(Pageable pageable);
 
   BusRideEntity patch(Integer id, Map<String, Object> fields);
+
+  Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page);
 }

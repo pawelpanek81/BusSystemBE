@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -279,6 +280,27 @@ public class BusRideServiceImpl implements BusRideService {
 
     this.update(busRideEntity);
     return busRideEntity;
+  }
+
+  @Override
+  public Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page) {
+    Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
+    if (type == null) {
+      busRides = this.read(page);
+    } else if (type.equals("active")) {
+      busRides = new PageImpl<>(this.readActive());
+    } else if (type.equals("inactive")) {
+      busRides = this.readInactive(page);
+    }
+
+    if (period.equals("week")) {
+      busRides = (Page<BusRideEntity>)
+          busRides.filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)));
+    } else if (period.equals("month")) {
+      busRides = (Page<BusRideEntity>)
+          busRides.filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)));
+    }
+    return busRides;
   }
 
 }

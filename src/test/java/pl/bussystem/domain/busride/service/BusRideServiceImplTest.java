@@ -15,6 +15,7 @@ import pl.bussystem.domain.lineinfo.lineroute.service.LineRouteService;
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
+import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 
 import java.sql.Time;
 import java.time.*;
@@ -46,6 +47,9 @@ public class BusRideServiceImplTest {
   private LineRouteService lineRouteService;
 
   @Mock
+  private AccountRepository accountRepository;
+
+  @Mock
   private BusStopService busStopService;
 
   private Clock clock = Clock.fixed(Instant.parse("2018-04-25T00:00:00.00Z"), ZoneId.of("UTC"));
@@ -53,11 +57,11 @@ public class BusRideServiceImplTest {
   @Before
   public void setUp() {
     busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository,
-        tickerRepository, busStopService, null, clock);
+        tickerRepository, busStopService, accountRepository, clock);
   }
 
   @Test
-  public void autoCreateSchoudlReturnListOfBusRidesBasedOnSchedulesAndDates() {
+  public void autoCreateShouldReturnListOfBusRidesBasedOnSchedulesAndDates() {
     //arange
     BusLineEntity n1 = new BusLineEntity(
         1, "N1", null, null, 60

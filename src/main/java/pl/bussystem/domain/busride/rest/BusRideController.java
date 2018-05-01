@@ -65,16 +65,10 @@ class BusRideController {
 
   @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<Page<ReadBusRideDTO>> readAll(@RequestParam(value = "type", required = false) String type,
+                                               @RequestParam(value = "period", required = false) String period,
                                                Pageable page) {
-    Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
-    if (type == null) {
-      busRides = busRideService.read(page);
-    } else if (type.equals("active")) {
-      busRides = new PageImpl<>(busRideService.readActive());
-    } else if (type.equals("inactive")) {
-      busRides = busRideService.readInactive(page);
-    }
 
+    Page<BusRideEntity> busRides = busRideService.getBusRidesPagesByTypeAndPeriod(type, period, page);
     Page<ReadBusRideDTO> dtos = busRides.map(BusRideMapper.mapToReadBusRideDTO);
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
