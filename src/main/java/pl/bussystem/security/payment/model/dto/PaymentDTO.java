@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentDTO {
-  private TicketDTO fromTicket;
-  private TicketDTO toTicket;
+  private TicketDTO departureTicket;
+  private TicketDTO returnTicket;
   private Integer numberOfPassengers;
   private String signature;
 }

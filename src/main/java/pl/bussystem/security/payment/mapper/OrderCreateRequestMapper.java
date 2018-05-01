@@ -39,8 +39,8 @@ public class OrderCreateRequestMapper {
 
   private String getTotalAmount(PaymentDTO dto) {
     Double price = 0.0;
-    TicketDTO fromTicket = dto.getFromTicket();
-    TicketDTO toTicket = dto.getToTicket();
+    TicketDTO fromTicket = dto.getDepartureTicket();
+    TicketDTO toTicket = dto.getReturnTicket();
 
     price = Double.valueOf(fromTicket.getTicketPrice());
 
@@ -64,16 +64,16 @@ public class OrderCreateRequestMapper {
   }
 
   public OrderCreateRequest createOrder(PaymentDTO paymentDTO, HttpServletRequest req) {
-    Optional<TicketEntity> ticketFrom = ticketService.readById(paymentDTO.getFromTicket().getTicketId());
+    Optional<TicketEntity> ticketFrom = ticketService.readById(paymentDTO.getDepartureTicket().getTicketId());
     Optional<TicketEntity> ticketTo = Optional.empty();
-    if (paymentDTO.getToTicket() != null) {
-      ticketTo = ticketService.readById(paymentDTO.getToTicket().getTicketId());
+    if (paymentDTO.getReturnTicket() != null) {
+      ticketTo = ticketService.readById(paymentDTO.getReturnTicket().getTicketId());
     }
 
     if (!ticketFrom.isPresent()) {
-      logger.error("Ticket with id: " + paymentDTO.getFromTicket().getTicketId() + " does not exists");
+      logger.error("Ticket with id: " + paymentDTO.getDepartureTicket().getTicketId() + " does not exists");
       throw new NoSuchElementException("Ticket with id: " +
-          paymentDTO.getFromTicket().getTicketId() + " does not exists");
+          paymentDTO.getDepartureTicket().getTicketId() + " does not exists");
     }
 
     if (ticketFrom.get().getPaid() || (ticketTo.isPresent() && ticketTo.get().getPaid())) {
@@ -81,36 +81,36 @@ public class OrderCreateRequestMapper {
       throw new RuntimeException("One of the ticket is already paid");
     }
 
-    if (!ticketFrom.get().getPrice().equals(Double.valueOf(paymentDTO.getFromTicket().getTicketPrice()))) {
-      logger.error("Invalid ticket from price");
-      throw new RuntimeException("Invalid ticket from price");
+    if (!ticketFrom.get().getPrice().equals(Double.valueOf(paymentDTO.getDepartureTicket().getTicketPrice()))) {
+      logger.error("Invalid `departure ticket` price");
+      throw new RuntimeException("Invalid `departure ticket` price");
     }
-    if (ticketTo.isPresent() && !ticketTo.get().getPrice().equals(Double.valueOf(paymentDTO.getToTicket().getTicketPrice()))) {
-      logger.error("Invalid ticket to price");
-      throw new RuntimeException("Invalid ticket to price");
+    if (ticketTo.isPresent() && !ticketTo.get().getPrice().equals(Double.valueOf(paymentDTO.getReturnTicket().getTicketPrice()))) {
+      logger.error("Invalid `return ticket` to price");
+      throw new RuntimeException("Invalid `return ticket` to price");
     }
 
     if (!ticketFrom.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
-      logger.error("Invalid ticket to number of seats (passengers)");
-      throw new RuntimeException("Invalid ticket to number of seats (passengers)");
+      logger.error("Invalid ticket to number of passengers");
+      throw new RuntimeException("Invalid ticket to number of passengers");
     }
 
     if (ticketTo.isPresent() && !ticketTo.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
-      logger.error("Invalid ticket from number of seats (passengers)");
-      throw new RuntimeException("Invalid ticket from number of seats (passengers)");
+      logger.error("Invalid ticket from number of passengers");
+      throw new RuntimeException("Invalid ticket from number of passengers");
     }
 
     List<Product> products = new ArrayList<>();
     products.add(Product.builder()
         .name("Bilet nr: " + ticketFrom.get().getId())
-        .unitPrice(convertPriceToSmallestUnit(paymentDTO.getFromTicket().getTicketPrice()))
+        .unitPrice(convertPriceToSmallestUnit(paymentDTO.getDepartureTicket().getTicketPrice()))
         .quantity(String.valueOf(1))
         .build());
 
     ticketTo.ifPresent(ticketEntity -> products.add(
         Product.builder()
             .name("Bilet nr: " + ticketEntity.getId())
-            .unitPrice(convertPriceToSmallestUnit(paymentDTO.getToTicket().getTicketPrice()))
+            .unitPrice(convertPriceToSmallestUnit(paymentDTO.getReturnTicket().getTicketPrice()))
             .quantity(String.valueOf(1))
             .build()
     ));

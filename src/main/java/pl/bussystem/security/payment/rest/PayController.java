@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.servlet.ModelAndView;
 import pl.bussystem.security.payment.mapper.OrderCreateRequestMapper;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
+import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
 import pl.bussystem.security.payment.service.PaymentService;
 
@@ -48,7 +50,13 @@ public class PayController {
       logger.error("Create order fail");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    return paymentService.payForATicket(order);
+    ResponseEntity<OrderCreateResponse> response;
+    try {
+      response = paymentService.payForATicket(order);
+    } catch (RestClientException e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    return response;
   }
 
   @RequestMapping(value = "/notify", method = RequestMethod.POST)

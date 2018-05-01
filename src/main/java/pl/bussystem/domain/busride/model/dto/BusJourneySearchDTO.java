@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusJourneySearchDTO {
-  private List<BusTripSearchDTO> departurePossibilites;
-  private List<BusTripSearchDTO> returnPossibilites;
+  private List<BusTripSearchDTO> departurePossibilities;
+  private List<BusTripSearchDTO> returnPossibilities;
   private ReadBusStopDTO stopFrom;
   private ReadBusStopDTO stopTo;
 }
