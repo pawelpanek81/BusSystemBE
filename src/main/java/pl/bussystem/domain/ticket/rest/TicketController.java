@@ -33,7 +33,7 @@ class TicketController {
   ResponseEntity<List<ReadTicketDTO>> read() {
     List<TicketEntity> read = ticketService.read();
     List<ReadTicketDTO> dtos = read.stream()
-        .map(TicketMapper.mapToReadTicektDTO)
+        .map(TicketMapper.mapToReadTicketDTO)
         .collect(Collectors.toList());
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
