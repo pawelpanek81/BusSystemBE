@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -90,18 +91,13 @@ class BusRideController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
   ResponseEntity<?> updateDrivers(@PathVariable Integer id, @RequestBody Map<String, Object> fields) {
-    BusRideEntity busRideEntity = busRideService.readById(id);
-
-    fields.forEach((k, v) -> {
-      if (k.equals("primaryDriver") || k.equals("secondaryDriver")) {
-        v = accountRepository.findById((Integer) v).orElse(null);
-        Field field = ReflectionUtils.findField(BusRideEntity.class, k);
-        field.setAccessible(true);
-        ReflectionUtils.setField(field, busRideEntity, v);
-        field.setAccessible(false);
-      }
-    });
-    busRideService.update(busRideEntity);
+    try {
+      busRideService.patch(id, fields);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

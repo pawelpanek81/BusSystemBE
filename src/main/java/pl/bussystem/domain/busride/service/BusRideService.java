@@ -9,6 +9,7 @@ import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface BusRideService {
   BusRideEntity create(BusRideEntity busRideEntity);
@@ -33,4 +34,6 @@ public interface BusRideService {
   List<BusRideEntity> readActive();
 
   Page<BusRideEntity> readInactive(Pageable pageable);
+
+  BusRideEntity patch(Integer id, Map<String, Object> fields);
 }
