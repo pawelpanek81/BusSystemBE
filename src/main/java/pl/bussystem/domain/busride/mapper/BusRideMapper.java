@@ -2,14 +2,17 @@ package pl.bussystem.domain.busride.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.bussystem.domain.bus.mapper.BusMapper;
 import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 import pl.bussystem.domain.busride.model.dto.BusTripSearchDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
+import pl.bussystem.domain.lineinfo.busline.mapper.BusLineMapper;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineRepository;
+import pl.bussystem.domain.user.mapper.UserMapper;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 
@@ -37,7 +40,12 @@ public class BusRideMapper {
           entity.getId(),
           entity.getStartDateTime(),
           entity.getEndDateTime(),
-          entity.getBusLine().getId()
+          BusLineMapper.mapToReadBusLineDTO.apply(entity.getBusLine()),
+          UserMapper.mapToReadUserDTO.apply(entity.getPrimaryDriver()),
+          UserMapper.mapToReadUserDTO.apply(entity.getSecondaryDriver()),
+          entity.getDriveNettoPrice(),
+          BusMapper.mapToReadBusDTO.apply(entity.getBus()),
+          entity.getActive()
       );
 
   public static BusTripSearchDTO mapToBusTripSearchDTO (BusRideEntity entity, Double price) {

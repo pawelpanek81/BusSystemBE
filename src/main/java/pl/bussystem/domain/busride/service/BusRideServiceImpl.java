@@ -6,6 +6,8 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
@@ -60,8 +62,8 @@ public class BusRideServiceImpl implements BusRideService {
   }
 
   @Override
-  public List<BusRideEntity> read() {
-    return busRideRepository.findAll();
+  public Page<BusRideEntity> read(Pageable pageable) {
+    return busRideRepository.findAllByOrderByStartDateTimeAsc(pageable);
   }
 
   @Override
@@ -220,18 +222,27 @@ public class BusRideServiceImpl implements BusRideService {
                                                                     java.time.LocalDate date, Integer seats,
                                                                     LocalDateTime minimalTime) {
 
-    return read().stream()
+    return readActive().stream()
         .filter(ride -> ride.getStartDateTime().toLocalDate().equals(date))
         .filter(ride -> ride.getStartDateTime().isAfter(minimalTime))
         .filter(ride -> containConnection(ride, stopFrom, stopTo))
         .filter(ride -> getFreeSeats(ride) >= seats)
-        .filter(BusRideEntity::getActive)
         .collect(toList());
   }
 
   @Override
   public Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo) {
     /* need calculator logix */
-    return busRideEntity.getDriveNettoPrice();
+    return busRideEntity.getDriveNettoPrice() / busRideEntity.getBus().getSeats();
+  }
+
+  @Override
+  public List<BusRideEntity> readActive() {
+    return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(Boolean.TRUE);
+  }
+
+  @Override
+  public Page<BusRideEntity> readInactive(Pageable pageable) {
+    return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(pageable, Boolean.FALSE);
   }
 }
