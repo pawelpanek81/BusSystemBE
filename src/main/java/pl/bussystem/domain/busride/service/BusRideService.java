@@ -1,5 +1,7 @@
 package pl.bussystem.domain.busride.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
@@ -11,7 +13,7 @@ import java.util.List;
 public interface BusRideService {
   BusRideEntity create(BusRideEntity busRideEntity);
 
-  List<BusRideEntity> read();
+  Page<BusRideEntity> read(Pageable pageable);
 
   List<BusRideEntity> autoCreate(CreateBusRideFromScheduleAndDatesDTO dto);
 
@@ -30,5 +32,5 @@ public interface BusRideService {
 
   List<BusRideEntity> readActive();
 
-  List<BusRideEntity> readInactive();
+  Page<BusRideEntity> readInactive(Pageable pageable);
 }

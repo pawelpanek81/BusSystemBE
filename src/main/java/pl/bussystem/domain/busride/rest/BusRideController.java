@@ -3,6 +3,9 @@ package pl.bussystem.domain.busride.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,19 +63,18 @@ class BusRideController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  ResponseEntity<List<ReadBusRideDTO>> readAll(@RequestParam(value = "type", required = false) String type) {
-    List<BusRideEntity> busRides = new ArrayList<>();
+  ResponseEntity<Page<ReadBusRideDTO>> readAll(@RequestParam(value = "type", required = false) String type,
+                                               Pageable page) {
+    Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
     if (type == null) {
-      busRides = busRideService.read();
+      busRides = busRideService.read(page);
     } else if (type.equals("active")) {
-      busRides = busRideService.readActive();
+      busRides = new PageImpl<>(busRideService.readActive());
     } else if (type.equals("inactive")) {
-      busRides = busRideService.readInactive();
+      busRides = busRideService.readInactive(page);
     }
 
-    List<ReadBusRideDTO> dtos = busRides.stream()
-        .map(BusRideMapper.mapToReadBusRideDTO)
-        .collect(Collectors.toList());
+    Page<ReadBusRideDTO> dtos = busRides.map(BusRideMapper.mapToReadBusRideDTO);
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
