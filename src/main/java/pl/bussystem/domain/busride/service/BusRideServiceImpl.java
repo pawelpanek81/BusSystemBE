@@ -286,21 +286,58 @@ public class BusRideServiceImpl implements BusRideService {
   public Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page) {
     Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
     if (type == null) {
-      busRides = this.read(page);
+      if (period == null) {
+        busRides = this.read(page);
+      } else if (period.equals("week")) {
+        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
+      } else if (period.equals("month")) {
+        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
+      }
     } else if (type.equals("active")) {
-      busRides = new PageImpl<>(this.readActive());
+      if (period == null) {
+        busRides = new PageImpl<>(this.readActive());
+      } else if (period.equals("week")) {
+        busRides = new PageImpl<>(this.readActive().stream()
+            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
+            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)))
+            .collect(toList()));
+      } else if (period.equals("month")) {
+        busRides = new PageImpl<>(this.readActive().stream()
+            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
+            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)))
+            .collect(toList()));
+      }
     } else if (type.equals("inactive")) {
-      busRides = this.readInactive(page);
-    }
-
-    if (period.equals("week")) {
-      busRides = (Page<BusRideEntity>)
-          busRides.filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)));
-    } else if (period.equals("month")) {
-      busRides = (Page<BusRideEntity>)
-          busRides.filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)));
+      if (period == null) {
+        busRides = this.readInactive(page);
+      } else if (period.equals("week")) {
+        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
+      } else if (period.equals("month")) {
+        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
+      }
     }
     return busRides;
+  }
+
+  @Override
+  public Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
+    return busRideRepository
+        .findAllByStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
+            page,
+            LocalDateTime.now(),
+            localDateTime
+        );
+  }
+
+  @Override
+  public Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
+    return busRideRepository
+        .findAllByActiveAndStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
+            page,
+            Boolean.FALSE,
+            LocalDateTime.now(),
+            localDateTime
+        );
   }
 
 }

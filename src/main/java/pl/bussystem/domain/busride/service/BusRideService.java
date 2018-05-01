@@ -38,4 +38,8 @@ public interface BusRideService {
   BusRideEntity patch(Integer id, Map<String, Object> fields);
 
   Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page);
+
+  Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
+
+  Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
 }
