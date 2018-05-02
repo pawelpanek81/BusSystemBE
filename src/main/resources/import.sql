@@ -191,16 +191,16 @@ INSERT INTO public.buses(id, brand, model, registration_number, seats)
 -- BUS RIDES
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
-VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, 3, null, 600, FALSE);
+VALUES (1, '2018-04-30T08:00:00', '2018-04-30T09:00:00', 1, 1, null, null, 600, FALSE);
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
-VALUES (2, '2018-05-10T08:00:00', '2018-05-10T09:25:00', 1, 1, 3, null, 40, TRUE );
+VALUES (2, '2018-05-10T08:00:00', '2018-05-10T09:25:00', 1, 1, null, null, 40, TRUE );
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
-VALUES (3, '2018-05-10T09:30:00', '2018-05-10T10:30:00', 1, 1, 3, null, 32, TRUE);
+VALUES (3, '2018-05-10T09:30:00', '2018-05-10T10:30:00', 1, 1, null, null, 32, TRUE);
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
-VALUES (4, '2018-05-10T09:20:00', '2018-05-10T10:20:00', 2, 2, 3, null, 26, TRUE);
+VALUES (4, '2018-05-10T09:20:00', '2018-05-10T10:20:00', 2, 2, null, null, 26, TRUE);
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
 VALUES (5, '2018-05-10T10:00:00', '2018-05-10T11:00:00', 2, 2, 3, null, 38, TRUE);

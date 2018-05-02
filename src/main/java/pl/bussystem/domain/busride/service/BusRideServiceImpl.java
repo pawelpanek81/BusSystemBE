@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
@@ -19,7 +21,9 @@ import pl.bussystem.domain.lineinfo.busline.persistence.repository.BusLineReposi
 import pl.bussystem.domain.lineinfo.schedule.persistence.entity.ScheduleEntity;
 import pl.bussystem.domain.lineinfo.schedule.persistence.repository.ScheduleRepository;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
+import pl.bussystem.domain.user.persistence.repository.AccountRepository;
 
+import java.lang.reflect.Field;
 import java.sql.Time;
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -27,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static java.util.stream.Collectors.toList;
@@ -38,6 +43,7 @@ public class BusRideServiceImpl implements BusRideService {
   private ScheduleRepository scheduleRepository;
   private TicketRepository ticketRepository;
   private BusStopService busStopService;
+  private AccountRepository accountRepository;
   private Clock clock;
   private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
 
@@ -47,12 +53,14 @@ public class BusRideServiceImpl implements BusRideService {
                             ScheduleRepository scheduleRepository,
                             TicketRepository ticketRepository,
                             BusStopService busStopService,
+                            AccountRepository accountRepository,
                             Clock clock) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
     this.scheduleRepository = scheduleRepository;
     this.ticketRepository = ticketRepository;
     this.busStopService = busStopService;
+    this.accountRepository = accountRepository;
     this.clock = clock;
   }
 
@@ -245,4 +253,91 @@ public class BusRideServiceImpl implements BusRideService {
   public Page<BusRideEntity> readInactive(Pageable pageable) {
     return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(pageable, Boolean.FALSE);
   }
+
+  @Override
+  public BusRideEntity patch(Integer id, Map<String, Object> fields) {
+    BusRideEntity busRideEntity = this.readById(id);
+
+    fields.forEach((k, v) -> {
+      Field field = ReflectionUtils.findField(BusRideEntity.class, k);
+      field.setAccessible(true);
+
+      switch (k) {
+        case "primaryDriver":
+        case "secondaryDriver":
+          v = accountRepository.findById((Integer) v).orElse(null);
+          ReflectionUtils.setField(field, busRideEntity, v);
+          break;
+        case "active":
+          ReflectionUtils.setField(field, busRideEntity, v);
+          break;
+        case "driveNettoPrice":
+          ReflectionUtils.setField(field, busRideEntity, Double.valueOf(String.valueOf(v)));
+          break;
+      }
+      field.setAccessible(false);
+    });
+
+    this.update(busRideEntity);
+    return busRideEntity;
+  }
+
+  @Override
+  public Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page) {
+    Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
+    if (type == null) {
+      if (period == null) {
+        busRides = this.read(page);
+      } else if (period.equals("week")) {
+        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
+      } else if (period.equals("month")) {
+        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
+      }
+    } else if (type.equals("active")) {
+      if (period == null) {
+        busRides = new PageImpl<>(this.readActive());
+      } else if (period.equals("week")) {
+        busRides = new PageImpl<>(this.readActive().stream()
+            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
+            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)))
+            .collect(toList()));
+      } else if (period.equals("month")) {
+        busRides = new PageImpl<>(this.readActive().stream()
+            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
+            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)))
+            .collect(toList()));
+      }
+    } else if (type.equals("inactive")) {
+      if (period == null) {
+        busRides = this.readInactive(page);
+      } else if (period.equals("week")) {
+        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
+      } else if (period.equals("month")) {
+        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
+      }
+    }
+    return busRides;
+  }
+
+  @Override
+  public Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
+    return busRideRepository
+        .findAllByStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
+            page,
+            LocalDateTime.now(),
+            localDateTime
+        );
+  }
+
+  @Override
+  public Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
+    return busRideRepository
+        .findAllByActiveAndStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
+            page,
+            Boolean.FALSE,
+            LocalDateTime.now(),
+            localDateTime
+        );
+  }
+
 }
