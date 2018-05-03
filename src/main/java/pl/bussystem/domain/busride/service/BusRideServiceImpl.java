@@ -296,19 +296,25 @@ public class BusRideServiceImpl implements BusRideService {
     } else if (type.equals("active")) {
       List<BusRideEntity> activeBusRides = this.readActive();
       if (period == null) {
-        busRides = new PageImpl<>(activeBusRides, page, activeBusRides.size());
+        int start = (int) page.getOffset();
+        int end = (start + page.getPageSize()) > activeBusRides.size() ? activeBusRides.size() : (start + page.getPageSize());
+        busRides = new PageImpl<>(activeBusRides.subList(start, end), page, activeBusRides.size());
       } else if (period.equals("week")) {
           List<BusRideEntity> weekActiveBusRides = activeBusRides.stream()
               .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
             .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)))
             .collect(toList());
-        busRides = new PageImpl<>(weekActiveBusRides, page, weekActiveBusRides.size());
+        int start = (int) page.getOffset();
+        int end = (start + page.getPageSize()) > weekActiveBusRides.size() ? weekActiveBusRides.size() : (start + page.getPageSize());
+        busRides = new PageImpl<>(weekActiveBusRides.subList(start, end), page, weekActiveBusRides.size());
       } else if (period.equals("month")) {
         List<BusRideEntity> monthActiveBusRides = activeBusRides.stream()
             .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
             .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)))
             .collect(toList());
-        busRides = new PageImpl<>(monthActiveBusRides, page, monthActiveBusRides.size());
+        int start = (int) page.getOffset();
+        int end = (start + page.getPageSize()) > monthActiveBusRides.size() ? monthActiveBusRides.size() : (start + page.getPageSize());
+        busRides = new PageImpl<>(monthActiveBusRides.subList(start, end), page, monthActiveBusRides.size());
       }
     } else if (type.equals("inactive")) {
       if (period == null) {
