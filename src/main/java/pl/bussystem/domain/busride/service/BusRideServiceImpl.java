@@ -294,18 +294,21 @@ public class BusRideServiceImpl implements BusRideService {
         busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
       }
     } else if (type.equals("active")) {
+      List<BusRideEntity> activeBusRides = this.readActive();
       if (period == null) {
-        busRides = new PageImpl<>(this.readActive());
+        busRides = new PageImpl<>(activeBusRides, page, activeBusRides.size());
       } else if (period.equals("week")) {
-        busRides = new PageImpl<>(this.readActive().stream()
-            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
+          List<BusRideEntity> weekActiveBusRides = activeBusRides.stream()
+              .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
             .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)))
-            .collect(toList()));
+            .collect(toList());
+        busRides = new PageImpl<>(weekActiveBusRides, page, weekActiveBusRides.size());
       } else if (period.equals("month")) {
-        busRides = new PageImpl<>(this.readActive().stream()
+        List<BusRideEntity> monthActiveBusRides = activeBusRides.stream()
             .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
             .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)))
-            .collect(toList()));
+            .collect(toList());
+        busRides = new PageImpl<>(monthActiveBusRides, page, monthActiveBusRides.size());
       }
     } else if (type.equals("inactive")) {
       if (period == null) {
