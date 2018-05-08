@@ -44,7 +44,7 @@ public class BusRideMapper {
           UserMapper.mapToReadUserDTO.apply(entity.getPrimaryDriver()),
           UserMapper.mapToReadUserDTO.apply(entity.getSecondaryDriver()),
           entity.getDriveNettoPrice(),
-          BusMapper.mapToReadBusDTO.apply(entity.getBus()),
+          entity.getBus() == null ? null : BusMapper.mapToReadBusDTO.apply(entity.getBus()),
           entity.getActive()
       );
 

@@ -4,13 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.mapper.BusRideMapper;
 import pl.bussystem.domain.busride.model.dto.*;
@@ -25,7 +23,6 @@ import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -116,7 +113,7 @@ class BusRideController {
           "There is no stop with ID " + to);
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
-    if (seats == null || seats < 1){
+    if (seats == null || seats < 1) {
       RestException restException = new RestException(RestExceptionCodes.INVALID_NUMBER_OF_SEATS,
           "You must specify number of seats and it have to be grater than 0");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
