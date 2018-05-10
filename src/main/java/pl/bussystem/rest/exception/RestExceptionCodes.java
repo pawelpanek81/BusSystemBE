@@ -45,6 +45,8 @@ public class RestExceptionCodes {
   public static final int NO_SUCH_RIDE_BACK = 23;
   public static final int NOT_ENOUGH_SEATS_IN_RIDE_TO = 24;
   public static final int NOT_ENOUGH_SEATS_IN_RIDE_BACK = 25;
+  public static final int BUS_HAS_ALREADY_LEFT = 26;
+  public static final int RIDE_BACK_IS_EARLIER = 27;
 
 
   /* NEWS */

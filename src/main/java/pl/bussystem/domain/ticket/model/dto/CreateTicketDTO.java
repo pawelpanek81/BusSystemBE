@@ -11,8 +11,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateTicketDTO {
-  private Integer userAccountId;
-
   @NotBlank
   private String name;
 
