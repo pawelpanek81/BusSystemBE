@@ -25,8 +25,10 @@ public class CreateTicketDTO {
   private String phone;
 
   @NotNull
-  private Double price;
+  private Integer seats;
 
   @NotNull
-  private Integer busRideId;
+  private Integer rideToId;
+
+  private Integer rideBackId;
 }
