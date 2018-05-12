@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
@@ -47,6 +48,9 @@ public class BusRideServiceImplTest {
   private LineRouteService lineRouteService;
 
   @Mock
+  private BusRepository busRepository;
+
+  @Mock
   private AccountRepository accountRepository;
 
   @Mock
@@ -57,7 +61,7 @@ public class BusRideServiceImplTest {
   @Before
   public void setUp() {
     busRideService = new BusRideServiceImpl(busRideRepository, busLineRepository, scheduleRepository,
-        tickerRepository, busStopService, accountRepository, clock);
+        tickerRepository, busStopService, accountRepository, busRepository, clock);
   }
 
   @Test

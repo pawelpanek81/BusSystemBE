@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideFromScheduleAndDatesDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.persistence.repository.BusRideRepository;
@@ -44,6 +45,7 @@ public class BusRideServiceImpl implements BusRideService {
   private TicketRepository ticketRepository;
   private BusStopService busStopService;
   private AccountRepository accountRepository;
+  private BusRepository busRepository;
   private Clock clock;
   private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
 
@@ -54,6 +56,7 @@ public class BusRideServiceImpl implements BusRideService {
                             TicketRepository ticketRepository,
                             BusStopService busStopService,
                             AccountRepository accountRepository,
+                            BusRepository busRepository,
                             Clock clock) {
     this.busRideRepository = busRideRepository;
     this.busLineRepository = busLineRepository;
@@ -61,6 +64,7 @@ public class BusRideServiceImpl implements BusRideService {
     this.ticketRepository = ticketRepository;
     this.busStopService = busStopService;
     this.accountRepository = accountRepository;
+    this.busRepository = busRepository;
     this.clock = clock;
   }
 
@@ -265,15 +269,28 @@ public class BusRideServiceImpl implements BusRideService {
       switch (k) {
         case "primaryDriver":
         case "secondaryDriver":
-          v = accountRepository.findById((Integer) v).orElse(null);
-          ReflectionUtils.setField(field, busRideEntity, v);
+          if (v == null) {
+            ReflectionUtils.setField(field, busRideEntity, null);
+          } else {
+            v = accountRepository.findById((Integer) v).orElse(null);
+            ReflectionUtils.setField(field, busRideEntity, v);
+          }
           break;
         case "active":
+          if (v == null) throw new IllegalArgumentException();
           ReflectionUtils.setField(field, busRideEntity, v);
           break;
         case "driveNettoPrice":
+          if (v == null) throw new IllegalArgumentException();
           ReflectionUtils.setField(field, busRideEntity, Double.valueOf(String.valueOf(v)));
           break;
+        case "bus":
+          if (v == null) {
+            ReflectionUtils.setField(field, busRideEntity, null);
+          } else {
+            v = busRepository.findById((Integer) v).orElse(null);
+            ReflectionUtils.setField(field, busRideEntity, v);
+          }
       }
       field.setAccessible(false);
     });
