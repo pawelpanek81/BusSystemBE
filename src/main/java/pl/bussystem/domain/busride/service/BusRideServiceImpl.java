@@ -349,4 +349,27 @@ public class BusRideServiceImpl implements BusRideService {
         );
   }
 
+  public Page<BusRideEntity> readCustom(Pageable pageable,
+                                        String type,
+                                        String period,
+                                        Integer lineId) {
+    Boolean active = null;
+    LocalDateTime after = null;
+    LocalDateTime before = null;
+    if (type != null && type.equals("active")) {
+      active = Boolean.TRUE;
+    } else if (type != null && type.equals("inactive")) {
+      active = Boolean.FALSE;
+    }
+    if (period != null && period.equals("week")) {
+      after = LocalDateTime.now();
+      before = after.plusWeeks(1);
+    } else if (period != null && period.equals("month")) {
+      after = LocalDateTime.now();
+      before = after.plusMonths(1);
+    }
+
+    return busRideRepository.findAllByQuery(pageable, active, after, before, lineId);
+  }
+
 }

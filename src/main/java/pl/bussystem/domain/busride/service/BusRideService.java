@@ -42,4 +42,6 @@ public interface BusRideService {
   Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
 
   Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
+
+  Page<BusRideEntity> readCustom(Pageable pageable, String type, String period, Integer lineId);
 }
