@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -254,11 +253,6 @@ public class BusRideServiceImpl implements BusRideService {
   }
 
   @Override
-  public Page<BusRideEntity> readInactive(Pageable pageable) {
-    return busRideRepository.findAllByActiveOrderByStartDateTimeAsc(pageable, Boolean.FALSE);
-  }
-
-  @Override
   public BusRideEntity patch(Integer id, Map<String, Object> fields) {
     BusRideEntity busRideEntity = this.readById(id);
 
@@ -299,73 +293,6 @@ public class BusRideServiceImpl implements BusRideService {
     return busRideEntity;
   }
 
-  @Override
-  public Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page) {
-    Page<BusRideEntity> busRides = new PageImpl<>(new ArrayList<>());
-    if (type == null) {
-      if (period == null) {
-        busRides = this.read(page);
-      } else if (period.equals("week")) {
-        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
-      } else if (period.equals("month")) {
-        busRides = this.readBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
-      }
-    } else if (type.equals("active")) {
-      List<BusRideEntity> activeBusRides = this.readActive();
-      if (period == null) {
-        int start = (int) page.getOffset();
-        int end = (start + page.getPageSize()) > activeBusRides.size() ? activeBusRides.size() : (start + page.getPageSize());
-        busRides = new PageImpl<>(activeBusRides.subList(start, end), page, activeBusRides.size());
-      } else if (period.equals("week")) {
-          List<BusRideEntity> weekActiveBusRides = activeBusRides.stream()
-              .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
-            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusWeeks(1)))
-            .collect(toList());
-        int start = (int) page.getOffset();
-        int end = (start + page.getPageSize()) > weekActiveBusRides.size() ? weekActiveBusRides.size() : (start + page.getPageSize());
-        busRides = new PageImpl<>(weekActiveBusRides.subList(start, end), page, weekActiveBusRides.size());
-      } else if (period.equals("month")) {
-        List<BusRideEntity> monthActiveBusRides = activeBusRides.stream()
-            .filter(br -> br.getStartDateTime().isAfter(LocalDateTime.now()))
-            .filter(br -> br.getStartDateTime().isBefore(LocalDateTime.now().plusMonths(1)))
-            .collect(toList());
-        int start = (int) page.getOffset();
-        int end = (start + page.getPageSize()) > monthActiveBusRides.size() ? monthActiveBusRides.size() : (start + page.getPageSize());
-        busRides = new PageImpl<>(monthActiveBusRides.subList(start, end), page, monthActiveBusRides.size());
-      }
-    } else if (type.equals("inactive")) {
-      if (period == null) {
-        busRides = this.readInactive(page);
-      } else if (period.equals("week")) {
-        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusWeeks(1));
-      } else if (period.equals("month")) {
-        busRides = this.readInactiveBeforeDateAndAfterNow(page, LocalDateTime.now().plusMonths(1));
-      }
-    }
-    return busRides;
-  }
-
-  @Override
-  public Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
-    return busRideRepository
-        .findAllByStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
-            page,
-            LocalDateTime.now(),
-            localDateTime
-        );
-  }
-
-  @Override
-  public Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime) {
-    return busRideRepository
-        .findAllByActiveAndStartDateTimeAfterAndStartDateTimeBeforeOrderByStartDateTimeAsc(
-            page,
-            Boolean.FALSE,
-            LocalDateTime.now(),
-            localDateTime
-        );
-  }
-
   public Page<BusRideEntity> readCustom(Pageable pageable,
                                         String type,
                                         String period,
@@ -386,7 +313,7 @@ public class BusRideServiceImpl implements BusRideService {
       before = after.plusMonths(1);
     }
 
-    return busRideRepository.findAllByQuery(pageable, active, after, before, lineId);
+    return busRideRepository.findAllByQuery(active, after, before, lineId, pageable);
   }
 
 }
