@@ -11,8 +11,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateTicketDTO {
-  private Integer userAccountId;
-
   @NotBlank
   private String name;
 
@@ -25,8 +23,10 @@ public class CreateTicketDTO {
   private String phone;
 
   @NotNull
-  private Double price;
+  private Integer seats;
 
   @NotNull
-  private Integer busRideId;
+  private Integer rideToId;
+
+  private Integer rideBackId;
 }
