@@ -65,7 +65,7 @@ public class PayController {
     try {
       Notification notification = objectMapper.readValue(request.getBody(), Notification.class);
       paymentService.consumeNotification(notification, request);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return new ResponseEntity<>(HttpStatus.OK);
