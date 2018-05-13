@@ -6,10 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,8 @@ import pl.bussystem.security.payment.model.payu.oauth.authorization.Authenticati
 import pl.bussystem.security.payment.model.payu.orders.create.request.OrderCreateRequest;
 import pl.bussystem.security.payment.model.payu.orders.create.response.OrderCreateResponse;
 import pl.bussystem.security.payment.model.payu.orders.notification.Notification;
+import pl.bussystem.security.payment.persistence.entity.OrderEntity;
+import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 import pl.bussystem.security.payment.rest.API;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +30,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -38,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
   private AuthenticationResponse authResponse;
   private LocalDateTime lastSuccessfullyAuthDateTime;
   private TicketService ticketService;
+  private OrderRepository orderRepository;
   private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
   @Getter
@@ -73,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Autowired
-  public PaymentServiceImpl(Credentials credentials, TicketService ticketService) {
+  public PaymentServiceImpl(Credentials credentials, TicketService ticketService, OrderRepository orderRepository) {
     this.credentials = credentials;
     try {
       lastSuccessfullyAuthDateTime = LocalDateTime.now();
@@ -85,6 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
       this.lastSuccessfullyAuthDateTime = null;
     }
     this.ticketService = ticketService;
+    this.orderRepository = orderRepository;
   }
 
   @Override
@@ -136,6 +138,7 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info("Setting paid flag on ticketReturn");
         ticketService.makeTicketPaid(returnTicketId);
       }
+      orderRepository.deleteById(notification.getOrder().getExtOrderId());
       logger.info("Setting paid flag done.");
     }
   }
@@ -190,6 +193,13 @@ public class PaymentServiceImpl implements PaymentService {
 
   @Override
   public ResponseEntity<OrderCreateResponse> payForATicket(OrderCreateRequest orderCreateRequest) {
+    Optional<OrderEntity> order = orderRepository.findById(orderCreateRequest.getExtOrderId());
+    if (order.isPresent()) {
+      HttpHeaders headers = new HttpHeaders();
+      headers.add("Location", order.get().getURL());
+      return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
     if (!this.isAuthenticatedSuccessfully() || this.isAuthenticationTokenExpired()) {
       this.renewAuthentication();
     }
@@ -202,6 +212,13 @@ public class PaymentServiceImpl implements PaymentService {
     RestTemplate restTemplate = new RestTemplate();
     HttpEntity<?> request = new HttpEntity<>(orderCreateRequest, headers);
 
-    return restTemplate.postForEntity(API.ORDERS_URL, request, OrderCreateResponse.class);
+    ResponseEntity<OrderCreateResponse> orderCreateResponseResponseEntity = restTemplate.postForEntity(API.ORDERS_URL, request, OrderCreateResponse.class);
+
+    orderRepository.save(new OrderEntity(
+        orderCreateResponseResponseEntity.getBody().getExtOrderId(),
+        orderCreateResponseResponseEntity.getHeaders().getLocation().toString()
+    ));
+
+    return orderCreateResponseResponseEntity;
   }
 }
