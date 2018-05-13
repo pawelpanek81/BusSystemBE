@@ -33,13 +33,7 @@ public interface BusRideService {
 
   List<BusRideEntity> readActive();
 
-  Page<BusRideEntity> readInactive(Pageable pageable);
-
   BusRideEntity patch(Integer id, Map<String, Object> fields);
 
-  Page<BusRideEntity> getBusRidesPagesByTypeAndPeriod(String type, String period, Pageable page);
-
-  Page<BusRideEntity> readBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
-
-  Page<BusRideEntity> readInactiveBeforeDateAndAfterNow(Pageable page, LocalDateTime localDateTime);
+  Page<BusRideEntity> readCustom(Pageable pageable, String type, String period, Integer lineId);
 }

@@ -61,13 +61,13 @@ class BusRideController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  ResponseEntity<Page<ReadBusRideDTO>> readAll(@RequestParam(value = "type", required = false) String type,
-                                               @RequestParam(value = "period", required = false) String period,
-                                               Pageable page) {
+  ResponseEntity<Page<ReadBusRideDTO>> readCustom(@RequestParam(value = "type", required = false) String type,
+                                                  @RequestParam(value = "period", required = false) String period,
+                                                  @RequestParam(value = "lineId", required = false) Integer lineId,
+                                                  Pageable page) {
 
-    Page<BusRideEntity> busRides = busRideService.getBusRidesPagesByTypeAndPeriod(type, period, page);
+    Page<BusRideEntity> busRides = busRideService.readCustom(page, type, period, lineId);
     Page<ReadBusRideDTO> dtos = busRides.map(BusRideMapper.mapToReadBusRideDTO);
-
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
