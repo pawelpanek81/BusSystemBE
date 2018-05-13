@@ -130,7 +130,7 @@ public class PaymentServiceImpl implements PaymentService {
 
       String[] ticketIds = extOrderId.split(",");
       Integer departureTicketId = Integer.valueOf(ticketIds[0]);
-      Integer returnTicketId = ticketIds.length > 1 ? Integer.valueOf(ticketIds[1]) : null;
+      Integer returnTicketId = ticketIds.length > 2 ? Integer.valueOf(ticketIds[1]) : null;
 
       logger.info("Setting paid flag on ticketDestination");
       ticketService.makeTicketPaid(departureTicketId);
