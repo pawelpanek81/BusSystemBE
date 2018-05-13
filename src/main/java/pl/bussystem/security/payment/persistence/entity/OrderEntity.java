@@ -19,6 +19,6 @@ public class OrderEntity {
   @Column(name = "order_id", nullable = false)
   private String orderId;
 
-  @Column(name = "url", nullable = false)
+  @Column(name = "url", nullable = false, length = 5000)
   private String URL;
 }
