@@ -213,12 +213,3 @@ VALUES (7, '2018-05-10T08:00:00', '2018-05-10T09:00:00', 3, 2, 3, null, 55, TRUE
 INSERT INTO public.bus_rides(
   id, start_date_time, end_date_time, bus, bus_line, primary_driver, secondary_driver, drive_netto_price, active)
 VALUES (8, '2018-05-11T08:00:00', '2018-05-10T09:00:00', 1, 1, 3, null, 55, TRUE);
-
-
--- EXPERIMENTAL TICKETS
-INSERT INTO public.tickets(
-  id, date_time, email, name, paid, phone, price, seats, surname, bus_ride, user_account)
-VALUES (3000, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, 1, 'Kowalski', 1, null);
-INSERT INTO public.tickets(
-  id, date_time, email, name, paid, phone, price, seats, surname, bus_ride, user_account)
-VALUES (3001, '2018-04-20T12:00:00', 'test@test.pl', 'Jan', false, '123-123-123', 30.15, 1, 'Kowalski', 1, null);
