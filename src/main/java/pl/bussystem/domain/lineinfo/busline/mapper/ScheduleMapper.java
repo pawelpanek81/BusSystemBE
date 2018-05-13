@@ -12,6 +12,7 @@ public class ScheduleMapper {
           entity.getId(),
           entity.getCode(),
           entity.getStartHour(),
+          entity.getDriveNettoPrice(),
           entity.getEnabled()
       );
 }
