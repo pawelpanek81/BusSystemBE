@@ -243,8 +243,9 @@ public class BusRideServiceImpl implements BusRideService {
 
   @Override
   public Double calculateTicketPrice(BusRideEntity busRideEntity, BusStopEntity stopFrom, BusStopEntity stopTo) {
-    /* need calculator logix */
-    return busRideEntity.getDriveNettoPrice() / busRideEntity.getBus().getSeats();
+    return Math.round(
+        busRideEntity.getDriveNettoPrice() / busRideEntity.getBus().getSeats() * 100
+    ) / 100.0;
   }
 
   @Override
