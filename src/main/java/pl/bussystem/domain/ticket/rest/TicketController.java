@@ -11,6 +11,7 @@ import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
 import pl.bussystem.domain.ticket.mapper.TicketMapper;
 import pl.bussystem.domain.ticket.model.dto.CreateTicketsOrderDTO;
+import pl.bussystem.domain.ticket.model.dto.CreatedTicketIdsDTO;
 import pl.bussystem.domain.ticket.model.dto.ReadAvailableTicketsDTO;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.service.TicketService;
@@ -53,8 +54,9 @@ class TicketController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
-  ResponseEntity<RestException> buyTicket(@RequestBody @Valid CreateTicketsOrderDTO dto,
+  ResponseEntity<?> buyTicket(@RequestBody @Valid CreateTicketsOrderDTO dto,
                                           Principal principal) {
+    CreatedTicketIdsDTO returnedDTO = new CreatedTicketIdsDTO();
     AccountEntity accountEntity = null;
     try {
       accountEntity = accountService.findAccountByPrincipal(principal);
@@ -101,11 +103,13 @@ class TicketController {
         return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
       }
 
-      ticketService.create(ticketBack);
+      TicketEntity backTicketEntity = ticketService.create(ticketBack);
+      returnedDTO.setBackTicket(backTicketEntity.getId());
     }
-    ticketService.create(ticketTo);
+    TicketEntity toTicketEntity = ticketService.create(ticketTo);
+    returnedDTO.setToTicket(toTicketEntity.getId());
 
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(returnedDTO, HttpStatus.CREATED);
   }
 
 
