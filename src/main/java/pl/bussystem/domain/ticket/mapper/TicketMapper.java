@@ -58,6 +58,8 @@ public class TicketMapper {
         .price(singlePrice * dto.getSeats())
         .seats(dto.getSeats())
         .busRide(ride)
+        .fromBusStop(from)
+        .destBusStop(destination)
         .paid(Boolean.FALSE)
         .build();
 
