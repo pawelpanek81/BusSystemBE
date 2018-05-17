@@ -111,6 +111,7 @@ class TicketController {
 
   @RequestMapping(value = "-of-user", method = RequestMethod.GET)
   ResponseEntity<List<ReadTicketDTO>> readByPrincipal(Principal principal) {
+    if (principal == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     List<ReadTicketDTO> dtos = ticketService.read().stream()
         .filter(ticketEntity -> ticketEntity.getUserAccount()
             .equals(accountService.findAccountByPrincipal(principal)))
