@@ -57,8 +57,6 @@ public class PayController {
     } catch (RestClientException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    HttpHeaders headers = response.getHeaders();
-    headers.add("Access-Control-Allow-Origin", "*");
     return response;
   }
 
