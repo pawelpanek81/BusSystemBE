@@ -26,6 +26,7 @@ import static pl.bussystem.security.payment.rest.API.PAYMENTS_NOTIFY_URL;
 
 @Component
 public class OrderCreateRequestMapper {
+  private static final String ORDER_SUFFIX = ",prod_v1";
   private PaymentServiceImpl.Credentials credentials;
   private TicketService ticketService;
   private static final Logger logger = LoggerFactory.getLogger(OrderCreateRequestMapper.class);
@@ -118,7 +119,7 @@ public class OrderCreateRequestMapper {
     String externalOrderId =
         ticketFrom.get().getId().toString() +
         ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("")
-        + ",dev_2";
+        + ORDER_SUFFIX;
 
     return OrderCreateRequest.builder()
         .extOrderId(externalOrderId)

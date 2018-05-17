@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
   List<TicketEntity> findByBusRide(BusRideEntity busRideEntity);
+  List<TicketEntity> findAllByPaid(Boolean paid);
 }
