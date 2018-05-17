@@ -29,6 +29,7 @@ public class OrderController {
 
   @RequestMapping(value = "", method = RequestMethod.GET)
   ResponseEntity<List<ReadOrderDTO>> readUserOrders(Principal principal) {
+    if (principal == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     List<ReadOrderDTO> dtos = orderService
         .readByAccountEntity(accountService.findAccountByPrincipal(principal))
         .stream()
