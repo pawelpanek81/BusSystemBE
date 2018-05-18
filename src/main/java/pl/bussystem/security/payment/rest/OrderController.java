@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/v1.0/tickets")
+@RequestMapping("api/v1.0/orders")
 public class OrderController {
   private OrderService orderService;
   private AccountService accountService;
