@@ -18,11 +18,13 @@ import pl.bussystem.domain.busstop.mapper.BusStopMapper;
 import pl.bussystem.domain.busstop.model.dto.ReadBusStopDTO;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.busstop.service.BusStopService;
-import pl.bussystem.domain.user.persistence.repository.AccountRepository;
+import pl.bussystem.domain.user.persistence.entity.AccountEntity;
+import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,18 +38,18 @@ import java.util.stream.Collectors;
 class BusRideController {
   private BusRideService busRideService;
   private BusRideMapper busRideMapper;
-  private AccountRepository accountRepository;
+  private AccountService accountService;
   private BusStopService busStopService;
   private static final Logger logger = LoggerFactory.getLogger(BusRideController.class);
 
   @Autowired
   public BusRideController(BusRideService busRideService,
                            BusRideMapper busRideMapper,
-                           AccountRepository accountRepository,
+                           AccountService accountService,
                            BusStopService busStopService) {
     this.busRideService = busRideService;
     this.busRideMapper = busRideMapper;
-    this.accountRepository = accountRepository;
+    this.accountService = accountService;
     this.busStopService = busStopService;
   }
 
@@ -141,4 +143,22 @@ class BusRideController {
     return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides, stopFromDTO, stopToDTO), HttpStatus.OK);
   }
 
+  @RequestMapping(value = "/byDriver", method = RequestMethod.GET)
+  ResponseEntity<List<ReadAssignedRideDTO>> readRidesAssignedToLoggedDriver(Principal principal) {
+    if (principal == null) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+    String userType = accountService.getUserType(principal.getName());
+    AccountEntity account = accountService.getUserByUsername(principal.getName());
+    if (userType.equals("DRIVER")) {
+      List<BusRideEntity> entities = busRideService.readFuture();
+      List<ReadAssignedRideDTO> result = entities.stream()
+          .filter(br -> br.getPrimaryDriver() != null && br.getPrimaryDriver().equals(account) ||
+              br.getSecondaryDriver() != null && br.getSecondaryDriver().equals(account))
+          .map(BusRideMapper.mapToReadAssignedRideDTO)
+          .collect(Collectors.toList());
+
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+  }
 }

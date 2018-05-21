@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface BusRideRepository extends JpaRepository<BusRideEntity, Integer> {
   List<BusRideEntity> findAllByActiveOrderByStartDateTimeAsc(Boolean active);
+  List<BusRideEntity> findAllByStartDateTimeAfterOrderByStartDateTimeAsc(LocalDateTime startDateTime);
   Page<BusRideEntity> findAllByOrderByStartDateTimeAsc(Pageable pageable);
 
   @Query("select br from BusRideEntity br where " +

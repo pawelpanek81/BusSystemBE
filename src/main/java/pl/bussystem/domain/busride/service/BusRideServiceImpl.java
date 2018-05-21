@@ -316,4 +316,9 @@ public class BusRideServiceImpl implements BusRideService {
     return busRideRepository.findAllByQuery(active, after, before, lineId, pageable);
   }
 
+  @Override
+  public List<BusRideEntity> readFuture() {
+    return busRideRepository.findAllByStartDateTimeAfterOrderByStartDateTimeAsc(LocalDateTime.now());
+  }
+
 }
