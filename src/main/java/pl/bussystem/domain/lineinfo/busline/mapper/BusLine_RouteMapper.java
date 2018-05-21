@@ -6,7 +6,7 @@ import pl.bussystem.domain.lineinfo.lineroute.persistence.entity.LineRouteEntity
 
 import java.util.function.Function;
 
-public class RouteMapper {
+public class BusLine_RouteMapper {
 
   public static Function<? super LineRouteEntity, ? extends ReadRouteDTO> mapToReadLineRouteDTO =
       entity -> new ReadRouteDTO(
