@@ -197,6 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
     if (order.isPresent()) {
       HttpHeaders headers = new HttpHeaders();
       headers.add("Location", order.get().getURL());
+      headers.add("Access-Control-Allow-Origin", "*");
       return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
@@ -218,7 +219,8 @@ public class PaymentServiceImpl implements PaymentService {
         orderCreateResponseResponseEntity.getBody().getExtOrderId(),
         orderCreateResponseResponseEntity.getHeaders().getLocation().toString()
     ));
-
+    orderCreateResponseResponseEntity.getHeaders()
+        .add("Access-Control-Allow-Origin", "*");
     return orderCreateResponseResponseEntity;
   }
 }
