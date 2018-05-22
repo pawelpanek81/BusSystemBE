@@ -49,7 +49,6 @@ public class BusRideMapper {
           entity.getActive()
       );
 
-
   public static Function<? super BusRideEntity, ? extends ReadAssignedRideDTO> mapToReadAssignedRideDTO =
       entity -> new ReadAssignedRideDTO(
           entity.getStartDateTime(),
@@ -60,13 +59,13 @@ public class BusRideMapper {
           entity.getBus() == null ? null : BusMapper.mapToReadBusDTO.apply(entity.getBus())
       );
 
-  public static BusTripSearchDTO mapToBusTripSearchDTO(BusRideEntity entity, Double price) {
+  public static BusTripSearchDTO mapToBusTripSearchDTO(BusRideEntity entity, Double price, Integer seats) {
     return new BusTripSearchDTO(
         entity.getId(),
         entity.getBusLine().getId(),
         entity.getStartDateTime(),
         entity.getEndDateTime(),
-        price
+        price * seats
     );
   }
 

@@ -128,7 +128,7 @@ class BusRideController {
         .readActiveRidesFromToWhereEnoughtSeats(stopFrom, stopTo, departureDate,
             seats, LocalDateTime.now())
         .stream()
-        .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopFrom, stopTo)))
+        .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopFrom, stopTo), seats))
         .collect(Collectors.toList());
 
     List<BusTripSearchDTO> returnRides = new ArrayList<>();
@@ -137,7 +137,7 @@ class BusRideController {
           .readActiveRidesFromToWhereEnoughtSeats(stopTo, stopFrom, returnDate,
               seats, departureRides.get(0).getEndDateTime())
           .stream()
-          .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopTo, stopFrom)))
+          .map(entity -> BusRideMapper.mapToBusTripSearchDTO(entity, busRideService.calculateTicketPrice(entity, stopTo, stopFrom), seats))
           .collect(Collectors.toList());
     }
     return new ResponseEntity<>(new BusJourneySearchDTO(departureRides, returnRides, stopFromDTO, stopToDTO), HttpStatus.OK);

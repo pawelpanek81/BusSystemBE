@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadTicketDTO {
+public class ReadAvailableTicketsDTO {
   private Integer id;
   private ReadUserDTO userAccount;
   private String name;
