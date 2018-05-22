@@ -2,6 +2,7 @@ package pl.bussystem.domain.ticket.persistence.entity;
 
 import lombok.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 
 import javax.persistence.*;
@@ -51,6 +52,14 @@ public class TicketEntity {
   @ManyToOne(optional = false)
   @JoinColumn(name = "bus_ride", nullable = false)
   private BusRideEntity busRide;
+
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "from_bus_stop_id")
+  private BusStopEntity fromBusStop;
+
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "dest_bus_stop_id")
+  private BusStopEntity destBusStop;
 
   @Column(name = "paid", nullable = false)
   private Boolean paid;

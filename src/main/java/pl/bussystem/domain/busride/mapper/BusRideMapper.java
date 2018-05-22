@@ -48,13 +48,13 @@ public class BusRideMapper {
           entity.getActive()
       );
 
-  public static BusTripSearchDTO mapToBusTripSearchDTO (BusRideEntity entity, Double price) {
+  public static BusTripSearchDTO mapToBusTripSearchDTO (BusRideEntity entity, Double price, Integer seats) {
     return new BusTripSearchDTO(
         entity.getId(),
         entity.getBusLine().getId(),
         entity.getStartDateTime(),
         entity.getEndDateTime(),
-        price
+        price * seats
     );
   }
 
