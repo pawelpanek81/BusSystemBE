@@ -197,12 +197,6 @@ public class PaymentServiceImpl implements PaymentService {
     if (order.isPresent()) {
       HttpHeaders headers = new HttpHeaders();
       headers.add("Location", order.get().getURL());
-      headers.add("Access-Control-Allow-Origin", "*");
-      headers.add("Access-Control-Allow-Credentials", "true");
-      headers.add("Access-Control-Allow-Methods", "POST");
-      headers.add("Access-Control-Max-Age", "3600");
-      headers.add("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Origin, Content-Type, Version");
-      headers.add("Access-Control-Expose-Headers", "X-Requested-With, Authorization, Origin, Content-Type");
       return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 

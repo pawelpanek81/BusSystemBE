@@ -30,7 +30,13 @@ class AccountServiceImpl implements AccountService {
 
   @Override
   public AccountEntity create(AccountEntity accountEntity) {
-    return accountRepository.save(accountEntity);
+    AccountEntity account = accountRepository.save(accountEntity);
+    AuthorityEntity authority = AuthorityEntity.builder()
+        .account(account)
+        .authority("ROLE_USER")
+        .build();
+    authorityRepository.save(authority);
+    return account;
   }
 
   @Override
