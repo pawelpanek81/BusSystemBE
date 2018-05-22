@@ -197,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
     if (order.isPresent()) {
       HttpHeaders headers = new HttpHeaders();
       headers.add("Location", order.get().getURL());
-      return new ResponseEntity<>(headers, HttpStatus.FOUND);
+      return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     if (!this.isAuthenticatedSuccessfully() || this.isAuthenticationTokenExpired()) {
@@ -218,6 +218,11 @@ public class PaymentServiceImpl implements PaymentService {
         orderCreateResponseResponseEntity.getBody().getExtOrderId(),
         orderCreateResponseResponseEntity.getHeaders().getLocation().toString()
     ));
-    return orderCreateResponseResponseEntity;
+
+    HttpHeaders responseHeader = new HttpHeaders();
+    responseHeader.add("Location",
+        orderCreateResponseResponseEntity.getHeaders().getLocation().toString()
+    );
+    return new ResponseEntity<>(responseHeader, HttpStatus.OK);
   }
 }
