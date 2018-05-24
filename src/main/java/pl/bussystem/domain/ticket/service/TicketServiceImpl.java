@@ -7,24 +7,29 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
+import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.security.payment.persistence.entity.OrderEntity;
 import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketServiceImpl implements TicketService {
   private static final int FIVE_MINUTES_IN_MILLISECONDS = 1000 * 60 * 5;
   private TicketRepository ticketRepository;
   private OrderRepository orderRepository;
+  private AccountService accountService;
   private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
   @Autowired
   public TicketServiceImpl(TicketRepository ticketRepository,
-                           OrderRepository orderRepository) {
+                           OrderRepository orderRepository,
+                           AccountService accountService) {
     this.ticketRepository = ticketRepository;
     this.orderRepository = orderRepository;
   }
@@ -37,6 +42,15 @@ public class TicketServiceImpl implements TicketService {
   @Override
   public List<TicketEntity> read() {
     return ticketRepository.findAll();
+  }
+
+  @Override
+  public List<TicketEntity> readUserTickets(Principal principal) {
+    return this.read().stream()
+        .filter(ticketEntity -> ticketEntity.getUserAccount() != null)
+        .filter(ticketEntity -> ticketEntity.getUserAccount().equals(accountService.findAccountByPrincipal(principal)))
+        .filter(ticketEntity -> ticketEntity.getPaid().equals(true))
+        .collect(Collectors.toList());
   }
 
   @Override
