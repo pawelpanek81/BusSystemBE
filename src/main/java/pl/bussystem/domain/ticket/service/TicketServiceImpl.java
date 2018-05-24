@@ -7,6 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
+import pl.bussystem.security.payment.persistence.entity.OrderEntity;
+import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,11 +19,14 @@ import java.util.Optional;
 public class TicketServiceImpl implements TicketService {
   private static final int FIVE_MINUTES_IN_MILISECONDS = 1000 * 60 * 5;
   private TicketRepository ticketRepository;
+  private OrderRepository orderRepository;
   private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
   @Autowired
-  public TicketServiceImpl(TicketRepository ticketRepository) {
+  public TicketServiceImpl(TicketRepository ticketRepository,
+                           OrderRepository orderRepository) {
     this.ticketRepository = ticketRepository;
+    this.orderRepository = orderRepository;
   }
 
   @Override
@@ -56,10 +61,19 @@ public class TicketServiceImpl implements TicketService {
   public void removeNotPayedTickets() {
     logger.info("Removing not payed tickets " + LocalDateTime.now() + "...");
     List<TicketEntity> tickets = ticketRepository.findAllByPaid(Boolean.FALSE);
+    List<OrderEntity> orders = orderRepository.findAll();
 
     for (TicketEntity ticket : tickets) {
       if (LocalDateTime.now().isAfter(ticket.getDateTime().plusHours(1))) {
         ticketRepository.delete(ticket);
+
+        logger.info("Removing not payed orders " + LocalDateTime.now() + "...");
+        for (OrderEntity order : orders) {
+          String[] splittedId = order.getOrderId().split(",");
+          if (splittedId[0].equals(ticket.getId().toString())) {
+            orderRepository.delete(order);
+          }
+        }
       }
     }
   }
