@@ -15,8 +15,10 @@ public class OrderServiceImpl implements OrderService {
   private OrderRepository orderRepository;
   private TicketRepository ticketRepository;
 
-  public OrderServiceImpl(OrderRepository orderRepository) {
+  public OrderServiceImpl(OrderRepository orderRepository,
+                          TicketRepository ticketRepository) {
     this.orderRepository = orderRepository;
+    this.ticketRepository = ticketRepository;
   }
 
   @Override
@@ -24,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     return orderRepository.findAll().stream()
         .filter(orderEntity -> ticketRepository
             .findById(Integer.parseInt(orderEntity.getOrderId().split(",")[0]))
+            .filter(ticketEntity -> ticketEntity.getUserAccount() != null)
             .map(ticketEntity -> ticketEntity.getUserAccount().equals(accountEntity))
             .orElse(false))
         .collect(Collectors.toList());
