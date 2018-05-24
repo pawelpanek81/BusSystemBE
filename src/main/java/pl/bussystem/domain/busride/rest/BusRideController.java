@@ -144,13 +144,9 @@ class BusRideController {
   }
 
   @RequestMapping(value = "/byDriver", method = RequestMethod.GET)
+  @Secured(value = {"ROLE_DRIVER"})
   ResponseEntity<List<ReadAssignedRideDTO>> readRidesAssignedToLoggedDriver(Principal principal) {
-    if (principal == null) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
-    String userType = accountService.getUserType(principal.getName());
     AccountEntity account = accountService.getUserByUsername(principal.getName());
-    if (userType.equals("DRIVER")) {
       List<BusRideEntity> entities = busRideService.readFuture();
       List<ReadAssignedRideDTO> result = entities.stream()
           .filter(br -> br.getPrimaryDriver() != null && br.getPrimaryDriver().equals(account) ||
@@ -159,6 +155,5 @@ class BusRideController {
           .collect(Collectors.toList());
 
       return new ResponseEntity<>(result, HttpStatus.OK);
-    } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
   }
 }
