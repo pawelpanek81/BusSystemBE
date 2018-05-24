@@ -118,6 +118,7 @@ class TicketController {
     List<ReadAvailableTicketsDTO> dtos = ticketService.read().stream()
         .filter(ticketEntity -> ticketEntity.getUserAccount()
             .equals(accountService.findAccountByPrincipal(principal)))
+        .filter(ticketEntity -> ticketEntity.getPaid().equals(true))
         .map(TicketMapper.mapToReadTicketDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(dtos, HttpStatus.OK);

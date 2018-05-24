@@ -20,11 +20,15 @@ import java.util.stream.Collectors;
 public class OrderController {
   private OrderService orderService;
   private AccountService accountService;
+  private OrderMapper orderMapper;
 
   @Autowired
-  public OrderController(OrderService orderService, AccountService accountService) {
+  public OrderController(OrderService orderService,
+                         AccountService accountService,
+                         OrderMapper orderMapper) {
     this.orderService = orderService;
     this.accountService = accountService;
+    this.orderMapper = orderMapper;
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
@@ -33,7 +37,7 @@ public class OrderController {
     List<ReadOrderDTO> dtos = orderService
         .readByAccountEntity(accountService.findAccountByPrincipal(principal))
         .stream()
-        .map(OrderMapper::mapToReadOrderDTO)
+        .map(orderMapper::mapToReadOrderDTO)
         .collect(Collectors.toList());
 
     return new ResponseEntity<>(dtos, HttpStatus.OK);
