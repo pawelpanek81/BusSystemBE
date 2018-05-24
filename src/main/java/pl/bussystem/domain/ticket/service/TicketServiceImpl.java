@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 public class TicketServiceImpl implements TicketService {
-  private static final int FIVE_MINUTES_IN_MILISECONDS = 1000 * 60 * 5;
+  private static final int FIVE_MINUTES_IN_MILLISECONDS = 1000 * 60 * 5;
   private TicketRepository ticketRepository;
   private OrderRepository orderRepository;
   private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
@@ -57,7 +57,7 @@ public class TicketServiceImpl implements TicketService {
     ticketRepository.save(ticketEntity);
   }
 
-  @Scheduled(fixedRate = FIVE_MINUTES_IN_MILISECONDS)
+  @Scheduled(fixedRate = FIVE_MINUTES_IN_MILLISECONDS)
   public void removeNotPayedTickets() {
     logger.info("Removing not payed tickets " + LocalDateTime.now() + "...");
     List<TicketEntity> tickets = ticketRepository.findAllByPaid(Boolean.FALSE);
