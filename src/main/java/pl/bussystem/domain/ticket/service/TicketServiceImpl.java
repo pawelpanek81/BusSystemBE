@@ -32,6 +32,7 @@ public class TicketServiceImpl implements TicketService {
                            AccountService accountService) {
     this.ticketRepository = ticketRepository;
     this.orderRepository = orderRepository;
+    this.accountService = accountService;
   }
 
   @Override
