@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
@@ -99,7 +101,7 @@ public class TicketServiceImpl implements TicketService {
   }
 
   @Override
-  public void createQRCode(Integer ticketId) throws Exception {
+  public String generateQRCode(Integer ticketId) throws Exception {
     Optional<TicketEntity> optionalTicket = this.readById(ticketId);
     if (!optionalTicket.isPresent()) {
       throw new Exception("There is no ticket with given id");
@@ -107,19 +109,27 @@ public class TicketServiceImpl implements TicketService {
     TicketEntity ticket = optionalTicket.get();
 
     String owner = ticket.getName() + " " + ticket.getSurname();
-    String route = ticket.getFromBusStop().getName() + " -> " + ticket.getDestBusStop().getName();
+    String route = ticket.getFromBusStop().getCity() + " - " +ticket.getFromBusStop().getName()
+        + " -> " + ticket.getDestBusStop().getCity() + " - " + ticket.getDestBusStop().getName();
     String paid = ticket.getPaid() ? "Opłacony" : "Nieopłacony";
 
-    String data = "Właściciel biletu: " + owner + "\n"
-        + "Trasa: " + route + "\n"
-        + paid;
+    String data = "Właściciel biletu: " + owner
+        + "\n" + "Trasa: " + route
+        + "\n" + "id: " + ticketId
+        + "\n" + paid;
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+    String payload = encoder.encode(data);
+    data += "\n" + "Payload: " + payload;
 
     QrCode qr0 = QrCode.encodeText(data, QrCode.Ecc.MEDIUM);
     BufferedImage img = qr0.toImage(4, 10);
+    String path = "src/main/resources/static/qr-ticket-" + ticketId + ".png";
     try {
-      ImageIO.write(img, "png", new File("qr-ticket-" + ticketId + ".png"));
+      ImageIO.write(img, "png", new File(path));
     } catch (IOException exc) {
       throw new Exception("Failed to save generated qr-code");
     }
+    return path;
   }
 }

@@ -1,12 +1,12 @@
 package pl.bussystem.domain.ticket.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
 import pl.bussystem.domain.ticket.mapper.TicketMapper;
@@ -20,6 +20,7 @@ import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
+import javax.servlet.ServletContext;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -34,13 +35,15 @@ class TicketController {
   private TicketMapper ticketMapper;
   private BusRideService busRideService;
   private AccountService accountService;
+  private ServletContext servletContext;
 
   @Autowired
-  TicketController(TicketService ticketService, TicketMapper ticketMapper, BusRideService busRideService, AccountService accountService) {
+  TicketController(TicketService ticketService, TicketMapper ticketMapper, BusRideService busRideService, AccountService accountService, ServletContext servletContext) {
     this.ticketService = ticketService;
     this.ticketMapper = ticketMapper;
     this.busRideService = busRideService;
     this.accountService = accountService;
+    this.servletContext = servletContext;
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
@@ -55,21 +58,22 @@ class TicketController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   ResponseEntity<?> buyTicket(@RequestBody @Valid CreateTicketsOrderDTO dto,
-                                          Principal principal) {
+                              Principal principal) {
     CreatedTicketIdsDTO returnedDTO = new CreatedTicketIdsDTO();
     AccountEntity accountEntity = null;
     try {
       accountEntity = accountService.findAccountByPrincipal(principal);
-    } catch (NullPointerException ignored) { }
+    } catch (NullPointerException ignored) {
+    }
     BusRideEntity rideTo;
     try {
       rideTo = busRideService.readById(dto.getRideToId());
-    } catch (NoSuchElementException exc){
+    } catch (NoSuchElementException exc) {
       RestException restException = new RestException(RestExceptionCodes.NO_SUCH_RIDE_TO,
           "There is no rideTo with given ID");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
-    if (rideTo.getStartDateTime().isBefore(LocalDateTime.now())){
+    if (rideTo.getStartDateTime().isBefore(LocalDateTime.now())) {
       RestException restException = new RestException(RestExceptionCodes.BUS_HAS_ALREADY_LEFT,
           "Bus departure time is in the past");
       return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
@@ -85,12 +89,12 @@ class TicketController {
       BusRideEntity rideBack;
       try {
         rideBack = busRideService.readById(dto.getRideBackId());
-      } catch (NoSuchElementException exc){
+      } catch (NoSuchElementException exc) {
         RestException restException = new RestException(RestExceptionCodes.NO_SUCH_RIDE_BACK,
             "There is no rideBack with given ID");
         return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
       }
-      if (!rideBack.getStartDateTime().isAfter(rideTo.getStartDateTime())){
+      if (!rideBack.getStartDateTime().isAfter(rideTo.getStartDateTime())) {
         RestException restException = new RestException(RestExceptionCodes.RIDE_BACK_IS_EARLIER,
             "Ride back is earlier");
         return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
@@ -121,11 +125,14 @@ class TicketController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "{id}", method = RequestMethod.GET)
-  ResponseEntity<?> getQRCode() {
+  @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+  ResponseEntity<byte[]> getQRCode(@PathVariable Integer id) throws Exception {
+    String path = ticketService.generateQRCode(id);
+    ClassPathResource imgFile = new ClassPathResource(path);
+    byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
 
-    return new ResponseEntity<>(HttpStatus.OK);
+    return ResponseEntity.ok()
+        .contentType(MediaType.IMAGE_PNG)
+        .body(bytes);
   }
-
-
 }
