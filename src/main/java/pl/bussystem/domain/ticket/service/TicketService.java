@@ -12,4 +12,5 @@ public interface TicketService {
   List<TicketEntity> readUserTickets(Principal principal);
   Optional<TicketEntity> readById(Integer id);
   void makeTicketPaid(Integer ticketId);
+  void createQRCode(Integer ticketId) throws Exception;
 }

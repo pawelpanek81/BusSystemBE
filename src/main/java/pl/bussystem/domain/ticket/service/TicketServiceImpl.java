@@ -8,9 +8,14 @@ import org.springframework.stereotype.Service;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 import pl.bussystem.domain.user.service.AccountService;
+import pl.bussystem.qrcodegen.QrCode;
 import pl.bussystem.security.payment.persistence.entity.OrderEntity;
 import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -90,6 +95,31 @@ public class TicketServiceImpl implements TicketService {
           }
         }
       }
+    }
+  }
+
+  @Override
+  public void createQRCode(Integer ticketId) throws Exception {
+    Optional<TicketEntity> optionalTicket = this.readById(ticketId);
+    if (!optionalTicket.isPresent()) {
+      throw new Exception("There is no ticket with given id");
+    }
+    TicketEntity ticket = optionalTicket.get();
+
+    String owner = ticket.getName() + " " + ticket.getSurname();
+    String route = ticket.getFromBusStop().getName() + " -> " + ticket.getDestBusStop().getName();
+    String paid = ticket.getPaid() ? "Opłacony" : "Nieopłacony";
+
+    String data = "Właściciel biletu: " + owner + "\n"
+        + "Trasa: " + route + "\n"
+        + paid;
+
+    QrCode qr0 = QrCode.encodeText(data, QrCode.Ecc.MEDIUM);
+    BufferedImage img = qr0.toImage(4, 10);
+    try {
+      ImageIO.write(img, "png", new File("qr-ticket-" + ticketId + ".png"));
+    } catch (IOException exc) {
+      throw new Exception("Failed to save generated qr-code");
     }
   }
 }

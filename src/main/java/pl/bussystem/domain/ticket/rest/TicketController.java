@@ -121,5 +121,11 @@ class TicketController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
+  @RequestMapping(value = "{id}", method = RequestMethod.GET)
+  ResponseEntity<?> getQRCode() {
+
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
 
 }
