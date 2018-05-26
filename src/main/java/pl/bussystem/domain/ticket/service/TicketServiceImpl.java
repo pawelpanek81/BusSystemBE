@@ -19,6 +19,7 @@ import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
@@ -122,7 +123,7 @@ public class TicketServiceImpl implements TicketService {
   }
 
   @Override
-  public String generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException {
+  public byte[] generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException {
     String[] ticketData = extractTicketData(ticketId);
     String owner = ticketData[0];
     String route = ticketData[1];
@@ -139,19 +140,16 @@ public class TicketServiceImpl implements TicketService {
 
     QrCode qr0 = QrCode.encodeText(data, QrCode.Ecc.MEDIUM);
     BufferedImage img = qr0.toImage(4, 10);
-    String path = "src/main/resources/static/qr-ticket-" + ticketId + ".png";
+    byte[] bytes;
     try {
-      ImageIO.write(img, "png", new File(path));
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ImageIO.write(img, "jpg", baos);
+      bytes = baos.toByteArray();
     } catch (IOException exc) {
-      try {
-        logger.error("Saving QR code failed! Trying one more time…");
-        ImageIO.write(img, "png", new File(path));
-      } catch (IOException innerExc) {
-        logger.error("Saving QR code failed");
-        throw new QRCodeGenerationFailedException("Failed to save generated qr-code");
-      }
+      logger.error("Saving QR code failed");
+      throw new QRCodeGenerationFailedException("Failed to save generated qr-code");
     }
-    return path;
+    return bytes;
   }
 
   @Override

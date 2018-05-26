@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
 import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
+import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.mapper.TicketMapper;
 import pl.bussystem.domain.ticket.model.dto.CreateTicketsOrderDTO;
 import pl.bussystem.domain.ticket.model.dto.CreatedTicketIdsDTO;
@@ -125,23 +126,18 @@ class TicketController {
 
   @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
   ResponseEntity<?> getQRCode(@PathVariable Integer id) throws Exception {
-    String path = "";
+    byte[] content;
     try {
-      path = ticketService.generateQRCode(id);
+      content = ticketService.generateQRCode(id);
     } catch (NoSuchTicketException exc) {
       RestException restException = new RestException(RestExceptionCodes.NO_SUCH_TICKET,
           "There is no ticket with given ID");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
 
-    FileSystemResource file = new FileSystemResource(path);
-    long fileLength = file.contentLength();
-    byte[] content = new byte[(int) fileLength];
-    IOUtils.read(file.getInputStream(), content);
-
     return ResponseEntity.ok()
         .contentType(MediaType.IMAGE_PNG)
-        .contentLength(fileLength)
+        .contentLength(content.length)
         .body(content);
   }
 
