@@ -115,7 +115,7 @@ public class TicketServiceImpl implements TicketService {
 
     String data = "Właściciel biletu: " + owner
         + "\n" + "Trasa: " + route
-        + "\n" + "id: " + ticketId
+        + "\n" + "Id: " + ticketId
         + "\n" + paid;
 
     PasswordEncoder encoder = new BCryptPasswordEncoder();

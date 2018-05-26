@@ -1,11 +1,11 @@
 package pl.bussystem.domain.ticket.rest;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
@@ -35,15 +35,13 @@ class TicketController {
   private TicketMapper ticketMapper;
   private BusRideService busRideService;
   private AccountService accountService;
-  private ServletContext servletContext;
 
   @Autowired
-  TicketController(TicketService ticketService, TicketMapper ticketMapper, BusRideService busRideService, AccountService accountService, ServletContext servletContext) {
+  TicketController(TicketService ticketService, TicketMapper ticketMapper, BusRideService busRideService, AccountService accountService) {
     this.ticketService = ticketService;
     this.ticketMapper = ticketMapper;
     this.busRideService = busRideService;
     this.accountService = accountService;
-    this.servletContext = servletContext;
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
@@ -128,11 +126,13 @@ class TicketController {
   @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
   ResponseEntity<byte[]> getQRCode(@PathVariable Integer id) throws Exception {
     String path = ticketService.generateQRCode(id);
-    ClassPathResource imgFile = new ClassPathResource(path);
-    byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
+    FileSystemResource file = new FileSystemResource(path);
+    byte[] content = new byte[(int)file.contentLength()];
+    IOUtils.read(file.getInputStream(), content);
 
     return ResponseEntity.ok()
         .contentType(MediaType.IMAGE_PNG)
-        .body(bytes);
+        .contentLength(file.contentLength())
+        .body(content);
   }
 }
