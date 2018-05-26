@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
+import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
 import pl.bussystem.domain.ticket.mapper.TicketMapper;
 import pl.bussystem.domain.ticket.model.dto.CreateTicketsOrderDTO;
 import pl.bussystem.domain.ticket.model.dto.CreatedTicketIdsDTO;
@@ -20,7 +21,6 @@ import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
-import javax.servlet.ServletContext;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -124,15 +124,45 @@ class TicketController {
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-  ResponseEntity<byte[]> getQRCode(@PathVariable Integer id) throws Exception {
-    String path = ticketService.generateQRCode(id);
+  ResponseEntity<?> getQRCode(@PathVariable Integer id) throws Exception {
+    String path = "";
+    try {
+      path = ticketService.generateQRCode(id);
+    } catch (NoSuchTicketException exc) {
+      RestException restException = new RestException(RestExceptionCodes.NO_SUCH_TICKET,
+          "There is no ticket with given ID");
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
+
     FileSystemResource file = new FileSystemResource(path);
-    byte[] content = new byte[(int)file.contentLength()];
+    long fileLength = file.contentLength();
+    byte[] content = new byte[(int) fileLength];
     IOUtils.read(file.getInputStream(), content);
 
     return ResponseEntity.ok()
         .contentType(MediaType.IMAGE_PNG)
-        .contentLength(file.contentLength())
+        .contentLength(fileLength)
         .body(content);
+  }
+
+  @RequestMapping(value = "verify", method = RequestMethod.GET)
+  ResponseEntity<?> verifyTicket(@RequestParam("owner") String owner,
+                                 @RequestParam("route") String route,
+                                 @RequestParam("ticketId") Integer ticketId,
+                                 @RequestParam("paymentStatus") String paymentStatus,
+                                 @RequestParam("payload") String payload) {
+    try {
+      if (ticketService.verifyTicket(owner, route, ticketId, paymentStatus, payload)) {
+        return new ResponseEntity<>(HttpStatus.OK);
+      } else {
+        RestException restException = new RestException(RestExceptionCodes.TICKET_VERIFICATION_FAILED,
+            "Verification failed - ticket is not valid");
+        return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
+      }
+    } catch (NoSuchTicketException exc) {
+      RestException restException = new RestException(RestExceptionCodes.NO_SUCH_TICKET,
+          "There is no ticket with given ID");
+      return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
+    }
   }
 }

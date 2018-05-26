@@ -7,6 +7,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
+import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
+import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 import pl.bussystem.domain.user.service.AccountService;
@@ -100,27 +103,39 @@ public class TicketServiceImpl implements TicketService {
     }
   }
 
-  @Override
-  public String generateQRCode(Integer ticketId) throws Exception {
+
+  private String[] extractTicketData(Integer ticketId) throws NoSuchTicketException {
     Optional<TicketEntity> optionalTicket = this.readById(ticketId);
     if (!optionalTicket.isPresent()) {
-      throw new Exception("There is no ticket with given id");
+      throw new NoSuchTicketException("There is no ticket with given id");
     }
     TicketEntity ticket = optionalTicket.get();
 
+    BusStopEntity from = ticket.getFromBusStop();
+    BusStopEntity dest = ticket.getDestBusStop();
     String owner = ticket.getName() + " " + ticket.getSurname();
-    String route = ticket.getFromBusStop().getCity() + " - " +ticket.getFromBusStop().getName()
-        + " -> " + ticket.getDestBusStop().getCity() + " - " + ticket.getDestBusStop().getName();
+    String route = from.getCity() + " - " + from.getName()
+        + " -> " + dest.getCity() + " - " + dest.getName();
     String paid = ticket.getPaid() ? "Opłacony" : "Nieopłacony";
+
+    return new String[]{owner, route, paid};
+  }
+
+  @Override
+  public String generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException {
+    String[] ticketData = extractTicketData(ticketId);
+    String owner = ticketData[0];
+    String route = ticketData[1];
+    String paid = ticketData[2];
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+    String payload = encoder.encode(owner + route + ticketId + paid);
 
     String data = "Właściciel biletu: " + owner
         + "\n" + "Trasa: " + route
         + "\n" + "Id: " + ticketId
-        + "\n" + paid;
-
-    PasswordEncoder encoder = new BCryptPasswordEncoder();
-    String payload = encoder.encode(data);
-    data += "\n" + "Payload: " + payload;
+        + "\n" + "Status pałtności: " + paid
+        + "\n" + "Payload: " + payload;
 
     QrCode qr0 = QrCode.encodeText(data, QrCode.Ecc.MEDIUM);
     BufferedImage img = qr0.toImage(4, 10);
@@ -128,8 +143,31 @@ public class TicketServiceImpl implements TicketService {
     try {
       ImageIO.write(img, "png", new File(path));
     } catch (IOException exc) {
-      throw new Exception("Failed to save generated qr-code");
+      try {
+        logger.error("Saving QR code failed! Trying one more time…");
+        ImageIO.write(img, "png", new File(path));
+      } catch (IOException innerExc) {
+        logger.error("Saving QR code failed");
+        throw new QRCodeGenerationFailedException("Failed to save generated qr-code");
+      }
     }
     return path;
+  }
+
+  @Override
+  public boolean verifyTicket(String owner, String route, Integer ticketId,
+                              String paymentStatus, String payload) throws NoSuchTicketException {
+
+    String[] ticketData = extractTicketData(ticketId);
+    String realOwner = ticketData[0];
+    String realRoute = ticketData[1];
+    String reaPaid = ticketData[2];
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+    return realOwner.equals(owner)
+        && realRoute.equals(route)
+        && reaPaid.equals(paymentStatus)
+        && encoder.matches(realOwner + realRoute + ticketId + reaPaid, payload);
+
   }
 }

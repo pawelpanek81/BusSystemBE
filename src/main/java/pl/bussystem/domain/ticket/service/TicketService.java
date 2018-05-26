@@ -1,5 +1,7 @@
 package pl.bussystem.domain.ticket.service;
 
+import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
+import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 
 import java.security.Principal;
@@ -12,5 +14,7 @@ public interface TicketService {
   List<TicketEntity> readUserTickets(Principal principal);
   Optional<TicketEntity> readById(Integer id);
   void makeTicketPaid(Integer ticketId);
-  String generateQRCode(Integer ticketId) throws Exception;
+  String generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException;
+  public boolean verifyTicket(String owner, String route, Integer ticketId,
+                              String paymentStatus, String payload) throws NoSuchTicketException;
 }
