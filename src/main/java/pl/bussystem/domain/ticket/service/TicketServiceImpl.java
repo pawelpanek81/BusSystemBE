@@ -1,5 +1,6 @@
 package pl.bussystem.domain.ticket.service;
 
+import io.nayuki.qrcodegen.QrCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,12 @@ import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 import pl.bussystem.domain.user.service.AccountService;
-import pl.bussystem.qrcodegen.QrCode;
 import pl.bussystem.security.payment.persistence.entity.OrderEntity;
 import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;

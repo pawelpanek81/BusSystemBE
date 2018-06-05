@@ -15,6 +15,6 @@ public interface TicketService {
   Optional<TicketEntity> readById(Integer id);
   void makeTicketPaid(Integer ticketId);
   byte[] generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException;
-  public boolean verifyTicket(String owner, String route, Integer ticketId,
-                              String paymentStatus, String payload) throws NoSuchTicketException;
+  boolean verifyTicket(String owner, String route, Integer ticketId,
+                       String paymentStatus, String payload) throws NoSuchTicketException;
 }
