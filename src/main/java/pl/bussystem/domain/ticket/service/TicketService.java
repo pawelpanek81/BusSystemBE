@@ -4,6 +4,7 @@ import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
 import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 
+import java.io.ByteArrayOutputStream;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,5 @@ public interface TicketService {
   byte[] generateQRCode(Integer ticketId) throws NoSuchTicketException, QRCodeGenerationFailedException;
   boolean verifyTicket(String owner, String route, Integer ticketId,
                        String paymentStatus, String payload) throws NoSuchTicketException;
+  ByteArrayOutputStream makePDF(Integer id);
 }
