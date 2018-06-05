@@ -152,7 +152,7 @@ public class BusRideServiceImpl implements BusRideService {
       LocalDate day = startDate.withFieldAdded(DurationFieldType.days(), i);
       java.time.LocalDate javaDay = java.time.LocalDate.of(day.getYear(), day.getMonthOfYear(), day.getDayOfMonth());
 
-      if (getNow().isAfter(startDateTime)) {
+      if (getNow().isAfter(LocalDateTime.of(javaDay, LocalTime.MIDNIGHT))) {
         continue;
       }
 
@@ -315,6 +315,11 @@ public class BusRideServiceImpl implements BusRideService {
     }
 
     return busRideRepository.findAllByQuery(active, after, before, lineId, pageable);
+  }
+
+  @Override
+  public List<BusRideEntity> readFuture() {
+    return busRideRepository.findAllByStartDateTimeAfterOrderByStartDateTimeAsc(LocalDateTime.now());
   }
 
 }

@@ -113,11 +113,9 @@ class TicketController {
   }
 
   @RequestMapping(value = "by-user", method = RequestMethod.GET)
-  ResponseEntity<List<ReadTicketDTO>> readByPrincipal(Principal principal) {
+  ResponseEntity<List<ReadAvailableTicketsDTO>> readByPrincipal(Principal principal) {
     if (principal == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    List<ReadTicketDTO> dtos = ticketService.read().stream()
-        .filter(ticketEntity -> ticketEntity.getUserAccount()
-            .equals(accountService.findAccountByPrincipal(principal)))
+    List<ReadAvailableTicketsDTO> dtos = ticketService.readUserTickets(principal).stream()
         .map(TicketMapper.mapToReadTicketDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(dtos, HttpStatus.OK);

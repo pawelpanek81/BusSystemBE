@@ -12,8 +12,8 @@ import pl.bussystem.domain.busstop.service.BusStopService;
 import pl.bussystem.domain.lineinfo.busline.exception.NoSuchBusStopFromException;
 import pl.bussystem.domain.lineinfo.busline.exception.NoSuchBusStopToException;
 import pl.bussystem.domain.lineinfo.busline.mapper.BusLineMapper;
-import pl.bussystem.domain.lineinfo.busline.mapper.RouteMapper;
-import pl.bussystem.domain.lineinfo.busline.mapper.ScheduleMapper;
+import pl.bussystem.domain.lineinfo.busline.mapper.BusLine_RouteMapper;
+import pl.bussystem.domain.lineinfo.busline.mapper.BusLine_ScheduleMapper;
 import pl.bussystem.domain.lineinfo.busline.model.dto.*;
 import pl.bussystem.domain.lineinfo.busline.persistence.entity.BusLineEntity;
 import pl.bussystem.domain.lineinfo.busline.service.BusLineService;
@@ -38,6 +38,7 @@ class BusLineController {
   private BusLineService busLineService;
   private LineRouteService lineRouteService;
   private ScheduleService scheduleService;
+  private BusLine_ScheduleMapper busLineScheduleMapper;
   private BusStopService busStopService;
   private BusLineMapper busLineMapper;
   private LineRouteMapper lineRouteMapper;
@@ -48,13 +49,15 @@ class BusLineController {
                            LineRouteService lineRouteService,
                            ScheduleService scheduleService,
                            BusStopService busStopService,
-                           LineRouteMapper lineRouteMapper) {
+                           LineRouteMapper lineRouteMapper,
+                           BusLine_ScheduleMapper busLineScheduleMapper) {
     this.busLineService = busLineService;
     this.busLineMapper = busLineMapper;
     this.lineRouteService = lineRouteService;
     this.scheduleService = scheduleService;
     this.busStopService = busStopService;
     this.lineRouteMapper = lineRouteMapper;
+    this.busLineScheduleMapper = busLineScheduleMapper;
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -110,7 +113,38 @@ class BusLineController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     List<ReadRouteDTO> routes = routeEntities.stream()
-        .map(RouteMapper.mapToReadLineRouteDTO)
+        .map(BusLine_RouteMapper.mapToReadLineRouteDTO)
+        .collect(Collectors.toList());
+    return new ResponseEntity<>(routes, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{id}/all-routes", method = RequestMethod.GET)
+  ResponseEntity<List<ReadRouteDTO>> readAllRoutes(@PathVariable Integer id) {
+    List<LineRouteEntity> routeEntities;
+    try {
+      routeEntities = lineRouteService.readByBusLineId(id);
+      BusLineEntity busLineEntity = busLineService.readById(id);
+      LineRouteEntity firstRoute = new LineRouteEntity(
+          null,
+          busLineEntity,
+          busLineEntity.getFrom(),
+          null,
+          0
+      );
+      LineRouteEntity lastRoute = new LineRouteEntity(
+          null,
+          busLineEntity,
+          busLineEntity.getTo(),
+          null,
+          busLineEntity.getDriveTime()
+      );
+      routeEntities.add(0, firstRoute);
+      routeEntities.add(lastRoute);
+    } catch (NoSuchElementException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    List<ReadRouteDTO> routes = routeEntities.stream()
+        .map(BusLine_RouteMapper.mapToReadLineRouteDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(routes, HttpStatus.OK);
   }
@@ -191,9 +225,22 @@ class BusLineController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     List<ReadScheduleDTO> schedules = scheduleEntities.stream()
-        .map(ScheduleMapper.mapToReadScheduleDTO)
+        .map(BusLine_ScheduleMapper.mapToReadScheduleDTO)
         .collect(Collectors.toList());
     return new ResponseEntity<>(schedules, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "{id}/schedules", method = RequestMethod.POST)
+  ResponseEntity<?> createSchedule(@PathVariable Integer id,
+                                   @RequestBody @Valid CreateScheduleDTO dto) {
+    ScheduleEntity scheduleEntity;
+    try {
+      scheduleEntity = busLineScheduleMapper.mapToScheduleEntity(dto, id);
+    } catch (NoSuchBusLineException e) {
+      return new ResponseEntity<>(HttpStatus.CONFLICT);
+    }
+    scheduleService.create(scheduleEntity);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @RequestMapping(value = "{busLineID}/schedules/{scheduleId}", method = RequestMethod.DELETE)

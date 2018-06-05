@@ -26,7 +26,8 @@ class ScheduleController {
   private ScheduleMapper scheduleMapper;
 
   @Autowired
-  public ScheduleController(ScheduleService scheduleService, ScheduleMapper scheduleMapper) {
+  public ScheduleController(ScheduleService scheduleService,
+                            ScheduleMapper scheduleMapper) {
     this.scheduleService = scheduleService;
     this.scheduleMapper = scheduleMapper;
   }

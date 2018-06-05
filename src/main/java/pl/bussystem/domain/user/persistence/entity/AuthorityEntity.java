@@ -11,6 +11,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AuthorityEntity {
   @Id
   @SequenceGenerator(name = "authorities_generator",

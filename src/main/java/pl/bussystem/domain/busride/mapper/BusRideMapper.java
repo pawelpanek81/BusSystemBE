@@ -7,6 +7,7 @@ import pl.bussystem.domain.bus.persistence.entity.BusEntity;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
 import pl.bussystem.domain.busride.model.dto.BusTripSearchDTO;
 import pl.bussystem.domain.busride.model.dto.CreateBusRideDTO;
+import pl.bussystem.domain.busride.model.dto.ReadAssignedRideDTO;
 import pl.bussystem.domain.busride.model.dto.ReadBusRideDTO;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.lineinfo.busline.mapper.BusLineMapper;
@@ -48,7 +49,17 @@ public class BusRideMapper {
           entity.getActive()
       );
 
-  public static BusTripSearchDTO mapToBusTripSearchDTO (BusRideEntity entity, Double price, Integer seats) {
+  public static Function<? super BusRideEntity, ? extends ReadAssignedRideDTO> mapToReadAssignedRideDTO =
+      entity -> new ReadAssignedRideDTO(
+          entity.getStartDateTime(),
+          entity.getEndDateTime(),
+          BusLineMapper.mapToReadBusLineDTO.apply(entity.getBusLine()),
+          UserMapper.mapToReadUserDTO.apply(entity.getPrimaryDriver()),
+          UserMapper.mapToReadUserDTO.apply(entity.getSecondaryDriver()),
+          entity.getBus() == null ? null : BusMapper.mapToReadBusDTO.apply(entity.getBus())
+      );
+
+  public static BusTripSearchDTO mapToBusTripSearchDTO(BusRideEntity entity, Double price, Integer seats) {
     return new BusTripSearchDTO(
         entity.getId(),
         entity.getBusLine().getId(),

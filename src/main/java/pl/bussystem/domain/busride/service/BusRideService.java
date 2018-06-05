@@ -36,4 +36,6 @@ public interface BusRideService {
   BusRideEntity patch(Integer id, Map<String, Object> fields);
 
   Page<BusRideEntity> readCustom(Pageable pageable, String type, String period, Integer lineId);
+
+  List<BusRideEntity> readFuture();
 }
