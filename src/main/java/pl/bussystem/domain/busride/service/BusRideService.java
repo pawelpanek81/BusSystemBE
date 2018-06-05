@@ -38,4 +38,6 @@ public interface BusRideService {
   Page<BusRideEntity> readCustom(Pageable pageable, String type, String period, Integer lineId);
 
   List<BusRideEntity> readFuture();
+
+  void removeInActive();
 }

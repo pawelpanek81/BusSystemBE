@@ -1,8 +1,6 @@
 package pl.bussystem.domain.ticket.rest;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.bussystem.domain.busride.persistence.entity.BusRideEntity;
 import pl.bussystem.domain.busride.service.BusRideService;
 import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
-import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.mapper.TicketMapper;
 import pl.bussystem.domain.ticket.model.dto.CreateTicketsOrderDTO;
 import pl.bussystem.domain.ticket.model.dto.CreatedTicketIdsDTO;
@@ -23,6 +20,7 @@ import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
 
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -160,5 +158,20 @@ class TicketController {
           "There is no ticket with given ID");
       return new ResponseEntity<>(restException, HttpStatus.NOT_FOUND);
     }
+  }
+
+  @RequestMapping(value = "pdf/{id}", method = RequestMethod.GET)
+  ResponseEntity<byte[]> pdf(@PathVariable Integer id) {
+    ByteArrayOutputStream os;
+    try {
+      os = ticketService.makePDF(id);
+    } catch (NoSuchTicketException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_PDF)
+        .contentLength(os.size())
+        .body(os.toByteArray());
   }
 }

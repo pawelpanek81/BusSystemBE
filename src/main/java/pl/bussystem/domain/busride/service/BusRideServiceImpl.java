@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import pl.bussystem.domain.bus.persistence.repository.BusRepository;
@@ -47,6 +48,8 @@ public class BusRideServiceImpl implements BusRideService {
   private BusRepository busRepository;
   private Clock clock;
   private static final Logger logger = LoggerFactory.getLogger(BusRideServiceImpl.class);
+  private static final int FIVE_MINUTES_IN_MILLISECONDS = 1000 * 60 * 5;
+
 
   @Autowired
   public BusRideServiceImpl(BusRideRepository busRideRepository,
@@ -272,6 +275,9 @@ public class BusRideServiceImpl implements BusRideService {
           }
           break;
         case "active":
+          if (busRideEntity.getStartDateTime().isBefore(LocalDateTime.now())) {
+            break;
+          }
           if (v == null) throw new IllegalArgumentException();
           ReflectionUtils.setField(field, busRideEntity, v);
           break;
@@ -320,6 +326,24 @@ public class BusRideServiceImpl implements BusRideService {
   @Override
   public List<BusRideEntity> readFuture() {
     return busRideRepository.findAllByStartDateTimeAfterOrderByStartDateTimeAsc(LocalDateTime.now());
+  }
+
+  @Override
+  public void removeInActive() {
+    List<BusRideEntity> all = busRideRepository.findAllByActiveOrderByStartDateTimeAsc(false);
+    all.forEach(ride -> busRideRepository.delete(ride));
+  }
+
+  @Scheduled(fixedRate = FIVE_MINUTES_IN_MILLISECONDS)
+  public void removeNotActivatedAndPastRides() {
+    logger.info("Removing past and not activated bus rides... " + LocalDateTime.now());
+    List<BusRideEntity> notActiveBusRides = busRideRepository.findAllByActiveOrderByStartDateTimeAsc(false);
+    for (BusRideEntity busRide : notActiveBusRides) {
+      if (busRide.getStartDateTime().isBefore(LocalDateTime.now())) {
+
+        busRideRepository.delete(busRide);
+      }
+    }
   }
 
 }
