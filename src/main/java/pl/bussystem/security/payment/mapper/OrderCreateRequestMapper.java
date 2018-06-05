@@ -65,60 +65,62 @@ public class OrderCreateRequestMapper {
   }
 
   public OrderCreateRequest createOrder(PaymentDTO paymentDTO, HttpServletRequest req) {
-    Optional<TicketEntity> ticketFrom = ticketService.readById(paymentDTO.getDepartureTicket().getTicketId());
-    Optional<TicketEntity> ticketTo = Optional.empty();
-    if (paymentDTO.getReturnTicket() != null) {
-      ticketTo = ticketService.readById(paymentDTO.getReturnTicket().getTicketId());
+    TicketDTO receivedDepartureTicket = paymentDTO.getDepartureTicket();
+    TicketDTO receivedReturnTicket = paymentDTO.getReturnTicket();
+    Optional<TicketEntity> expectedDepartureTicket = ticketService.readById(receivedDepartureTicket.getTicketId());
+    Optional<TicketEntity> expectedReturnTicket = Optional.empty();
+    if (receivedReturnTicket != null) {
+      expectedReturnTicket = ticketService.readById(receivedReturnTicket.getTicketId());
     }
 
-    if (!ticketFrom.isPresent()) {
-      logger.error("Ticket with id: " + paymentDTO.getDepartureTicket().getTicketId() + " does not exists");
+    if (!expectedDepartureTicket.isPresent()) {
+      logger.error("Ticket with id: " + receivedDepartureTicket.getTicketId() + " does not exists");
       throw new NoSuchElementException("Ticket with id: " +
-          paymentDTO.getDepartureTicket().getTicketId() + " does not exists");
+          receivedDepartureTicket.getTicketId() + " does not exists");
     }
 
-    if (ticketFrom.get().getPaid() || (ticketTo.isPresent() && ticketTo.get().getPaid())) {
+    if (expectedDepartureTicket.get().getPaid() || (expectedReturnTicket.isPresent() && expectedReturnTicket.get().getPaid())) {
       logger.error("One of the ticket is alreaty paid");
       throw new RuntimeException("One of the ticket is already paid");
     }
 
-    if (!ticketFrom.get().getPrice().equals(Double.valueOf(paymentDTO.getDepartureTicket().getTicketPrice()))) {
+    if (!expectedDepartureTicket.get().getPrice().equals(Double.valueOf(receivedDepartureTicket.getTicketPrice()))) {
       logger.error("Invalid `departure ticket` price");
       throw new RuntimeException("Invalid `departure ticket` price");
     }
-    if (ticketTo.isPresent() && !ticketTo.get().getPrice().equals(Double.valueOf(paymentDTO.getReturnTicket().getTicketPrice()))) {
-      logger.error("Invalid `return ticket` to price");
+    if (expectedReturnTicket.isPresent() && !expectedReturnTicket.get().getPrice().equals(Double.valueOf(receivedReturnTicket.getTicketPrice()))) {
+      logger.error("Invalid `return ticket` to price; oczekuję: " + expectedReturnTicket.get().getPrice() + " otrzymuję " + receivedReturnTicket.getTicketPrice());
       throw new RuntimeException("Invalid `return ticket` to price");
     }
 
-    if (!ticketFrom.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
+    if (!expectedDepartureTicket.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
       logger.error("Invalid ticket to number of passengers");
       throw new RuntimeException("Invalid ticket to number of passengers");
     }
 
-    if (ticketTo.isPresent() && !ticketTo.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
+    if (expectedReturnTicket.isPresent() && !expectedReturnTicket.get().getSeats().equals(paymentDTO.getNumberOfPassengers())) {
       logger.error("Invalid ticket from number of passengers");
       throw new RuntimeException("Invalid ticket from number of passengers");
     }
 
     List<Product> products = new ArrayList<>();
     products.add(Product.builder()
-        .name("Bilet nr: " + ticketFrom.get().getId())
-        .unitPrice(convertPriceToSmallestUnit(paymentDTO.getDepartureTicket().getTicketPrice()))
+        .name("Bilet nr: " + expectedDepartureTicket.get().getId())
+        .unitPrice(convertPriceToSmallestUnit(receivedDepartureTicket.getTicketPrice()))
         .quantity(String.valueOf(1))
         .build());
 
-    ticketTo.ifPresent(ticketEntity -> products.add(
+    expectedReturnTicket.ifPresent(ticketEntity -> products.add(
         Product.builder()
             .name("Bilet nr: " + ticketEntity.getId())
-            .unitPrice(convertPriceToSmallestUnit(paymentDTO.getReturnTicket().getTicketPrice()))
+            .unitPrice(convertPriceToSmallestUnit(receivedReturnTicket.getTicketPrice()))
             .quantity(String.valueOf(1))
             .build()
     ));
 
     String externalOrderId =
-        ticketFrom.get().getId().toString() +
-        ticketTo.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("")
+        expectedDepartureTicket.get().getId().toString() +
+        expectedReturnTicket.map(ticketEntity -> "," + ticketEntity.getId().toString()).orElse("")
         + ORDER_SUFFIX;
 
     return OrderCreateRequest.builder()
@@ -127,15 +129,15 @@ public class OrderCreateRequestMapper {
         .continueUrl(PAYMENTS_CONTINUE_URL)
         .customerIp(req.getRemoteAddr())
         .merchantPosId(credentials.getPos_id())
-        .description(ticketTo.isPresent() ? "Sprzedaż biletów" : "Sprzedaż biletu")
+        .description(expectedReturnTicket.isPresent() ? "Sprzedaż biletów" : "Sprzedaż biletu")
         .currencyCode("PLN")
         .totalAmount(this.getTotalAmount(paymentDTO))
         .buyer(
             Buyer.builder()
-                .email(ticketFrom.get().getEmail())
-                .phone(ticketFrom.get().getPhone()) // optional
-                .firstName(ticketFrom.get().getName()) // optional
-                .lastName(ticketFrom.get().getSurname()) // optional
+                .email(expectedDepartureTicket.get().getEmail())
+                .phone(expectedDepartureTicket.get().getPhone()) // optional
+                .firstName(expectedDepartureTicket.get().getName()) // optional
+                .lastName(expectedDepartureTicket.get().getSurname()) // optional
                 .language("pl") // optional
                 .build())
         .settings(
