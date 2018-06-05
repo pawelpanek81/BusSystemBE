@@ -156,4 +156,16 @@ class BusRideController {
 
       return new ResponseEntity<>(result, HttpStatus.OK);
   }
+
+  @RequestMapping(value = "", method = RequestMethod.DELETE)
+  @Secured(value = {"ROLE_ADMIN"})
+  ResponseEntity<?> removeNotActive(@RequestParam("type") String type) {
+    if (type.equals("inactive")) {
+      busRideService.removeInActive();
+      return new ResponseEntity<>(HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }

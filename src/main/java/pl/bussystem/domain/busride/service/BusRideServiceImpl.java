@@ -328,6 +328,12 @@ public class BusRideServiceImpl implements BusRideService {
     return busRideRepository.findAllByStartDateTimeAfterOrderByStartDateTimeAsc(LocalDateTime.now());
   }
 
+  @Override
+  public void removeInActive() {
+    List<BusRideEntity> all = busRideRepository.findAllByActiveOrderByStartDateTimeAsc(false);
+    all.forEach(ride -> busRideRepository.delete(ride));
+  }
+
   @Scheduled(fixedRate = FIVE_MINUTES_IN_MILLISECONDS)
   public void removeNotActivatedAndPastRides() {
     logger.info("Removing past and not activated bus rides... " + LocalDateTime.now());
