@@ -19,4 +19,5 @@ public interface TicketService {
   boolean verifyTicket(String owner, String route, Integer ticketId,
                        String paymentStatus, String payload) throws NoSuchTicketException;
   ByteArrayOutputStream makePDF(Integer id);
+  void sendTicketMail(Integer id);
 }

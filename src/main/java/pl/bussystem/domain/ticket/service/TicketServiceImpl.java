@@ -2,21 +2,28 @@ package pl.bussystem.domain.ticket.service;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import io.nayuki.qrcodegen.QrCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import pl.bussystem.domain.busstop.persistence.entity.BusStopEntity;
 import pl.bussystem.domain.ticket.exception.NoSuchTicketException;
 import pl.bussystem.domain.ticket.exception.QRCodeGenerationFailedException;
 import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 import pl.bussystem.domain.user.service.AccountService;
+import pl.bussystem.email.EmailSender;
 import pl.bussystem.security.payment.persistence.entity.OrderEntity;
 import pl.bussystem.security.payment.persistence.repository.OrderRepository;
 
@@ -37,15 +44,21 @@ public class TicketServiceImpl implements TicketService {
   private TicketRepository ticketRepository;
   private OrderRepository orderRepository;
   private AccountService accountService;
+  private final EmailSender emailSender;
+  private final TemplateEngine templateEngine;
   private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
   @Autowired
   public TicketServiceImpl(TicketRepository ticketRepository,
                            OrderRepository orderRepository,
-                           AccountService accountService) {
+                           AccountService accountService,
+                           EmailSender emailSender,
+                           TemplateEngine templateEngine) {
     this.ticketRepository = ticketRepository;
     this.orderRepository = orderRepository;
     this.accountService = accountService;
+    this.emailSender = emailSender;
+    this.templateEngine = templateEngine;
   }
 
   @Override
@@ -182,11 +195,6 @@ public class TicketServiceImpl implements TicketService {
     Document document = new Document();
 
     try {
-      document.addAuthor("JanuszPol");
-      document.addCreationDate();
-      document.addCreator("JanuszPol System");
-      document.addTitle("Bilet nr: " + id);
-      document.addSubject("Bilet PDF");
 
       Font regular = FontFactory.getFont(BaseFont.HELVETICA, BaseFont.CP1250, BaseFont.EMBEDDED, 12);
       Font bold = FontFactory.getFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1250, BaseFont.EMBEDDED, 12);
@@ -194,8 +202,11 @@ public class TicketServiceImpl implements TicketService {
       PdfWriter writer = PdfWriter.getInstance(document, os);
       document.open();
 
-      document.add(new Paragraph("JanuszPol sp. z.o.o. Janusz i Grażyna Nosacze", bold));
-      document.add(new Paragraph("\n"));
+      document.addAuthor("JanuszPol");
+      document.addCreationDate();
+      document.addCreator("JanuszPol System");
+      document.addTitle("Bilet nr: " + id);
+      document.addSubject("Bilet PDF");
 
       {
         Paragraph p = new Paragraph("Bilet nr: ", bold);
@@ -296,7 +307,18 @@ public class TicketServiceImpl implements TicketService {
         document.add(new Jpeg(img));
       }
 
-      document.add(new Paragraph("Dziekujemy za skorzystanie z naszych usług i zapraszamy ponownie :-)"));
+      Font ffont = FontFactory.getFont(BaseFont.TIMES_ITALIC, BaseFont.CP1250, BaseFont.EMBEDDED, 10);
+      PdfContentByte cb = writer.getDirectContent();
+      Phrase header = new Phrase("JanuszPol sp. z.o.o. Janusz i Grażyna Nosacze", ffont);
+      Phrase footer = new Phrase("Dziekujemy za skorzystanie z naszych usług i zapraszamy ponownie :-)", ffont);
+      ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+          header,
+          (document.right() - document.left()) / 2 + document.leftMargin(),
+          document.top() + 10, 0);
+      ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+          footer,
+          (document.right() - document.left()) / 2 + document.leftMargin(),
+          document.bottom() - 10, 0);
 
       document.close();
       writer.close();
@@ -306,5 +328,20 @@ public class TicketServiceImpl implements TicketService {
 
     return os;
 
+  }
+
+  public void sendTicketMail(Integer id) {
+    Optional<TicketEntity> optionalTicket = this.readById(id);
+    if (!optionalTicket.isPresent()) {
+      throw new NoSuchTicketException("There is no ticket with given id");
+    }
+    TicketEntity ticket = optionalTicket.get();
+
+    Context context = new Context();
+    context.setVariable("ticketUrl", "http://www.januszpol-rest.herokuapp.com/api/v1.0/tickets/");
+    String body = templateEngine.process("sendTicket", context);
+
+    emailSender.sendEmail(ticket.getEmail(), "Bilet :: JanuszPol", body,
+        "bilet.pdf", new ByteArrayResource(this.makePDF(id).toByteArray()), MediaType.APPLICATION_PDF_VALUE);
   }
 }

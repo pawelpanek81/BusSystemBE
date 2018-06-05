@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -134,9 +135,11 @@ public class PaymentServiceImpl implements PaymentService {
 
       logger.info("Setting paid flag on ticketDestination");
       ticketService.makeTicketPaid(departureTicketId);
+      CompletableFuture.runAsync(() -> ticketService.sendTicketMail(departureTicketId));
       if (returnTicketId != null) {
         logger.info("Setting paid flag on ticketReturn");
         ticketService.makeTicketPaid(returnTicketId);
+        CompletableFuture.runAsync(() -> ticketService.sendTicketMail(returnTicketId));
       }
       orderRepository.deleteById(notification.getOrder().getExtOrderId());
       logger.info("Setting paid flag done.");
