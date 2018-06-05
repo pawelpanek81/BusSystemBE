@@ -21,9 +21,9 @@ public class OrderMapper {
 
   public ReadOrderDTO mapToReadOrderDTO(OrderEntity orderEntity) {
     String[] orderIdComponents = orderEntity.getOrderId().split(",");
-    String orderId = orderIdComponents[0] + ",";
+    String orderId = orderIdComponents[0];
     if (orderIdComponents.length > 2) {
-      orderId += orderIdComponents[1];
+      orderId += "-" + orderIdComponents[1];
     }
 
     Optional<TicketEntity> firstTicket = ticketRepository.findById(Integer.valueOf(orderIdComponents[0]));

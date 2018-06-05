@@ -96,7 +96,7 @@ class TicketController {
         return new ResponseEntity<>(restException, HttpStatus.BAD_REQUEST);
       }
 
-      TicketEntity ticketBack = ticketMapper.mapToTicketEntity(dto, accountEntity, rideTo);
+      TicketEntity ticketBack = ticketMapper.mapToTicketEntity(dto, accountEntity, rideBack);
       if (busRideService.getFreeSeats(rideBack) < ticketBack.getSeats()) {
         RestException restException = new RestException(RestExceptionCodes.NOT_ENOUGH_SEATS_IN_RIDE_BACK,
             "There is no enough seats in rideBack");
