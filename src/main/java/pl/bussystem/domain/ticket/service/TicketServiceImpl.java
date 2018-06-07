@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -103,18 +104,21 @@ public class TicketServiceImpl implements TicketService {
     logger.info("Removing not payed tickets " + LocalDateTime.now() + "...");
     List<TicketEntity> tickets = ticketRepository.findAllByPaid(Boolean.FALSE);
     List<OrderEntity> orders = orderRepository.findAll();
+    List<Integer> removedTickets = new ArrayList<>();
 
     for (TicketEntity ticket : tickets) {
       if (LocalDateTime.now().isAfter(ticket.getDateTime().plusHours(1))) {
         ticketRepository.delete(ticket);
+        removedTickets.add(ticket.getId());
+      }
+    }
 
-        logger.info("Removing not payed orders " + LocalDateTime.now() + "...");
-        for (OrderEntity order : orders) {
-          String[] splittedId = order.getOrderId().split(",");
-          if (splittedId[0].equals(ticket.getId().toString())) {
-            orderRepository.delete(order);
-          }
-        }
+    logger.info("Removing not payed orders " + LocalDateTime.now() + "...");
+    for (OrderEntity order : orders) {
+      String[] splittedId = order.getOrderId().split(",");
+
+      if (removedTickets.contains(Integer.valueOf(splittedId[0]))) {
+        orderRepository.delete(order);
       }
     }
   }

@@ -15,6 +15,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
+import pl.bussystem.domain.ticket.persistence.repository.TicketRepository;
 import pl.bussystem.domain.ticket.service.TicketService;
 import pl.bussystem.security.payment.model.dto.PaymentDTO;
 import pl.bussystem.security.payment.model.payu.oauth.authorization.AuthenticationResponse;
@@ -30,6 +32,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,6 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
   private LocalDateTime lastSuccessfullyAuthDateTime;
   private TicketService ticketService;
   private OrderRepository orderRepository;
+  private final TicketRepository ticketRepository;
   private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
   @Getter
@@ -75,7 +79,10 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Autowired
-  public PaymentServiceImpl(Credentials credentials, TicketService ticketService, OrderRepository orderRepository) {
+  public PaymentServiceImpl(Credentials credentials,
+                            TicketService ticketService,
+                            OrderRepository orderRepository,
+                            TicketRepository ticketRepository) {
     this.credentials = credentials;
     try {
       lastSuccessfullyAuthDateTime = LocalDateTime.now();
@@ -88,6 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
     this.ticketService = ticketService;
     this.orderRepository = orderRepository;
+    this.ticketRepository = ticketRepository;
   }
 
   @Override
@@ -217,10 +225,22 @@ public class PaymentServiceImpl implements PaymentService {
 
     ResponseEntity<OrderCreateResponse> orderCreateResponseResponseEntity = restTemplate.postForEntity(API.ORDERS_URL, request, OrderCreateResponse.class);
 
-    orderRepository.save(new OrderEntity(
+
+    String extOrderId = orderCreateResponseResponseEntity.getBody().getExtOrderId();
+    String[] ticketIds = extOrderId.split(",");
+    Integer departureTicketId = Integer.valueOf(ticketIds[0]);
+    Integer returnTicketId = ticketIds.length > 2 ? Integer.valueOf(ticketIds[1]) : null;
+
+    TicketEntity firstTicket = ticketRepository.findById(departureTicketId).orElseThrow(NoSuchElementException::new);
+    TicketEntity secondTicket = returnTicketId == null ? null : ticketRepository.findById(returnTicketId).orElse(null);
+
+    OrderEntity orderEntity = new OrderEntity(
         orderCreateResponseResponseEntity.getBody().getExtOrderId(),
-        orderCreateResponseResponseEntity.getHeaders().getLocation().toString()
-    ));
+        orderCreateResponseResponseEntity.getHeaders().getLocation().toString(),
+        firstTicket,
+        secondTicket
+    );
+    orderRepository.save(orderEntity);
 
     HttpHeaders responseHeader = new HttpHeaders();
     responseHeader.add("Location",
