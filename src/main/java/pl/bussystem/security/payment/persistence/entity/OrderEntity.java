@@ -1,11 +1,9 @@
 package pl.bussystem.security.payment.persistence.entity;
 
 import lombok.*;
+import pl.bussystem.domain.ticket.persistence.entity.TicketEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "orders")
@@ -21,4 +19,12 @@ public class OrderEntity {
 
   @Column(name = "url", nullable = false, length = 5000)
   private String URL;
+
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "first_ticket")
+  private TicketEntity firstTicket;
+
+  @ManyToOne()
+  @JoinColumn(name = "second_ticket")
+  private TicketEntity secondTicket;
 }
