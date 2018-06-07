@@ -115,9 +115,7 @@ public class TicketServiceImpl implements TicketService {
 
     logger.info("Removing not payed orders " + LocalDateTime.now() + "...");
     for (OrderEntity order : orders) {
-      String[] splittedId = order.getOrderId().split(",");
-
-      if (removedTickets.contains(Integer.valueOf(splittedId[0]))) {
+      if (removedTickets.contains(order.getFirstTicket().getId())) {
         orderRepository.delete(order);
       }
     }
