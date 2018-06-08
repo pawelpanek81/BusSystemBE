@@ -1,17 +1,17 @@
 package pl.bussystem.security.email.verification.service;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,11 +19,13 @@ import java.util.Objects;
 public class SendEmailService {
   private Environment env;
   private JavaMailSender mailSender;
+  private ResourceLoader resourceLoader;
 
   @Autowired
-  public SendEmailService(Environment env, JavaMailSender mailSender) {
+  public SendEmailService(Environment env, JavaMailSender mailSender, ResourceLoader resourceLoader) {
     this.env = env;
     this.mailSender = mailSender;
+    this.resourceLoader = resourceLoader;
   }
 
   public void sendEmail(MimeMessage email) {
@@ -42,10 +44,12 @@ public class SendEmailService {
       helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 
       ClassLoader classLoader = getClass().getClassLoader();
-      String filePath = Objects.requireNonNull(classLoader.getResource(templateURI)).getFile();
-      String decodedFilePath = URLDecoder.decode(filePath, "UTF-8");
-      File file = new File(decodedFilePath);
-      String data = FileUtils.readFileToString(file, "utf-8");
+
+      String data = StreamUtils.copyToString(
+          Objects.requireNonNull(resourceLoader.getResource("classpath:" + templateURI)).getInputStream(),
+          Charset.forName("UTF-8")
+      );
+
       Object[] varargs = emailTemplateVariables.toArray();
       String htmlMsg = String.format(data, varargs);
 
