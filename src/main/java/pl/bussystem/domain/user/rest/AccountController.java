@@ -14,6 +14,7 @@ import pl.bussystem.domain.user.persistence.entity.AccountEntity;
 import pl.bussystem.domain.user.service.AccountService;
 import pl.bussystem.rest.exception.RestException;
 import pl.bussystem.rest.exception.RestExceptionCodes;
+import pl.bussystem.security.email.verification.async.RegistrationCompleteEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -60,7 +61,7 @@ class AccountController {
         account.getPassword(),
         account.getEmail(),
         account.getPhone(),
-        true,
+        false,
         null
     );
 
@@ -73,9 +74,9 @@ class AccountController {
     String contextPath = request.getContextPath();  // includes leading forward slash
 
     String resultPath = scheme + "://" + serverName + ":" + serverPort + contextPath;
-//    eventPublisher.publishEvent(new RegistrationCompleteEvent(
-//        accountEntity, request.getLocale(), resultPath
-//    ));
+    eventPublisher.publishEvent(new RegistrationCompleteEvent(
+        accountEntity, request.getLocale(), resultPath
+    ));
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
